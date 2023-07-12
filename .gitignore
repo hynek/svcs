@@ -1,0 +1,12 @@
+.direnv
+.envrc
+.vscode
+__pycache__
+.coverage*
+.pytest_cache
+.mypy_cache
+dist
+t.py
+Justfile
+docs/_build
+.tox
