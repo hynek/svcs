@@ -1,3 +1,6 @@
+import contextlib
+import sys
+
 import svc_reg
 
 
@@ -16,3 +19,12 @@ con = svc_reg.Container(reg)
 # The type checker believes whatever we tell it.
 o1: object = con.get(object)
 o2: int = con.get(object)
+
+con.close()
+
+with contextlib.closing(svc_reg.Container(reg)) as con:
+    ...
+
+if sys.version_info >= (3, 10):
+    with contextlib.aclosing(svc_reg.Container(reg)) as con:
+        ...
