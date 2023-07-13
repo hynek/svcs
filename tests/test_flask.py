@@ -157,6 +157,32 @@ class TestFlask:
         assert 2 == len(container.cleanups)
         assert 0 == len(container.async_cleanups)
 
+    def test_teardown_warns_on_async_cleanups(self, container):
+        """
+        teardown() warns if there are async cleanups.
+        """
+
+        async def cleanup(svc):
+            pass
+
+        rs = svc_reg.RegisteredService(
+            Interface, lambda: Service1(), cleanup=cleanup, ping=None
+        )
+
+        container.add_cleanup(rs, rs.factory())
+
+        with pytest.warns(UserWarning) as wi:
+            teardown(None)
+
+        w = wi.pop()
+
+        assert 0 == len(wi.list)
+        assert (
+            "1 async cleanup(s) left, "
+            "but svc-reg's Flask support does not support them automatically."
+            == w.message.args[0]
+        )
+
 
 class TestInitApp:
     def test_implicit_registry(self):

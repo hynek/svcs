@@ -26,5 +26,7 @@ with contextlib.closing(svc_reg.Container(reg)) as con:
     ...
 
 if sys.version_info >= (3, 10):
-    with contextlib.aclosing(svc_reg.Container(reg)) as con:
-        ...
+
+    async def f() -> None:
+        async with contextlib.aclosing(svc_reg.Container(reg)):
+            ...
