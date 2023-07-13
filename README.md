@@ -4,13 +4,21 @@
 > ☠️ Not ready yet! ☠️
 >
 > Feedback is welcome, but everything can and will change until proclaimed stable.
+>
+> Currently only [**Flask** support](#flask) is production-ready, but details can still change.
 
 *svc-reg* is a service registry for Python that lets you register factories for certain types and then create instances of those types with life-cycle management and health checks.
 
-This allows you to store resources and their factories in one central place and access them in a consistent way.
-That enables dependency injection, simplifies testing, unifies cleanups, and allows for easy health checks across *all* resources.
+This allows you to configure and manage resources in *one central place* and access them in a consistent way.
 
-It's up to you whether you want to use thread-local global variable magic like Flask has popularized, or not.
+That:
+
+- enables **dependency injection**,
+- simplifies **testing**,
+- unifies **cleanups**,
+- and allows for **easy health** checks across *all* resources.
+
+No global mutable state necessary (but possible for extra comfort).
 
 
 ## Low-Level Core API
@@ -20,8 +28,8 @@ You're unlikely to use the core API directly, but it's good to know what's going
 *svc-reg* has two important concepts:
 
 A **`Registry`** allows to register factories for certain types.
-It's expected to live as long as you application lives.
-It's only job is to store and retrieve factories.
+It's expected to live as long as your application lives.
+Its only job is to store and retrieve factories.
 
 It is possible to register either factories or values:
 
@@ -59,7 +67,7 @@ True
 ```
 
 A container lives as long as you want the instances to live -- e.g. as long as a request lives.
-At the end the you run `container.cleanup()` to cleanup all instances that the container has created.
+At the end you run `container.cleanup()` to cleanup all instances that the container has created.
 You can use this to return database connections to a pool, et cetera.
 
 If you have async cleanup functions, use `await container.acleanup()` instead.
@@ -88,7 +96,7 @@ On the other hand, the `Container` object should live on a request-scoped object
 
 ## Flask
 
-*svc-reg* has grown from my frustration of the repetitiveness of using the `get_x` that creates an `x` and then stores it on the `g` object.
+*svc-reg* has grown from my frustration of the repetitiveness of using the `get_x` that creates an `x` and then stores it on the `g` object [pattern](https://flask.palletsprojects.com/en/latest/appcontext/#storing-data).
 
 Therefore it comes with Flask support out of the box in the form of the `svc_reg.flask` module.
 

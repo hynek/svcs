@@ -1,11 +1,10 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
+requires = ["hatchling", "hatch-vcs", "hatch-fancy-pypi-readme"]
 build-backend = "hatchling.build"
 
 
 [project]
-dynamic = ["version"]
-readme = { file = "README.md", content-type = "text/markdown" }
+dynamic = ["version", "readme"]
 name = "svc-reg"
 description = "A Service Registry for Dependency Injection"
 requires-python = ">=3.8"
@@ -39,6 +38,17 @@ Funding = "https://github.com/sponsors/hynek"
 [tool.hatch.version]
 source = "vcs"
 raw-options = { local_scheme = "no-local-version" }
+
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = "text/markdown"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+text = """\
+> **Warning**
+> ☠️ Not ready yet! ☠️
+>
+> Feedback is welcome, but everything can and will change until proclaimed stable.
+"""
 
 
 [tool.pytest.ini_options]
