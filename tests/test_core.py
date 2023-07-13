@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 
@@ -192,12 +192,17 @@ class TestContainer:
         rs2 = svc_reg.RegisteredService(
             AnotherService, svc, Mock(spec_set=["__call__"]), None
         )
+        rs3 = svc_reg.RegisteredService(
+            AnotherService, svc, AsyncMock(spec_set=["__call__"]), None
+        )
 
         container._add_instance(rs, Service())
         container._add_instance(rs2, Service())
+        container._add_instance(rs3, Service())  # overwrites  rs2
 
         assert (
-            "<Container(instantiated=2, cleanups=1, async_cleanups=0>"
+            # rs2 has been removed, but its cleanup is still there.
+            "<Container(instantiated=2, cleanups=1, async_cleanups=1>"
             == repr(container)
         )
 
