@@ -50,6 +50,11 @@ end-before = "\n<!-- end-pypi -->"
 [[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
 text = """
 
+---
+
+For now, please refer to the [GitHub README](https://github.com/hynek/svc-reg/blob/main/README.md) for latest documentation.
+
+
 ## Release Information
 
 """
