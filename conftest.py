@@ -16,7 +16,6 @@ markdown_examples = Sybil(
         MarkdownPythonCodeBlockParser(),
     ],
     patterns=['*.md'],
-    fixtures=['keep_seed']
 )
 
 rest_examples = Sybil(
@@ -25,7 +24,6 @@ rest_examples = Sybil(
         ReSTPythonCodeBlockParser(),
     ],
     patterns=['*.py'],
-    fixtures=['keep_seed']
 )
 
 pytest_collect_file = (markdown_examples+rest_examples).pytest()
