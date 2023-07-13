@@ -17,7 +17,7 @@
 **This allows you to configure and manage resources in *one central place* and access them in a *consistent* way.**
 
 The idea is that at runtime, you say, for example, "*Give me a database connection*!", and *svc-reg* will give you one, depending on how you configured it.
-If you like the [*Dependency Inversion Principle*](https://en.wikipedia.org/wiki/Dependency_inversion_principle) (aka, "*program against interfaces, not implementations*"), you would register concrete factories for abstract interfaces[^abstract].
+If you like the [*Dependency Inversion Principle*](https://en.wikipedia.org/wiki/Dependency_inversion_principle) (aka "*program against interfaces, not implementations*"), you would register concrete factories for abstract interfaces[^abstract].
 
 [^abstract]: In Python usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [Abstract Base Class](https://docs.python.org/3.11/library/abc.html).
 
