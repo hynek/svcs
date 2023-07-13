@@ -15,6 +15,10 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
  ## [Unreleased](https://github.com/hynek/svc-reg/compare/23.1.0...HEAD)
 
+### Changed
+
+- `Container.cleanup()` and `Container.acleanup` have been renamed to `close()` and `aclose*()` respectively.
+
 
 ## [23.1.0](https://github.com/hynek/svc-reg/tree/23.1.0) - 2023-07-12
 

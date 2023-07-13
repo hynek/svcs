@@ -213,7 +213,7 @@ class TestContainer:
         )
         container._add_instance(rs_cleanup, svc)
 
-        container.cleanup()
+        container.close()
 
         rs_cleanup.cleanup.assert_called_once_with(svc)
 

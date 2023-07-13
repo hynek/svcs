@@ -69,15 +69,15 @@ def teardown(exc: BaseException | None) -> None:
     The app context is torn down after the response is sent.
     """
     if has_app_context():
-        cleanup()
+        close()
 
 
-def cleanup() -> None:
+def close() -> None:
     """
     Remove container & run all registered cleanups.
     """
     if container := g.pop("svc_container", None):
-        container.cleanup()
+        container.close()
 
 
 def _ensure_req_data() -> tuple[Registry, Container]:

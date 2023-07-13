@@ -50,4 +50,4 @@ class TestAsync:
         assert 1 == len(container.async_cleanups)
         assert Service() == svc
 
-        await container.acleanup()
+        await container.aclose()

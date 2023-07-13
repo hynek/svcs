@@ -1,3 +1,4 @@
+
 # A Service Registry for Dependency Injection
 
 > **Warning**
@@ -67,10 +68,10 @@ True
 ```
 
 A container lives as long as you want the instances to live -- e.g. as long as a request lives.
-At the end you run `container.cleanup()` to cleanup all instances that the container has created.
+At the end you run `container.close()` to cleanup all instances that the container has created.
 You can use this to return database connections to a pool, et cetera.
 
-If you have async cleanup functions, use `await container.acleanup()` instead.
+If you have async cleanup functions, use `await container.aclose()` instead.
 It will run both sync and async cleanup functions.
 
 ---
@@ -184,7 +185,7 @@ def healthy() -> flask.ResponseValue:
     return {"ok": ok, "failing": failing}, code
 ```
 
-`init_app()` also installs an `teardown_appcontext()` handler that calls `cleanup()` on the container when a request is done.
+`init_app()` also installs an [`teardown_appcontext()`](http://flask.pocoo.org/docs/latest/api#flask.Flask.teardown_appcontext) handler that calls `close()` on the container when a request is done.
 
 
 ### Testing

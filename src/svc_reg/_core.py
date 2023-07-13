@@ -88,7 +88,7 @@ class Container:
         with suppress(KeyError):
             del self.instantiated[svc_type]
 
-    def cleanup(self) -> None:
+    def close(self) -> None:
         """
         Run all synchronous registered cleanups.
         """
@@ -96,13 +96,11 @@ class Container:
             rs, svc = self.cleanups.pop()
             rs.cleanup(svc)  # type: ignore[misc]
 
-    async def acleanup(self) -> None:
+    async def aclose(self) -> None:
         """
-        Run *all* registered cleanups.
-
-        This method calls ``cleanup()`` first.
+        Run *all* registered cleanups -- synchronous **and** asynchronous.
         """
-        self.cleanup()
+        self.close()
 
         while self.async_cleanups:
             rs, svc = self.async_cleanups.pop()
@@ -110,7 +108,7 @@ class Container:
 
     def get_pings(self) -> list[ServicePing]:
         """
-        Get all pingable services and bind them to *container* for cleanups.
+        Get all pingable services and bind them to ourselves for cleanups.
         """
         return [
             ServicePing(self, rs)
