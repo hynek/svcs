@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 
 from collections.abc import Callable
 from contextlib import suppress
 from typing import Any
 
 import attrs
+
+
+log = logging.getLogger(__name__)
 
 
 class ServiceNotFoundError(Exception):
@@ -94,7 +98,14 @@ class Container:
         """
         while self.cleanups:
             rs, svc = self.cleanups.pop()
-            rs.cleanup(svc)  # type: ignore[misc]
+            try:
+                rs.cleanup(svc)  # type: ignore[misc]
+            except Exception:  # noqa: PERF203, BLE001
+                log.warning(
+                    "clean up failed",
+                    exc_info=True,
+                    extra={"service": rs.name},
+                )
 
     async def aclose(self) -> None:
         """
@@ -104,7 +115,14 @@ class Container:
 
         while self.async_cleanups:
             rs, svc = self.async_cleanups.pop()
-            await rs.cleanup(svc)  # type: ignore[misc]
+            try:
+                await rs.cleanup(svc)  # type: ignore[misc]
+            except Exception:  # noqa: PERF203, BLE001
+                log.warning(
+                    "clean up failed",
+                    exc_info=True,
+                    extra={"service": rs.name},
+                )
 
     def get_pings(self) -> list[ServicePing]:
         """

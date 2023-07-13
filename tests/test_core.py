@@ -13,6 +13,10 @@ class AnotherService:
     pass
 
 
+class YetAnotherService:
+    pass
+
+
 @pytest.fixture(name="rs")
 def _rs(svc):
     return svc_reg.RegisteredService(Service, Service, None, None)
@@ -221,6 +225,40 @@ class TestContainer:
         container.close()
 
         rs_cleanup.cleanup.assert_called_once_with(svc)
+
+    @pytest.mark.asyncio()
+    async def test_clean_resilient(self, container, registry, caplog):
+        """
+        Failing cleanups are logged and ignored. They do not break the
+        cleanup process.
+        """
+        registry.register_factory(
+            Service,
+            Service,
+            cleanup=Mock(spec_set=["__call__"], side_effect=Exception),
+        )
+        registry.register_factory(
+            AnotherService,
+            AnotherService,
+            cleanup=AsyncMock(spec_set=["__call__"], side_effect=Exception),
+        )
+        last_cleanup = Mock(spec_set=["__call__"])
+        registry.register_factory(
+            YetAnotherService,
+            YetAnotherService,
+            cleanup=last_cleanup,
+        )
+
+        container.get(Service)
+        container.get(AnotherService)
+        container.get(YetAnotherService)
+
+        await container.aclose()
+
+        # Sync cleanups are run first.
+        assert "Service" == caplog.records[0].service
+        assert "AnotherService" == caplog.records[1].service
+        last_cleanup.assert_called_once()
 
 
 class TestRegisteredService:

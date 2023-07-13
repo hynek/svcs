@@ -85,6 +85,8 @@ You can use this to return database connections to a pool, et cetera.
 If you have async cleanup functions, use `await container.aclose()` instead.
 It will run both sync and async cleanup functions.
 
+Failing cleanups are logged at `warning` level but otherwise ignored.
+
 ---
 
 Additionally, each registered service may have a `ping` callable that you can use for health checks.

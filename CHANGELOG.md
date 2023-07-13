@@ -18,6 +18,8 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 ### Changed
 
 - `Container.cleanup()` and `Container.acleanup` have been renamed to `close()` and `aclose*()` respectively.
+- The clean up methods are now more resilient by catching and logging exceptions at `warning` level.
+  That means that if the first clean up method fails, the second one will still be called.
 
 
 ## [23.1.0](https://github.com/hynek/svc-reg/tree/23.1.0) - 2023-07-12
