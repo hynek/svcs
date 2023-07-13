@@ -5,13 +5,21 @@
 > **Warning**
 > ☠️ Not ready yet! ☠️
 >
-> Feedback is welcome, but everything can and will change until proclaimed stable.
+> [Feedback is very welcome](https://github.com/hynek/svc-reg/discussions), but everything can and will change until proclaimed stable.
 >
 > Currently only [**Flask** support](#flask) is production-ready, but details can still change.
+>
+> At this point, it's unclear whether this project will become a "proper Hynek project".
+> I will keep using it for my work projects, but whether this will grow beyond my personal needs depends on community interest.
 
-*svc-reg* is a service registry for Python that lets you register factories for certain types and then create instances of those types with life-cycle management and health checks.
+*svc-reg* is a [service locator](https://en.wikipedia.org/wiki/Service_locator_pattern) for Python that lets you register factories for types/interfaces and then create instances of those types with unified life-cycle management and health checks.
 
-This allows you to configure and manage resources in *one central place* and access them in a consistent way.
+**This allows you to configure and manage resources in *one central place* and access them in a *consistent* way.**
+
+The idea is that at runtime, you say, for example, "*Give me a database connection*!", and *svc-reg* will give you one, depending on how you configured it.
+If you like the [*Dependency Inversion Principle*](https://en.wikipedia.org/wiki/Dependency_inversion_principle) (aka, "*program against interfaces, not implementations*"), you would register concrete factories for abstract interfaces[^abstract].
+
+[^abstract]: In Python usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [Abstract Base Class](https://docs.python.org/3.11/library/abc.html).
 
 That:
 
@@ -20,16 +28,16 @@ That:
 - unifies **cleanups**,
 - and allows for **easy health** checks across *all* resources.
 
-No global mutable state necessary (but possible for extra comfort).
+No global mutable state is necessary – but possible for extra comfort.
 
 <!-- end-pypi -->
 
 
 ## Low-Level Core API
 
-You're unlikely to use the core API directly, but it's good to know what's going on underneath.
+You're unlikely to use the core API directly, but knowing what's happening underneath is good to dispel any concerns about magic.
 
-*svc-reg* has two important concepts:
+*svc-reg* has two essential concepts:
 
 A **`Registry`** allows to register factories for certain types.
 It's expected to live as long as your application lives.
@@ -48,7 +56,7 @@ It is possible to register either factories or values:
 
 ```
 
-The values and return values of the factories don't have to be actually instances of the type they're registered for.
+The values and return values of the factories don't have to be actual instances of the type they're registered for.
 But the types must be *hashable* because they're used as keys in a lookup dictionary.
 
 ---
@@ -70,8 +78,8 @@ True
 
 ```
 
-A container lives as long as you want the instances to live -- e.g. as long as a request lives.
-At the end you run `container.close()` to cleanup all instances that the container has created.
+A container lives as long as you want the instances to live -- e.g., as long as a request lives.
+At the end, you run `container.close()` to clean up all instances that the container has created.
 You can use this to return database connections to a pool, et cetera.
 
 If you have async cleanup functions, use `await container.aclose()` instead.
@@ -79,33 +87,35 @@ It will run both sync and async cleanup functions.
 
 ---
 
-Additionally, each registered service may have a `ping` callable that can be used in a health check.
-You can ask for all pingable registered services with `container.get_pings()`.
+Additionally, each registered service may have a `ping` callable that you can use for health checks.
+You can request all pingable registered services with `container.get_pings()`.
 This returns a list of `ServicePing` objects that currently have a name property to identify the ping and a `ping` method that instantiates the service, adds it to the cleanup list, and runs the ping.
 
-Importantly: It is possible to overwrite registered service factories later -- e.g. for testing -- **without monkey-patching**.
-You have to make sure to remove possibly cached instances from the container if you're using nested dependencies (`Container.forget_service_type()`).
+Importantly: It is possible to overwrite registered service factories later -- e.g., for testing -- **without monkey-patching**.
+You have to remove possibly cached instances from the container if you're using nested dependencies (`Container.forget_service_type()`).
 The Flask integration takes care of this for you.
+
+How to achieve this in other frameworks elegantly is TBD.
 
 ---
 
-Generally speaking, the `Registry` object should live on an application-scoped object like Flask's `app.config` object.
+Generally, the `Registry` object should live on an application-scoped object like Flask's `app.config` object.
 On the other hand, the `Container` object should live on a request-scoped object like Flask's `g` object or Pyramid's `request` object.
 
 
 > **Note**
-> The core APIs only use pure object without any global state but also without any comfort.
-> It gets more interesting when using framework-specific integrations where the life-cycle of the Container and thus services is handled automatically.
+> The core APIs only use vanilla objects without any global state but also without any comfort.
+> It gets more interesting when using framework-specific integrations where the life-cycle of the container and, thus, services is handled automatically.
 
 
 ## Flask
 
-*svc-reg* has grown from my frustration of the repetitiveness of using the `get_x` that creates an `x` and then stores it on the `g` object [pattern](https://flask.palletsprojects.com/en/latest/appcontext/#storing-data).
+*svc-reg* has grown from my frustration with the repetitiveness of using the `get_x` that creates an `x` and then stores it on the `g` object [pattern](https://flask.palletsprojects.com/en/latest/appcontext/#storing-data).
 
 Therefore it comes with Flask support out of the box in the form of the `svc_reg.flask` module.
 
 You can add support for *svc-reg* by calling `svc_reg.flask.init_app(app)` in your [*application factory*](https://flask.palletsprojects.com/en/latest/patterns/appfactories/).
-For instance to create a factory that uses an SQLAlchemy Engine to create Connections, you could do this:
+For instance, to create a factory that uses an SQLAlchemy Engine to produce connections, you could do this:
 
 ```python
 from flask import Flask
@@ -130,7 +140,7 @@ def create_app(config_filename):
     # Now, register a factory that calls `engine.connect()` if you ask for a
     # Connections and `connection.close()` on cleanup.
     # If you ask for a ping, it will run `SELECT 1` on a new connection and
-    # cleanup the connection behind itself.
+    # clean up the connection behind itself.
     engine = create_engine("postgresql://localhost")
     ping = text("SELECT 1")
     reg.register_factory(
@@ -165,7 +175,7 @@ def index():
     conn: Connection = svc_reg.flask.get(Connection)
 ```
 
-If you have an health endpoint, it could look like this:
+If you have a health endpoint, it could look like this:
 
 ```python
 @bp.get("healthy")
@@ -219,7 +229,7 @@ def test_handles_db_failure():
 
 ### Quality of Life
 
-In practice, you can simplify / beautify the code within your views by creating a `services` module that re-exports those Flask helpers.
+In practice, you can simplify/beautify the code within your views by creating a `services` module that re-exports those Flask helpers.
 
 Say this is `app/services.py`:
 
@@ -266,9 +276,9 @@ def index():
 ## Caveats
 
 One would expect the the `Container.get()` method would have a type signature like `get(type: type[T]) -> T`.
-Unfortunately, that's currently impossible, because it [precludes the usage of `Protocols` as service types](https://github.com/python/mypy/issues/4717) which would make the package pointless.
+Unfortunately, that's currently impossible because it [precludes the usage of `Protocols` as service types](https://github.com/python/mypy/issues/4717), making this package pointless.
 
-Therefore it returns `Any` and until Mypy changes its stance, you have to use it like this:
+Therefore it returns `Any`, and until Mypy changes its stance, you have to use it like this:
 
 ```python
 conn: Connection = container.get(Connection)
