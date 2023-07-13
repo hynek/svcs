@@ -43,12 +43,34 @@ raw-options = { local_scheme = "no-local-version" }
 content-type = "text/markdown"
 
 [[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
-text = """\
-> **Warning**
-> ☠️ Not ready yet! ☠️
->
-> Feedback is welcome, but everything can and will change until proclaimed stable.
+path = "README.md"
+start-after = "<!-- begin-pypi -->\n"
+end-before = "\n<!-- end-pypi -->"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+text = """
+
+## Release Information
+
 """
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+path = "CHANGELOG.md"
+start-after = "<!-- changelog follows -->"
+pattern = "\n(###.+?\n)## "
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+text = """
+---
+
+[→ Full Changelog](https://github.com/hynek/svc-reg/blob/main/CHANGELOG.md)
+
+
+"""
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+path = "README.md"
+start-at = "## Credits"
 
 
 [tool.pytest.ini_options]

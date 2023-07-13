@@ -1,3 +1,4 @@
+<!-- begin-pypi -->
 
 # A Service Registry for Dependency Injection
 
@@ -20,6 +21,8 @@ That:
 - and allows for **easy health** checks across *all* resources.
 
 No global mutable state necessary (but possible for extra comfort).
+
+<!-- end-pypi -->
 
 
 ## Low-Level Core API
