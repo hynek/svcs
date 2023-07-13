@@ -32,6 +32,32 @@ def get(svc_type: type) -> Any:
 
 
 def register_factory(
+    app: Flask,
+    svc_type: type,
+    factory: Callable,
+    *,
+    cleanup: Callable | None = None,
+    ping: Callable | None = None,
+) -> None:
+    app.config["svc_registry"].register_factory(
+        svc_type, factory, cleanup=cleanup, ping=ping
+    )
+
+
+def register_value(
+    app: Flask,
+    svc_type: type,
+    instance: object,
+    *,
+    cleanup: Callable | None = None,
+    ping: Callable | None = None,
+) -> None:
+    app.config["svc_registry"].register_value(
+        svc_type, instance, cleanup=cleanup, ping=ping
+    )
+
+
+def replace_factory(
     svc_type: type,
     factory: Callable,
     *,
@@ -44,7 +70,7 @@ def register_factory(
     registry.register_factory(svc_type, factory, cleanup=cleanup, ping=ping)
 
 
-def register_value(
+def replace_value(
     svc_type: type,
     instance: object,
     *,

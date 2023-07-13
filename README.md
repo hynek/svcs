@@ -5,9 +5,9 @@
 > **Warning**
 > ☠️ Not ready yet! ☠️
 >
-> [Feedback is very welcome](https://github.com/hynek/svc-reg/discussions), but everything can and will change until proclaimed stable.
+> This project is only public to [gather feedback](https://github.com/hynek/svc-reg/discussions), and everything can and will change until the project is proclaimed stable.
 >
-> Currently only [**Flask** support](#flask) is production-ready, but details can still change.
+> Currently only [**Flask** support](#flask) is production-ready, but  API details can still change.
 >
 > At this point, it's unclear whether this project will become a "proper Hynek project".
 > I will keep using it for my work projects, but whether this will grow beyond my personal needs depends on community interest.
@@ -29,6 +29,22 @@ That:
 - and allows for **easy health** checks across *all* resources.
 
 No global mutable state is necessary – but possible for extra comfort.
+
+The goal is to minimize your business code to:
+
+```python
+def view(request):
+    db = request.services.get(Database)
+```
+
+or even:
+
+```python
+def view():
+    db = services.get(Database)
+```
+
+The latter already works with [Flask](#flask).
 
 <!-- end-pypi -->
 
@@ -115,9 +131,17 @@ On the other hand, the `Container` object should live on a request-scoped object
 *svc-reg* has grown from my frustration with the repetitiveness of using the `get_x` that creates an `x` and then stores it on the `g` object [pattern](https://flask.palletsprojects.com/en/latest/appcontext/#storing-data).
 
 Therefore it comes with Flask support out of the box in the form of the `svc_reg.flask` module.
+It:
+
+- puts the registry into `app.config["svc_registry"]`,
+- unifies the putting and caching of services on the `g` object by putting a container into `g.svc_container`,
+- transparently retrieves them from there for you,
+- and installs a [`teardown_appcontext()`](http://flask.pocoo.org/docs/latest/api#flask.Flask.teardown_appcontext) handler that calls `close()` on the container when a request is done.
+
+---
 
 You can add support for *svc-reg* by calling `svc_reg.flask.init_app(app)` in your [*application factory*](https://flask.palletsprojects.com/en/latest/patterns/appfactories/).
-For instance, to create a factory that uses an SQLAlchemy Engine to produce connections, you could do this:
+For instance, to create a factory that uses a SQLAlchemy engine to produce connections, you could do this:
 
 ```python
 from flask import Flask
@@ -133,11 +157,7 @@ def create_app(config_filename):
 
     ##########################################################################
     # Set up the registry using Flask integration.
-    reg = svc_reg.Registry()
-    app = svc_reg.flask.init_app(app, reg)
-
-    # The registry lives in app.config["svc_registry"] now. If you don't pass it
-    # explicitly, init_app creates one for you.
+    app = svc_reg.flask.init_app(app)
 
     # Now, register a factory that calls `engine.connect()` if you ask for a
     # Connections and `connection.close()` on cleanup.
@@ -145,7 +165,9 @@ def create_app(config_filename):
     # clean up the connection behind itself.
     engine = create_engine("postgresql://localhost")
     ping = text("SELECT 1")
-    reg.register_factory(
+    svc_reg_flask.register_factory(
+        # The app argument makes it good for custom init_app() functions.
+        app,
         Connection,
         engine.connect,
         cleanup=lambda conn: conn.close(),
@@ -153,9 +175,10 @@ def create_app(config_filename):
     )
 
     # You also use svc_reg WITHIN factories:
-    reg.register_factory(
-        unit_of_work.UnitOfWork,
-        lambda: unit_of_work.UnitOfWork.from_connection(
+    svc_reg_flask.register_factory(
+        app, # <---
+        AbstractRepository,
+        lambda: Repository.from_connection(
             svc_reg.flask.get(Connection)
         ),
     )
@@ -173,14 +196,14 @@ Now you can request the `Connection` object in your views:
 
 ```python
 @app.route("/")
-def index():
+def index() -> flask.ResponseValue:
     conn: Connection = svc_reg.flask.get(Connection)
 ```
 
 If you have a health endpoint, it could look like this:
 
 ```python
-@bp.get("healthy")
+@app.get("healthy")
 def healthy() -> flask.ResponseValue:
     """
     Ping all external services.
@@ -189,7 +212,7 @@ def healthy() -> flask.ResponseValue:
     failing: list[dict[str, str]] = []
     code = 200
 
-    for svc in services.get_pings():
+    for svc in svc_reg.flask.get_pings():
         try:
             svc.ping()
             ok.append(svc.name)
@@ -200,12 +223,11 @@ def healthy() -> flask.ResponseValue:
     return {"ok": ok, "failing": failing}, code
 ```
 
-`init_app()` also installs an [`teardown_appcontext()`](http://flask.pocoo.org/docs/latest/api#flask.Flask.teardown_appcontext) handler that calls `close()` on the container when a request is done.
-
 
 ### Testing
 
-Now if you want the database to return a mock `Connection`, you can do this:
+Having a central place for all your services, makes it obvious where to mock them for testing.
+So, if you want the connection service to return a mock `Connection`, you can do this:
 
 ```python
 from unittest.mock import Mock
@@ -219,14 +241,21 @@ def test_handles_db_failure():
         conn = Mock(spec_set=Connection)
         conn.execute.side_effect = Exception("Database is down!")
 
+        #################################################
         # Overwrite the Connection factory with the Mock.
         # This is all it takes to mock the database.
-        reg_svc.flask.register_value(Connection, conn)
+        reg_svc.flask.replace_value(Connection, conn)
+        #################################################
 
         # Now, the endpoint should return a 500.
         response = app.test_client().get("/")
         assert response.status_code == 500
 ```
+
+> **Note**
+> The `replace_(factory|value)` method *requires* an application context and ensures that if a factory/value has already been created *and cached*, they're removed before the new factory/value is registered.
+>>
+> Possible situations where this can occur are Pytest fixtures where you don't control the order in which they're called.
 
 
 ### Quality of Life
@@ -242,6 +271,8 @@ from svc_reg.flask import (
     init_app,
     register_factory,
     register_value,
+    replace_factory,
+    replace_value,
 )
 
 
@@ -251,21 +282,25 @@ __all__ = [
     "init_app",
     "register_factory",
     "register_value",
+    "replace_factory",
+    "replace_value",
 ]
 ```
 
 Now you can register services in your application factory like this:
 
 ```python
-from app import services
+from your_app import services
 
-services.register_factory(Connection, ...)
+def init_app(app):
+    services.register_factory(app, Connection, ...)
+    return app
 ```
 
-And you get them in your views like this::
+And you get them in your views like this:
 
 ```python
-from app import services
+from your_app import services
 
 @app.route("/")
 def index():

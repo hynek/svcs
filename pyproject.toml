@@ -105,9 +105,7 @@ strict = true
 show_error_codes = true
 enable_error_code = ["ignore-without-code"]
 
-ignore_missing_imports = true
 allow_any_generics = true
-
 
 [[tool.mypy.overrides]]
 module = "tests.*"

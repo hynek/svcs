@@ -13,10 +13,13 @@ except ImportError:
     pytest.skip("Flask not installed", allow_module_level=True)
 
 
-@pytest.fixture(name="clean_app_ctx")
-def _clean_app_ctx(registry):
-    app = flask.Flask("tests")
+@pytest.fixture(name="app")
+def _app():
+    return flask.Flask("tests")
 
+
+@pytest.fixture(name="clean_app_ctx")
+def _clean_app_ctx(registry, app):
     svc_reg.flask.init_app(app, registry)
     with app.app_context() as ctx:
         yield ctx
@@ -55,7 +58,7 @@ class TestFlask:
         cleanup2 = Mock(return_value=None)
 
         registry.register_factory(Service1, Service1, cleanup=cleanup1)
-        svc_reg.flask.register_factory(Service2, Service2, cleanup=cleanup2)
+        svc_reg.flask.replace_factory(Service2, Service2, cleanup=cleanup2)
 
         svc1 = svc_reg.flask.get(Service1)
         svc2 = svc_reg.flask.get(Service2)
@@ -81,7 +84,7 @@ class TestFlask:
         assert isinstance(svc_reg.flask.get(Interface), Interface)
         assert [] != container.cleanups
 
-        svc_reg.flask.register_value(Interface, Service2())
+        svc_reg.flask.replace_value(Interface, Service2())
 
         assert isinstance(svc_reg.flask.get(Interface), Service2)
         assert [] == svc_reg.flask.get_pings()
@@ -91,14 +94,14 @@ class TestFlask:
         It's possible to overwrite an already registered type using a factory.
         """
 
-        svc_reg.flask.register_value(
+        svc_reg.flask.replace_value(
             Interface, Interface(), cleanup=lambda _: None, ping=lambda _: None
         )
 
         assert isinstance(svc_reg.flask.get(Interface), Interface)
         assert [] != container.cleanups
 
-        svc_reg.flask.register_factory(Interface, Service2)
+        svc_reg.flask.replace_factory(Interface, Service2)
 
         assert isinstance(svc_reg.flask.get(Interface), Service2)
         assert [] == svc_reg.flask.get_pings()
@@ -108,7 +111,7 @@ class TestFlask:
         Getting a service twice within the same request returns the same
         object.
         """
-        svc_reg.flask.register_factory(Interface, Service1)
+        svc_reg.flask.replace_factory(Interface, Service1)
 
         assert svc_reg.flask.get(Interface) is svc_reg.flask.get(Interface)
 
@@ -124,8 +127,8 @@ class TestFlask:
         """
         get_pingable returns only pingable svc_reg.
         """
-        svc_reg.flask.register_factory(Service1, Service1)
-        svc_reg.flask.register_factory(Service2, Service2, ping=lambda _: None)
+        svc_reg.flask.replace_factory(Service1, Service1)
+        svc_reg.flask.replace_factory(Service2, Service2, ping=lambda _: None)
 
         assert [Service2] == [
             ping._rs.svc_type for ping in svc_reg.flask.get_pings()
@@ -136,10 +139,10 @@ class TestFlask:
         If other svc_reg are registered, they are ignored by the cleanup
         purge.
         """
-        svc_reg.flask.register_factory(
+        svc_reg.flask.replace_factory(
             Service1, Service1, cleanup=lambda _: None
         )
-        svc_reg.flask.register_factory(
+        svc_reg.flask.replace_factory(
             Service2, Service2, cleanup=lambda _: None
         )
 
@@ -149,7 +152,7 @@ class TestFlask:
         assert 2 == len(container.cleanups)
         assert 0 == len(container.async_cleanups)
 
-        svc_reg.flask.register_factory(Service1, Interface)
+        svc_reg.flask.replace_factory(Service1, Interface)
 
         svc_reg.flask.get(Service1)
         svc_reg.flask.get(Service2)
@@ -182,6 +185,28 @@ class TestFlask:
             "but svc-reg's Flask support does not support them automatically."
             == w.message.args[0]
         )
+
+
+class TestNonContextHelpers:
+    def test_register_factory_helper(self, registry, app):
+        """
+        register_factory() registers a factory to the app that is passed.
+        """
+        svc_reg.flask.init_app(app, registry)
+
+        svc_reg.flask.register_factory(app, Interface, Service1)
+
+        assert Interface in registry.services
+
+    def test_register_value_helper(self, registry, app):
+        """
+        register_value() registers a value to the app that is passed.
+        """
+        svc_reg.flask.init_app(app, registry)
+
+        svc_reg.flask.register_value(app, Interface, 42)
+
+        assert Interface in registry.services
 
 
 class TestInitApp:
