@@ -5,9 +5,12 @@
 > **Warning**
 > ☠️ Not ready yet! ☠️
 >
-> Feedback is welcome, but everything can and will change until proclaimed stable.
+> [Feedback is very welcome](https://github.com/hynek/svc-reg/discussions), but everything can and will change until proclaimed stable.
 >
 > Currently only [**Flask** support](#flask) is production-ready, but details can still change.
+>
+> At this point it's unclear whether this project will become a "proper Hynek project".
+> I will keep using it for my work projects, but it depends on community interest whether this will grow beyond my personal needs.
 
 *svc-reg* is a service registry for Python that lets you register factories for certain types and then create instances of those types with life-cycle management and health checks.
 
