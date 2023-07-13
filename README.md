@@ -35,6 +35,7 @@ The goal is to minimize your business code to:
 ```python
 def view(request):
     db = request.services.get(Database)
+    api = request.services.get(WebAPIClient)
 ```
 
 or even:
@@ -42,6 +43,7 @@ or even:
 ```python
 def view():
     db = services.get(Database)
+    api = services.get(WebAPIClient)
 ```
 
 The latter already works with [Flask](#flask).
