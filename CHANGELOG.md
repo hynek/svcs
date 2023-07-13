@@ -13,6 +13,9 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 <!-- changelog follows -->
 
 
+ ## [Unreleased](https://github.com/hynek/svc-reg/compare/23.1.0...HEAD)
+
+
 ## [23.1.0](https://github.com/hynek/svc-reg/tree/23.1.0) - 2023-07-12
 
 - Initial release.
