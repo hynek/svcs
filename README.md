@@ -55,9 +55,10 @@ engine = create_engine("postgresql://localhost")
 
 def engine_factory():
     with engine.connect() as conn:
-        yield conn
+        yield Database(conn)
 
-svc_reg.register_factory(Database, create_database)
+registry = svc_reg.Registry()
+registry.register_factory(Database, create_database)
 ```
 
 The generator-based setup and cleanup may remind you of [Pytest fixtures](https://docs.pytest.org/en/stable/explanation/fixtures.html).
