@@ -157,6 +157,10 @@ ignore = [
   "EM101",  # no need for exception msg hygiene in tests
 ]
 
+"conftest.py" = [
+  "PT005", # we always add underscores and explicit name
+]
+
 
 [tool.ruff.isort]
 lines-between-types = 1

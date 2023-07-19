@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import Mock
 
 import pytest
 
@@ -19,29 +19,12 @@ class YetAnotherService:
 
 @pytest.fixture(name="rs")
 def _rs(svc):
-    return svc_reg.RegisteredService(Service, Service, None, None)
-
-
-@pytest.fixture(name="container")
-def _container(registry):
-    return svc_reg.Container(registry)
+    return svc_reg.RegisteredService(Service, Service, None)
 
 
 @pytest.fixture(name="svc")
 def _svc():
     return Service()
-
-
-@pytest.fixture(name="registry")
-def _registry():
-    return svc_reg.Registry()
-
-
-def nop_cleanup(svc):
-    pass
-
-
-# class TestRegistry:
 
 
 class TestContainer:
@@ -71,7 +54,7 @@ class TestContainer:
         """
         Asking for a service that isn't registered raises a ServiceNotFoundError.
         """
-        with pytest.raises(svc_reg.ServiceNotFoundError) as ei:
+        with pytest.raises(svc_reg.exceptions.ServiceNotFoundError) as ei:
             container.get(Service)
 
         assert Service is ei.value.args[0]
@@ -93,47 +76,6 @@ class TestContainer:
             ping._rs.svc_type for ping in container.get_pings()
         ]
 
-    def test_add_get_instance_cleanup(self, container, svc):
-        """
-        _add_instance adds the service with its cleanup to the container and
-        get_instance retrieves it.
-        """
-        rs = svc_reg.RegisteredService(Service, Service, nop_cleanup, None)
-
-        container._add_instance(rs, svc)
-
-        assert svc is container._get_instance(rs.svc_type)
-        assert [(rs, svc)] == container.cleanups
-
-    def test_add_get_instance_no_cleanup(self, container, svc, rs):
-        """
-        _add_instance adds the service with its cleanup to the container and
-        get_instance retrieves it.
-        """
-        container._add_instance(rs, svc)
-
-        assert svc is container._get_instance(rs.svc_type)
-        assert [] == container.cleanups
-
-    def test_add_cleanup_added(self, container, svc):
-        """
-        If the registered service has a cleanup, it is added to the cleanup
-        and add_cleanup returns True.
-        """
-
-        rs = svc_reg.RegisteredService(Service, Service, nop_cleanup, None)
-
-        assert container.add_cleanup(rs, svc)
-        assert [(rs, svc)] == container.cleanups
-
-    def test_add_cleanup_not_added(self, container, rs, svc):
-        """
-        If the registered service has no cleanup, it's not added and
-        add_cleanup returns False.
-        """
-        assert False is container.add_cleanup(rs, svc)
-        assert [] == container.cleanups
-
     def test_forget_service_type_nothing_registered(self, container):
         """
         forget_service_type does nothing if nothing has been registered.
@@ -144,87 +86,56 @@ class TestContainer:
         """
         forget_service_type removes the registered service from the container.
         """
-        container._add_instance(rs, svc)
+        container.instantiated[rs.svc_type] = (rs, svc)
 
         container.forget_service_type(Service)
 
         assert {} == container.instantiated
         assert [] == container.cleanups
 
-    def test_forget_service_type_with_cleanup(self, container, svc):
-        """
-        forget_service_type removes the registered service from the container.
-        """
-        rs = svc_reg.RegisteredService(
-            Service, svc, Mock(spec_set=["__call__"]), None
-        )
-        container._add_instance(rs, svc)
-
-        container.forget_service_type(Service)
-
-        assert {} == container.instantiated
-
-    def test_forget_service_type_is_ok_with_other_registrations(
-        self, container, registry
-    ):
-        """
-        If other svc_reg are registered, they are ignored by the cleanup
-        purge.
-        """
-        registry.register_factory(Service, Service, cleanup=lambda _: None)
-        registry.register_factory(
-            AnotherService, AnotherService, cleanup=lambda _: None
-        )
-
-        container.get(Service)
-        container.get(AnotherService)
-
-        assert 2 == len(container.cleanups)
-
-        container.forget_service_type(Service)
-        registry.register_value(Service, object(), cleanup=nop_cleanup)
-
-        container.get(Service)
-        container.get(AnotherService)
-
-        assert 3 == len(container.cleanups)
-
-    def test_repr(self, container, rs, svc):
+    @pytest.mark.asyncio()
+    async def test_repr(self, registry, container):
         """
         The repr counts correctly.
         """
-        rs2 = svc_reg.RegisteredService(
-            AnotherService, svc, Mock(spec_set=["__call__"]), None
-        )
-        rs3 = svc_reg.RegisteredService(
-            AnotherService, svc, AsyncMock(spec_set=["__call__"]), None
-        )
 
-        container._add_instance(rs, Service())
-        container._add_instance(rs2, Service())
-        container._add_instance(rs3, Service())  # overwrites  rs2
+        def factory():
+            yield 42
+
+        async def async_factory():
+            yield 42
+
+        registry.register_factory(Service, factory)
+        registry.register_factory(AnotherService, async_factory)
+
+        container.get(Service)
+        await container.aget(AnotherService)
 
         assert (
-            # rs2 has been removed, but its cleanup is still there.
-            "<Container(instantiated=2, cleanups=1, async_cleanups=1>"
+            "<Container(instantiated=2, cleanups=1, async_cleanups=1)>"
             == repr(container)
         )
 
-    def test_cleanup_called(self, container, rs):
+    def test_cleanup_called(self, registry, container, rs):
         """
         Services that have a cleanup have them called on cleanup.
         """
-        container._add_instance(rs, Service())
+        cleaned_up = False
 
-        svc = AnotherService()
-        rs_cleanup = svc_reg.RegisteredService(
-            AnotherService, AnotherService, Mock(spec_set=["__call__"]), None
-        )
-        container._add_instance(rs_cleanup, svc)
+        def factory():
+            nonlocal cleaned_up
+            yield 42
+            cleaned_up = True
+
+        registry.register_factory(Service, factory)
+
+        container.get(Service)
+
+        assert not cleaned_up
 
         container.close()
 
-        rs_cleanup.cleanup.assert_called_once_with(svc)
+        assert cleaned_up
 
     @pytest.mark.asyncio()
     async def test_clean_resilient(self, container, registry, caplog):
@@ -232,33 +143,64 @@ class TestContainer:
         Failing cleanups are logged and ignored. They do not break the
         cleanup process.
         """
-        registry.register_factory(
-            Service,
-            Service,
-            cleanup=Mock(spec_set=["__call__"], side_effect=Exception),
-        )
-        registry.register_factory(
-            AnotherService,
-            AnotherService,
-            cleanup=AsyncMock(spec_set=["__call__"], side_effect=Exception),
-        )
-        last_cleanup = Mock(spec_set=["__call__"])
-        registry.register_factory(
-            YetAnotherService,
-            YetAnotherService,
-            cleanup=last_cleanup,
-        )
 
-        container.get(Service)
-        container.get(AnotherService)
-        container.get(YetAnotherService)
+        def factory():
+            yield 1
+            raise Exception
+
+        async def async_factory():
+            yield 2
+            raise Exception
+
+        cleaned_up = False
+
+        async def factory_no_boom():
+            nonlocal cleaned_up
+
+            yield 3
+
+            cleaned_up = True
+
+        registry.register_factory(Service, factory)
+        registry.register_factory(AnotherService, async_factory)
+        registry.register_factory(YetAnotherService, factory_no_boom)
+
+        assert 1 == container.get(Service)
+        assert 2 == await container.aget(AnotherService)
+        assert 3 == await container.aget(YetAnotherService)
+
+        assert not cleaned_up
 
         await container.aclose()
 
         # Sync cleanups are run first.
         assert "Service" == caplog.records[0].service
         assert "AnotherService" == caplog.records[1].service
-        last_cleanup.assert_called_once()
+        assert cleaned_up
+
+    def test_warns_if_generator_does_not_stop_after_cleanup(
+        self, registry, container
+    ):
+        """
+        If a generator doesn't stop after cleanup, a warning is emitted.
+        """
+
+        def factory():
+            yield Service()
+            yield 42
+
+        registry.register_factory(Service, factory)
+
+        container.get(Service)
+
+        with pytest.warns(UserWarning) as wi:
+            container.close()
+
+        assert (
+            "clean up for <RegisteredService("
+            "svc_type=tests.test_core.Service, has_ping=False)> "
+            "didn't stop iterating" == wi.pop().message.args[0]
+        )
 
 
 class TestRegisteredService:
@@ -268,7 +210,7 @@ class TestRegisteredService:
         """
 
         assert (
-            "<RegisteredService(svc_type=tests.test_core.Service, has_cleanup=False, has_ping=False)>"
+            "<RegisteredService(svc_type=tests.test_core.Service, has_ping=False)>"
         ) == repr(rs)
 
     def test_name(self, rs):
@@ -287,23 +229,30 @@ class TestServicePing:
 
         assert "Service" == svc_reg.ServicePing(None, rs).name
 
-    def test_ping(self):
+    def test_ping(self, registry, container):
         """
         Calling ping instantiates the service using its factory, appends it to
         the cleanup list, and calls the service's ping method.
         """
 
-        svc = Service()
-        rs = svc_reg.RegisteredService(
-            Service,
-            lambda: svc,
-            Mock(spec_set=["__call__"]),
-            Mock(spec_set=["__call__"]),
-        )
-        container = svc_reg.Container(svc_reg.Registry())
-        svc_ping = svc_reg.ServicePing(container, rs)
+        cleaned_up = False
+
+        def factory():
+            nonlocal cleaned_up
+            yield Service()
+            cleaned_up = True
+
+        ping = Mock(spec_set=["__call__"])
+        registry.register_factory(Service, factory, ping=ping)
+
+        (svc_ping,) = container.get_pings()
 
         svc_ping.ping()
 
-        rs.ping.assert_called_once_with(svc)
-        assert [(rs, svc)] == container.cleanups
+        ping.assert_called_once()
+
+        assert not cleaned_up
+
+        container.close()
+
+        assert cleaned_up

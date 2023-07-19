@@ -1,22 +1,18 @@
 from __future__ import annotations
 
-import asyncio
 import logging
+import warnings
 
 from collections.abc import Callable
 from contextlib import suppress
-from typing import Any
+from typing import Any, AsyncGenerator, Generator
 
 import attrs
 
+from .exceptions import ServiceNotFoundError
+
 
 log = logging.getLogger(__name__)
-
-
-class ServiceNotFoundError(Exception):
-    """
-    Raised when a service type is not registered.
-    """
 
 
 @attrs.define
@@ -27,16 +23,16 @@ class Container:
 
     registry: Registry
     instantiated: dict[type, object] = attrs.Factory(dict)
-    cleanups: list[tuple[RegisteredService, object]] = attrs.Factory(list)
-    async_cleanups: list[tuple[RegisteredService, object]] = attrs.Factory(
-        list
-    )
+    cleanups: list[tuple[RegisteredService, Generator]] = attrs.Factory(list)
+    async_cleanups: list[
+        tuple[RegisteredService, AsyncGenerator]
+    ] = attrs.Factory(list)
 
     def __repr__(self) -> str:
         return (
             f"<Container(instantiated={len(self.instantiated)}, "
             f"cleanups={len(self.cleanups)}, "
-            f"async_cleanups={len(self.async_cleanups)}>"
+            f"async_cleanups={len(self.async_cleanups)})>"
         )
 
     def get(self, svc_type: type) -> Any:
@@ -48,42 +44,44 @@ class Container:
         Returns:
              Any until https://github.com/python/mypy/issues/4717 is fixed.
         """
-        if (svc := self._get_instance(svc_type)) is not None:
+        if (svc := self.instantiated.get(svc_type)) is not None:
             return svc
 
         rs = self.registry.get_registered_service_for(svc_type)
         svc = rs.factory()
-        self._add_instance(rs, svc)
+
+        if isinstance(svc, Generator):
+            self.cleanups.append((rs, svc))
+            svc = next(svc)
+
+        self.instantiated[rs.svc_type] = svc
 
         return svc
 
-    def _add_instance(self, rs: RegisteredService, svc: object) -> None:
-        self.instantiated[rs.svc_type] = svc
-        self.add_cleanup(rs, svc)
-
-    def _get_instance(self, svc_type: type) -> object | None:
+    async def aget(self, svc_type: type) -> Any:
         """
-        If present, return the cached instance of *svc_type*.
-        """
-        return self.instantiated.get(svc_type)
+        Get an instance of *svc_type*.
 
-    def add_cleanup(self, rs: RegisteredService, svc: object) -> bool:
-        """
-        Add a cleanup function for *svc* if *rs* has one without remembering
-        the service itself.
+        Instantiate it asynchronously if necessary and register its cleanup.
 
-        Return:
-            True if a cleanup was added, False otherwise.
+        Returns:
+             Any until https://github.com/python/mypy/issues/4717 is fixed.
         """
-        if not rs.cleanup:
-            return False
+        if (svc := self.instantiated.get(svc_type)) is not None:
+            return svc
 
-        if asyncio.iscoroutinefunction(rs.cleanup):
+        rs = self.registry.get_registered_service_for(svc_type)
+        svc = rs.factory()
+
+        if isinstance(svc, AsyncGenerator):
             self.async_cleanups.append((rs, svc))
+            svc = await svc.__anext__()
         else:
-            self.cleanups.append((rs, svc))
+            svc = await svc  # type: ignore[misc]
 
-        return True
+        self.instantiated[rs.svc_type] = svc
+
+        return svc
 
     def forget_service_type(self, svc_type: type) -> None:
         """
@@ -97,10 +95,16 @@ class Container:
         Run all synchronous registered cleanups.
         """
         while self.cleanups:
-            rs, svc = self.cleanups.pop()
+            rs, gen = self.cleanups.pop()
             try:
-                rs.cleanup(svc)  # type: ignore[misc]
-            except Exception:  # noqa: PERF203, BLE001
+                next(gen)
+
+                warnings.warn(
+                    f"clean up for {rs!r} didn't stop iterating", stacklevel=1
+                )
+            except StopIteration:  # noqa: PERF203
+                pass
+            except Exception:  # noqa: BLE001
                 log.warning(
                     "clean up failed",
                     exc_info=True,
@@ -114,10 +118,17 @@ class Container:
         self.close()
 
         while self.async_cleanups:
-            rs, svc = self.async_cleanups.pop()
+            rs, gen = self.async_cleanups.pop()
             try:
-                await rs.cleanup(svc)  # type: ignore[misc]
-            except Exception:  # noqa: PERF203, BLE001
+                await gen.__anext__()
+
+                warnings.warn(
+                    f"clean up for {rs!r} didn't stop iterating", stacklevel=1
+                )
+
+            except StopAsyncIteration:  # noqa: PERF203
+                pass
+            except Exception:  # noqa: BLE001
                 log.warning(
                     "clean up failed",
                     exc_info=True,
@@ -139,7 +150,6 @@ class Container:
 class RegisteredService:
     svc_type: type
     factory: Callable = attrs.field(hash=False)
-    cleanup: Callable | None = attrs.field(hash=False)
     ping: Callable | None = attrs.field(hash=False)
 
     @property
@@ -150,7 +160,6 @@ class RegisteredService:
         return (
             f"<RegisteredService(svc_type={ self.svc_type.__module__ }."
             f"{ self.svc_type.__qualname__ }, "
-            f"has_cleanup={ self.cleanup is not None}, "
             f"has_ping={ self.ping is not None})>"
         )
 
@@ -161,8 +170,7 @@ class ServicePing:
     _rs: RegisteredService
 
     def ping(self) -> None:
-        svc = self._rs.factory()
-        self._container.add_cleanup(self._rs, svc)
+        svc = self._container.get(self._rs.svc_type)
         self._rs.ping(svc)  # type: ignore[misc]
 
     @property
@@ -179,24 +187,18 @@ class Registry:
         svc_type: type,
         factory: Callable,
         *,
-        cleanup: Callable | None = None,
         ping: Callable | None = None,
     ) -> None:
-        self.services[svc_type] = RegisteredService(
-            svc_type, factory, cleanup, ping
-        )
+        self.services[svc_type] = RegisteredService(svc_type, factory, ping)
 
     def register_value(
         self,
         svc_type: type,
         instance: object,
         *,
-        cleanup: Callable | None = None,
         ping: Callable | None = None,
     ) -> None:
-        self.register_factory(
-            svc_type, lambda: instance, cleanup=cleanup, ping=ping
-        )
+        self.register_factory(svc_type, lambda: instance, ping=ping)
 
     def get_registered_service_for(self, svc_type: type) -> RegisteredService:
         try:
