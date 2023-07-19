@@ -12,7 +12,7 @@
 > At this point, it's unclear whether this project will become a "proper Hynek project".
 > I will keep using it for my work projects, but whether this will grow beyond my personal needs depends on community interest.
 
-*svc-reg* is a [service locator](https://en.wikipedia.org/wiki/Service_locator_pattern) for Python that lets you register factories for types/interfaces and then create instances of those types with unified life-cycle management and health checks.
+*svc-reg* is a [service locator](https://en.wikipedia.org/wiki/Service_locator_pattern) for Python that lets you register factories for types/interfaces and then create instances of those types with **unified life-cycle management** and **health checks**.
 
 **This allows you to configure and manage resources in *one central place* and access them in a *consistent* way.**
 
@@ -47,6 +47,20 @@ def view():
 ```
 
 The latter already works with [Flask](#flask).
+
+And you set it up like this:
+
+```python
+engine = create_engine("postgresql://localhost")
+
+def engine_factory():
+    with engine.connect() as conn:
+        yield conn
+
+svc_reg.register_factory(Database, create_database)
+```
+
+The generator-based setup and cleanup may remind you of [Pytest fixtures](https://docs.pytest.org/en/stable/explanation/fixtures.html).
 
 <!-- end-pypi -->
 
@@ -97,11 +111,13 @@ True
 ```
 
 A container lives as long as you want the instances to live -- e.g., as long as a request lives.
-At the end, you run `container.close()` to clean up all instances that the container has created.
+
+If a factory is a generator and yields the instance, the generator will be remembered.
+At the end, you run `container.close()` and all generators will be finished (i.e. called `next(g)`).
 You can use this to return database connections to a pool, et cetera.
 
-If you have async cleanup functions, use `await container.aclose()` instead.
-It will run both sync and async cleanup functions.
+If you have async generators, use `await container.aclose()` instead which calls `await g.__anext__()` on all async generators.
+It will run both sync and async cleanup functions by default.
 
 Failing cleanups are logged at `warning` level but otherwise ignored.
 
@@ -162,17 +178,21 @@ def create_app(config_filename):
     app = svc_reg.flask.init_app(app)
 
     # Now, register a factory that calls `engine.connect()` if you ask for a
-    # Connections and `connection.close()` on cleanup.
+    # Connections. Since we use yield inside of a context manager, the
+    # connection gets cleaned up when the container is closed.
     # If you ask for a ping, it will run `SELECT 1` on a new connection and
     # clean up the connection behind itself.
     engine = create_engine("postgresql://localhost")
+    def engine_factory():
+        with engine.connect() as conn:
+            yield conn
+
     ping = text("SELECT 1")
     svc_reg_flask.register_factory(
         # The app argument makes it good for custom init_app() functions.
         app,
         Connection,
-        engine.connect,
-        cleanup=lambda conn: conn.close(),
+        engine_factory,
         ping=lambda conn: conn.execute(ping)
     )
 
@@ -180,6 +200,7 @@ def create_app(config_filename):
     svc_reg_flask.register_factory(
         app, # <---
         AbstractRepository,
+        # No cleanup, so we just return an object using a lambda
         lambda: Repository.from_connection(
             svc_reg.flask.get(Connection)
         ),

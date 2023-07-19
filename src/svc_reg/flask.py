@@ -36,12 +36,9 @@ def register_factory(
     svc_type: type,
     factory: Callable,
     *,
-    cleanup: Callable | None = None,
     ping: Callable | None = None,
 ) -> None:
-    app.config["svc_registry"].register_factory(
-        svc_type, factory, cleanup=cleanup, ping=ping
-    )
+    app.config["svc_registry"].register_factory(svc_type, factory, ping=ping)
 
 
 def register_value(
@@ -49,38 +46,33 @@ def register_value(
     svc_type: type,
     instance: object,
     *,
-    cleanup: Callable | None = None,
     ping: Callable | None = None,
 ) -> None:
-    app.config["svc_registry"].register_value(
-        svc_type, instance, cleanup=cleanup, ping=ping
-    )
+    app.config["svc_registry"].register_value(svc_type, instance, ping=ping)
 
 
 def replace_factory(
     svc_type: type,
     factory: Callable,
     *,
-    cleanup: Callable | None = None,
     ping: Callable | None = None,
 ) -> None:
     registry, container = _ensure_req_data()
 
     container.forget_service_type(svc_type)
-    registry.register_factory(svc_type, factory, cleanup=cleanup, ping=ping)
+    registry.register_factory(svc_type, factory, ping=ping)
 
 
 def replace_value(
     svc_type: type,
     instance: object,
     *,
-    cleanup: Callable | None = None,
     ping: Callable | None = None,
 ) -> None:
     registry, container = _ensure_req_data()
 
     container.forget_service_type(svc_type)
-    registry.register_value(svc_type, instance, cleanup=cleanup, ping=ping)
+    registry.register_value(svc_type, instance, ping=ping)
 
 
 def get_pings() -> list[ServicePing]:

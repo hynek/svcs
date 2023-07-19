@@ -25,11 +25,6 @@ def _clean_app_ctx(registry, app):
         yield ctx
 
 
-@pytest.fixture(name="registry")
-def _registry():
-    return svc_reg.Registry()
-
-
 @pytest.fixture(name="container")
 def _container(clean_app_ctx):
     return svc_reg.flask._ensure_req_data()[1]
@@ -54,35 +49,39 @@ class TestFlask:
         get() handles the case where there is already a cleanup registered.
         """
 
-        cleanup1 = Mock(return_value=None)
-        cleanup2 = Mock(return_value=None)
+        cleanup1 = Mock()
+        cleanup2 = Mock()
 
-        registry.register_factory(Service1, Service1, cleanup=cleanup1)
-        svc_reg.flask.replace_factory(Service2, Service2, cleanup=cleanup2)
+        def factory1():
+            yield Service1()
+            cleanup1()
+
+        def factory2():
+            yield Service2()
+            cleanup2()
+
+        registry.register_factory(Service1, factory1)
+        svc_reg.flask.replace_factory(Service2, factory2)
 
         svc1 = svc_reg.flask.get(Service1)
         svc2 = svc_reg.flask.get(Service2)
 
         assert isinstance(svc1, Service1)
         assert isinstance(svc2, Service2)
+        assert 2 == len(flask.g.svc_container.cleanups)
 
         teardown(None)
 
-        cleanup1.assert_called_once_with(svc1)
-        cleanup2.assert_called_once_with(svc2)
+        cleanup1.assert_called_once_with()
+        cleanup2.assert_called_once_with()
 
-    def test_overwrite_value(self, registry, container):
+    def test_overwrite_value(self, registry):
         """
-        It's possible to overwrite an already registered type. That type's
-        cleanup is removed.
+        It's possible to overwrite an already registered type.
         """
-
-        registry.register_value(
-            Interface, Interface(), cleanup=lambda _: None, ping=lambda _: None
-        )
+        registry.register_value(Interface, Interface(), ping=lambda _: None)
 
         assert isinstance(svc_reg.flask.get(Interface), Interface)
-        assert [] != container.cleanups
 
         svc_reg.flask.replace_value(Interface, Service2())
 
@@ -93,13 +92,11 @@ class TestFlask:
         """
         It's possible to overwrite an already registered type using a factory.
         """
-
         svc_reg.flask.replace_value(
-            Interface, Interface(), cleanup=lambda _: None, ping=lambda _: None
+            Interface, Interface(), ping=lambda _: None
         )
 
         assert isinstance(svc_reg.flask.get(Interface), Interface)
-        assert [] != container.cleanups
 
         svc_reg.flask.replace_factory(Interface, Service2)
 
@@ -120,7 +117,7 @@ class TestFlask:
         Trying to get a service that hasn't been registered raises a
         ServiceNotFoundError.
         """
-        with pytest.raises(svc_reg.ServiceNotFoundError):
+        with pytest.raises(svc_reg.exceptions.ServiceNotFoundError):
             svc_reg.flask.get(Interface)
 
     def test_get_pingeable(self):
@@ -139,12 +136,15 @@ class TestFlask:
         If other svc_reg are registered, they are ignored by the cleanup
         purge.
         """
-        svc_reg.flask.replace_factory(
-            Service1, Service1, cleanup=lambda _: None
-        )
-        svc_reg.flask.replace_factory(
-            Service2, Service2, cleanup=lambda _: None
-        )
+
+        def factory1():
+            yield Service1()
+
+        def factory2():
+            yield Service2()
+
+        svc_reg.flask.replace_factory(Service1, factory1)
+        svc_reg.flask.replace_factory(Service2, factory2)
 
         svc_reg.flask.get(Service1)
         svc_reg.flask.get(Service2)
@@ -160,19 +160,18 @@ class TestFlask:
         assert 2 == len(container.cleanups)
         assert 0 == len(container.async_cleanups)
 
-    def test_teardown_warns_on_async_cleanups(self, container):
+    @pytest.mark.asyncio()
+    async def test_teardown_warns_on_async_cleanups(self, container):
         """
         teardown() warns if there are async cleanups.
         """
 
-        async def cleanup(svc):
-            pass
+        async def factory():
+            yield Service1()
 
-        rs = svc_reg.RegisteredService(
-            Interface, lambda: Service1(), cleanup=cleanup, ping=None
-        )
+        svc_reg.flask.replace_factory(Service1, factory)
 
-        container.add_cleanup(rs, rs.factory())
+        await container.aget(Service1)
 
         with pytest.warns(UserWarning) as wi:
             teardown(None)

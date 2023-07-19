@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+from . import exceptions
 from ._core import (
     Container,
     RegisteredService,
     Registry,
-    ServiceNotFoundError,
     ServicePing,
 )
 
@@ -15,6 +15,7 @@ __all__ = [
     "Registry",
     "ServiceNotFoundError",
     "ServicePing",
+    "exceptions",
 ]
 
 try:
