@@ -5,6 +5,7 @@ import warnings
 
 from collections.abc import Callable
 from contextlib import suppress
+from inspect import isasyncgenfunction, isawaitable, iscoroutinefunction
 from typing import Any, AsyncGenerator, Generator
 
 import attrs
@@ -76,8 +77,8 @@ class Container:
         if isinstance(svc, AsyncGenerator):
             self.async_cleanups.append((rs, svc))
             svc = await svc.__anext__()
-        else:
-            svc = await svc  # type: ignore[misc]
+        elif isawaitable(svc):
+            svc = await svc
 
         self.instantiated[rs.svc_type] = svc
 
@@ -163,6 +164,12 @@ class RegisteredService:
             f"has_ping={ self.ping is not None})>"
         )
 
+    @property
+    def is_async(self) -> bool:
+        return iscoroutinefunction(self.factory) or isasyncgenfunction(
+            self.factory
+        )
+
 
 @attrs.frozen
 class ServicePing:
@@ -173,9 +180,23 @@ class ServicePing:
         svc = self._container.get(self._rs.svc_type)
         self._rs.ping(svc)  # type: ignore[misc]
 
+    async def aping(self) -> None:
+        svc = await self._container.aget(self._rs.svc_type)
+        if iscoroutinefunction(self._rs.ping):
+            await self._rs.ping(svc)
+        else:
+            self._rs.ping(svc)  # type: ignore[misc]
+
     @property
     def name(self) -> str:
         return self._rs.name
+
+    @property
+    def is_async(self) -> bool:
+        """
+        Return True if you have to use `aping` instead of `ping`.
+        """
+        return self._rs.is_async or iscoroutinefunction(self._rs.ping)
 
 
 @attrs.define

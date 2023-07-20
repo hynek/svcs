@@ -1,3 +1,5 @@
+import asyncio
+
 from unittest.mock import Mock
 
 import pytest
@@ -219,6 +221,39 @@ class TestRegisteredService:
         """
 
         assert "Service" == rs.name
+
+    def test_is_async_yep(self):
+        """
+        The is_async property returns True if the factory needs to be awaited.
+        """
+
+        async def factory():
+            return 42
+
+        async def factory_cleanup():
+            await asyncio.sleep(0)
+            yield 42
+
+        assert svc_reg.RegisteredService(object, factory, None).is_async
+        assert svc_reg.RegisteredService(
+            object, factory_cleanup, None
+        ).is_async
+
+    def test_is_async_nope(self):
+        """
+        is_async is False for sync factories.
+        """
+
+        def factory():
+            return 42
+
+        def factory_cleanup():
+            yield 42
+
+        assert not svc_reg.RegisteredService(object, factory, None).is_async
+        assert not svc_reg.RegisteredService(
+            object, factory_cleanup, None
+        ).is_async
 
 
 class TestServicePing:
