@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2023 Hynek Schlawack <hs@ox.cx>
+#
+# SPDX-License-Identifier: MIT
+
 import asyncio
 
 from unittest.mock import Mock
