@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 import warnings
 
 from collections.abc import Callable
@@ -18,6 +19,11 @@ from .exceptions import ServiceNotFoundError
 
 
 log = logging.getLogger(__name__)
+
+if sys.version_info < (3, 10):
+
+    def anext(gen: AsyncGenerator) -> Any:
+        return gen.__anext__()
 
 
 @attrs.define
@@ -80,7 +86,7 @@ class Container:
 
         if isinstance(svc, AsyncGenerator):
             self.async_cleanups.append((rs, svc))
-            svc = await svc.__anext__()
+            svc = await anext(svc)
         elif isawaitable(svc):
             svc = await svc
 
@@ -125,7 +131,7 @@ class Container:
         while self.async_cleanups:
             rs, gen = self.async_cleanups.pop()
             try:
-                await gen.__anext__()
+                await anext(gen)
 
                 warnings.warn(
                     f"clean up for {rs!r} didn't stop iterating", stacklevel=1

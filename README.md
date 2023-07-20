@@ -118,11 +118,11 @@ True
 A container lives as long as you want the instances to live -- e.g., as long as a request lives.
 
 If a factory is a generator and yields the instance, the generator will be remembered.
-At the end, you run `container.close()` and all generators will be finished (i.e. called `next(g)`).
+At the end, you run `container.close()` and all generators will be finished (i.e. called `next(factory)` again).
 You can use this to return database connections to a pool, et cetera.
 
-If you have async generators, use `await container.aclose()` instead which calls `await g.__anext__()` on all async generators.
-It will run both sync and async cleanup functions by default.
+If you have async generators, use `await container.aclose()` instead which calls `await anext(factory)` on all async generators.
+It will run both sync and async cleanup functions.
 
 Failing cleanups are logged at `warning` level but otherwise ignored.
 
