@@ -58,7 +58,7 @@ def engine_factory():
         yield Database(conn)
 
 registry = svc_reg.Registry()
-registry.register_factory(Database, create_database)
+registry.register_factory(Database, engine_factory)
 ```
 
 The generator-based setup and cleanup may remind you of [Pytest fixtures](https://docs.pytest.org/en/stable/explanation/fixtures.html).
