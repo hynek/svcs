@@ -67,7 +67,7 @@ The generator-based setup and cleanup may remind you of [Pytest fixtures](https:
 
 Unlike typical dependency injection that passes your dependencies as arguments, the active obtainment of resources by calling `get()` when you *know* you're going to need it avoids the conundrum of either having to pass a factory (e.g., a connection pool -- which also puts the onus of cleanup on you), or eagerly creating resources that are never used.
 
-*svc-reg* comes with full async support via a-prefixed methods (i.e. `aget()` instead of `get()`, et cetera).
+*svc-reg* comes with **full async** support via a-prefixed methods (i.e. `aget()` instead of `get()`, et cetera).
 
 <!-- end-pypi -->
 
