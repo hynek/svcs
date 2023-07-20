@@ -4,8 +4,6 @@
 
 from __future__ import annotations
 
-import warnings
-
 from collections.abc import Callable
 from typing import Any
 
@@ -94,13 +92,6 @@ def teardown(exc: BaseException | None) -> None:
     """
     if has_app_context() and (container := g.pop("svc_container", None)):
         container.close()
-        if container.async_cleanups:
-            warnings.warn(
-                f"{len(container.async_cleanups)} async cleanup(s) left, but "
-                "svc-reg's Flask support does not support them automatically.",
-                # stacklevel doesn't matter here; it's coming from a framework.
-                stacklevel=1,
-            )
 
 
 def _ensure_req_data() -> tuple[Registry, Container]:

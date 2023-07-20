@@ -19,6 +19,11 @@ class AnotherService:
     pass
 
 
+@dataclass
+class YetAnotherService:
+    pass
+
+
 @pytest.mark.asyncio()
 class TestAsync:
     async def test_async_factory(self, registry, container):
@@ -55,7 +60,7 @@ class TestAsync:
 
     async def test_async_cleanup(self, registry, container):
         """
-        Async cleanups are handled by acleanup.
+        Async cleanups are handled by aclose.
         """
         cleaned_up = False
 
@@ -72,12 +77,53 @@ class TestAsync:
 
         svc = await container.aget(Service)
 
-        assert 1 == len(container.async_cleanups)
+        assert 1 == len(container.cleanups)
         assert Service() == svc
         assert not cleaned_up
 
         await container.aclose()
 
+        assert cleaned_up
+
+    @pytest.mark.asyncio()
+    async def test_aclose_resilient(self, container, registry, caplog):
+        """
+        Failing cleanups are logged and ignored. They do not break the
+        cleanup process.
+        """
+
+        def factory():
+            yield 1
+            raise Exception
+
+        async def async_factory():
+            yield 2
+            raise Exception
+
+        cleaned_up = False
+
+        async def factory_no_boom():
+            nonlocal cleaned_up
+
+            yield 3
+
+            cleaned_up = True
+
+        registry.register_factory(Service, factory)
+        registry.register_factory(AnotherService, async_factory)
+        registry.register_factory(YetAnotherService, factory_no_boom)
+
+        assert 1 == container.get(Service)
+        assert 2 == await container.aget(AnotherService)
+        assert 3 == await container.aget(YetAnotherService)
+
+        assert not cleaned_up
+
+        await container.aclose()
+
+        # Inverse order
+        assert "AnotherService" == caplog.records[0].service
+        assert "Service" == caplog.records[1].service
         assert cleaned_up
 
     async def test_warns_if_generator_does_not_stop_after_cleanup(

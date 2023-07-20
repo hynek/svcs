@@ -117,12 +117,9 @@ class TestContainer:
         container.get(Service)
         await container.aget(AnotherService)
 
-        assert (
-            "<Container(instantiated=2, cleanups=1, async_cleanups=1)>"
-            == repr(container)
-        )
+        assert "<Container(instantiated=2, cleanups=2)>" == repr(container)
 
-    def test_cleanup_called(self, registry, container, rs):
+    def test_cleanup_called(self, registry, container):
         """
         Services that have a cleanup have them called on cleanup.
         """
@@ -143,8 +140,7 @@ class TestContainer:
 
         assert cleaned_up
 
-    @pytest.mark.asyncio()
-    async def test_clean_resilient(self, container, registry, caplog):
+    def test_close_resilient(self, container, registry, caplog):
         """
         Failing cleanups are logged and ignored. They do not break the
         cleanup process.
@@ -154,13 +150,9 @@ class TestContainer:
             yield 1
             raise Exception
 
-        async def async_factory():
-            yield 2
-            raise Exception
-
         cleaned_up = False
 
-        async def factory_no_boom():
+        def factory_no_boom():
             nonlocal cleaned_up
 
             yield 3
@@ -168,20 +160,16 @@ class TestContainer:
             cleaned_up = True
 
         registry.register_factory(Service, factory)
-        registry.register_factory(AnotherService, async_factory)
         registry.register_factory(YetAnotherService, factory_no_boom)
 
         assert 1 == container.get(Service)
-        assert 2 == await container.aget(AnotherService)
-        assert 3 == await container.aget(YetAnotherService)
+        assert 3 == container.get(YetAnotherService)
 
         assert not cleaned_up
 
-        await container.aclose()
+        container.close()
 
-        # Sync cleanups are run first.
         assert "Service" == caplog.records[0].service
-        assert "AnotherService" == caplog.records[1].service
         assert cleaned_up
 
     def test_warns_if_generator_does_not_stop_after_cleanup(

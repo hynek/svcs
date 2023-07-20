@@ -154,7 +154,6 @@ class TestFlask:
         svc_reg.flask.get(Service2)
 
         assert 2 == len(container.cleanups)
-        assert 0 == len(container.async_cleanups)
 
         svc_reg.flask.replace_factory(Service1, Interface)
 
@@ -162,7 +161,6 @@ class TestFlask:
         svc_reg.flask.get(Service2)
 
         assert 2 == len(container.cleanups)
-        assert 0 == len(container.async_cleanups)
 
     @pytest.mark.asyncio()
     async def test_teardown_warns_on_async_cleanups(self, container):
@@ -184,9 +182,9 @@ class TestFlask:
 
         assert 0 == len(wi.list)
         assert (
-            "1 async cleanup(s) left, "
-            "but svc-reg's Flask support does not support them automatically."
-            == w.message.args[0]
+            "Skipped async cleanup for "
+            "<RegisteredService(svc_type=tests.test_flask.Service1, "
+            "has_ping=False)>. Use aclose() instead." == w.message.args[0]
         )
 
 

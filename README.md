@@ -121,8 +121,7 @@ If a factory is a generator and yields the instance, the generator will be remem
 At the end, you run `container.close()` and all generators will be finished (i.e. called `next(factory)` again).
 You can use this to return database connections to a pool, et cetera.
 
-If you have async generators, use `await container.aclose()` instead which calls `await anext(factory)` on all async generators.
-It will run both sync and async cleanup functions.
+If you have async generators, use `await container.aclose()` instead which calls `await anext(factory)` on all async generators (and `next(factory)` on sync ones).
 
 Failing cleanups are logged at `warning` level but otherwise ignored.
 

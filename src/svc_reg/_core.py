@@ -34,16 +34,14 @@ class Container:
 
     registry: Registry
     instantiated: dict[type, object] = attrs.Factory(dict)
-    cleanups: list[tuple[RegisteredService, Generator]] = attrs.Factory(list)
-    async_cleanups: list[
-        tuple[RegisteredService, AsyncGenerator]
+    cleanups: list[
+        tuple[RegisteredService, Generator | AsyncGenerator]
     ] = attrs.Factory(list)
 
     def __repr__(self) -> str:
         return (
             f"<Container(instantiated={len(self.instantiated)}, "
-            f"cleanups={len(self.cleanups)}, "
-            f"async_cleanups={len(self.async_cleanups)})>"
+            f"cleanups={len(self.cleanups)})>"
         )
 
     def get(self, svc_type: type) -> Any:
@@ -85,7 +83,7 @@ class Container:
         svc = rs.factory()
 
         if isinstance(svc, AsyncGenerator):
-            self.async_cleanups.append((rs, svc))
+            self.cleanups.append((rs, svc))
             svc = await anext(svc)
         elif isawaitable(svc):
             svc = await svc
@@ -104,10 +102,21 @@ class Container:
     def close(self) -> None:
         """
         Run all synchronous registered cleanups.
+
+        Async closes are *not* awaited.
         """
         while self.cleanups:
             rs, gen = self.cleanups.pop()
             try:
+                if isinstance(gen, AsyncGenerator):
+                    warnings.warn(
+                        f"Skipped async cleanup for {rs!r}. "
+                        "Use aclose() instead.",
+                        # stacklevel doesn't matter here; it's coming from a framework.
+                        stacklevel=1,
+                    )
+                    continue
+
                 next(gen)
 
                 warnings.warn(
@@ -126,18 +135,19 @@ class Container:
         """
         Run *all* registered cleanups -- synchronous **and** asynchronous.
         """
-        self.close()
-
-        while self.async_cleanups:
-            rs, gen = self.async_cleanups.pop()
+        while self.cleanups:
+            rs, gen = self.cleanups.pop()
             try:
-                await anext(gen)
+                if isinstance(gen, AsyncGenerator):
+                    await anext(gen)
+                else:
+                    next(gen)
 
                 warnings.warn(
                     f"clean up for {rs!r} didn't stop iterating", stacklevel=1
                 )
 
-            except StopAsyncIteration:  # noqa: PERF203
+            except (StopAsyncIteration, StopIteration):  # noqa: PERF203
                 pass
             except Exception:  # noqa: BLE001
                 log.warning(
