@@ -25,12 +25,18 @@ def factory_with_cleanup() -> Generator[int, None, None]:
     yield 1
 
 
+async def async_ping() -> None:
+    pass
+
+
 reg.register_value(int, 1)
 reg.register_value(int, 1, ping=lambda: None)
+reg.register_value(int, 1, ping=async_ping)
 reg.register_value(int, gen)
 
 reg.register_factory(str, str)
 reg.register_factory(int, factory_with_cleanup)
+reg.register_factory(int, factory_with_cleanup, ping=async_ping)
 reg.register_value(str, str, ping=lambda: None)
 reg.register_value(str, async_gen)
 
