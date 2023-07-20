@@ -22,6 +22,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   It works with sync factories too, so you can use it universally in async code.
 - Async method `ServicePing.aping()`.
   It works with sync factories and pings too, so you can use it universally in async code.
+  [#4](https://github.com/hynek/svc-reg/pull/4)
 
 
 ### Changed
