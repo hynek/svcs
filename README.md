@@ -12,11 +12,11 @@
 > At this point, it's unclear whether this project will become a "proper Hynek project".
 > I will keep using it for my work projects, but whether this will grow beyond my personal needs depends on community interest.
 
-*svc-reg* is a [service locator](https://en.wikipedia.org/wiki/Service_locator_pattern) for Python that lets you register factories for types/interfaces and then imperatively request instances of those types with **unified life-cycle management** and **health checks**.
+*svc-reg* is a [service locator](https://en.wikipedia.org/wiki/Service_locator_pattern) for Python that lets you register factories for types/interfaces and then imperatively request instances of those types with **automatic cleanup** and **health checks**.
 
-**This allows you to configure and manage resources in *one central place* and access them in a *consistent* way.**
+**This allows you to configure and manage resources in *one central place* and access them all in a *consistent* way.**
 
-The idea is that at runtime, you say, for example, "*Give me a database connection*!", and *svc-reg* will give you whatever you've configured it to return when asked for a database connection.
+In practice that means that at runtime, you say, for example, "*Give me a database connection*!", and *svc-reg* will give you whatever you've configured it to return when asked for a database connection.
 This can be an actual database connection or it can be a mock object for testing.
 
 If you like the [*Dependency Inversion Principle*](https://en.wikipedia.org/wiki/Dependency_inversion_principle) (aka "*program against interfaces, not implementations*"), you would register concrete factories for abstract interfaces[^abstract].
@@ -65,7 +65,7 @@ registry.register_factory(Database, create_database)
 
 The generator-based setup and cleanup may remind you of [Pytest fixtures](https://docs.pytest.org/en/stable/explanation/fixtures.html).
 
-Unlike typical dependency injection that passes your dependencies as arguments, the active obtainment of resources by calling `get()` when you *know* you're going to need it avoids the conundrum of either having to pass a factory (e.g., a connection pool -- which also puts the onus of cleanup on you), or eagerly creating resources that are never used.
+Unlike typical dependency injection that passes your dependencies as arguments, the active obtainment of resources by calling `get()` (or `aget()` for async resources) when you *know* you're going to need it avoids the conundrum of either having to pass a factory (e.g., a connection pool -- which also puts the onus of cleanup on you), or eagerly creating resources that are never used.
 
 <!-- end-pypi -->
 
