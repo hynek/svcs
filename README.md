@@ -323,6 +323,7 @@ Now you can register services in your application factory like this:
 from your_app import services
 
 def init_app(app):
+    app = services.init_app(app)
     services.register_factory(app, Connection, ...)
     return app
 ```
