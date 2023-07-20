@@ -13,7 +13,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 <!-- changelog follows -->
 
 
-## [Unreleased](https://github.com/hynek/svc-reg/compare/23.2.0...HEAD)
+## [23.3.0](https://github.com/hynek/svc-reg/compare/23.2.0...23.3.0) - 2023-07-20
 
 ### Added
 
