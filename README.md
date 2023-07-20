@@ -131,6 +131,9 @@ Failing cleanups are logged at `warning` level but otherwise ignored.
 Additionally, each registered service may have a `ping` callable that you can use for health checks.
 You can request all pingable registered services with `container.get_pings()`.
 This returns a list of `ServicePing` objects that currently have a name property to identify the ping and a `ping` method that instantiates the service, adds it to the cleanup list, and runs the ping.
+If you have async resources (either factory or ping callable), you can use `aping()` instead.
+`aping()` works with sync resources too, so you can use it universally in async code.
+You can look at the `is_async` property to check whether you *need* to use `aget()`, though.
 
 Importantly: It is possible to overwrite registered service factories later -- e.g., for testing -- **without monkey-patching**.
 You have to remove possibly cached instances from the container if you're using nested dependencies (`Container.forget_service_type()`).

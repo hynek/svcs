@@ -10,6 +10,11 @@ class Service:
     pass
 
 
+@dataclass
+class AnotherService:
+    pass
+
+
 @pytest.mark.asyncio()
 class TestAsync:
     async def test_async_factory(self, registry, container):
@@ -27,6 +32,22 @@ class TestAsync:
 
         assert isinstance(svc, Service)
         assert svc is (await container.aget(Service))
+
+    async def test_aget_works_with_sync_factory(self, registry, container):
+        """
+        A synchronous factory does not break aget().
+        """
+        registry.register_factory(Service, Service)
+
+        assert Service() == (await container.aget(Service))
+
+    async def test_aget_works_with_value(self, registry, container):
+        """
+        A value instead of a factory does not break aget().
+        """
+        registry.register_value(Service, 42)
+
+        assert 42 == (await container.aget(Service))
 
     async def test_async_cleanup(self, registry, container):
         """
@@ -78,3 +99,32 @@ class TestAsync:
             "svc_type=tests.test_async.Service, has_ping=False)> "
             "didn't stop iterating" == wi.pop().message.args[0]
         )
+
+    async def test_aping(self, registry, container):
+        """
+        Async and sync pings work.
+        """
+        apinged = pinged = False
+
+        async def aping(svc):
+            await asyncio.sleep(0)
+            nonlocal apinged
+            apinged = True
+
+        def ping(svc):
+            nonlocal pinged
+            pinged = True
+
+        registry.register_value(Service, Service(), ping=aping)
+        registry.register_value(AnotherService, AnotherService(), ping=ping)
+
+        (ap, p) = container.get_pings()
+
+        assert ap.is_async
+        assert not p.is_async
+
+        await ap.aping()
+        await p.aping()
+
+        assert pinged
+        assert apinged
