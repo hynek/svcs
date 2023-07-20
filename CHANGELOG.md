@@ -15,12 +15,24 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svc-reg/compare/23.2.0...HEAD)
 
+### Added
 
- ## [23.2.0](https://github.com/hynek/svc-reg/compare/23.1.0...23.2.0) - 2023-07-13
+- Async method `Container.aget()`.
+  This was necessary for generator-based cleanups.
+
 
 ### Changed
 
-- `Container.cleanup()` and `Container.acleanup` have been renamed to `close()` and `aclose*()` respectively.
+- Switched the cleanup mechanism from passing a function to allowing the factory to be a generator that yields the resource and can clean up after the `yield`.
+  Just like Pytest fixtures.
+  [#3](https://github.com/hynek/svc-reg/pull/3)
+
+
+## [23.2.0](https://github.com/hynek/svc-reg/compare/23.1.0...23.2.0) - 2023-07-13
+
+### Changed
+
+- `Container.cleanup()` and `Container.acleanup` have been renamed to `close()` and `aclose()` respectively.
 - The clean up methods are now more resilient by catching and logging exceptions at `warning` level.
   That means that if the first clean up method fails, the second one will still be called.
 - `svc_reg.flask.register_(factory|value)` now take the current Flask application as first argument.
