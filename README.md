@@ -12,7 +12,8 @@
 > At this point, it's unclear whether this project will become a "proper Hynek project".
 > I will keep using it for my work projects, but whether this will grow beyond my personal needs depends on community interest.
 
-*svc-reg* is a [service locator](https://en.wikipedia.org/wiki/Service_locator_pattern) for Python that lets you register factories for types/interfaces and then imperatively request instances of those types with **automatic cleanup** and **health checks**.
+*svc-reg* is a [service locator](https://en.wikipedia.org/wiki/Service_locator_pattern) for Python.
+It provides you with a central place to register factories for types/interfaces and then imperatively request instances of those types with **automatic cleanup** and **health checks**.
 
 **This allows you to configure and manage resources in *one central place* and access them all in a *consistent* way.**
 
@@ -23,9 +24,8 @@ If you like the [*Dependency Inversion Principle*](https://en.wikipedia.org/wiki
 
 That:
 
-- enables **dependency injection**,
+- unifies **acquisition** and **cleanups**,
 - simplifies **testing**,
-- unifies **cleanups**,
 - and allows for **easy health** checks across *all* resources.
 
 No global mutable state is necessary – but possible for extra comfort.
@@ -48,7 +48,7 @@ def view():
 
 The latter already works with [Flask](#flask).
 
-And you set it up like this:
+You set it up like this:
 
 ```python
 engine = create_engine("postgresql://localhost")
