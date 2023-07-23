@@ -50,7 +50,11 @@ The latter already works with [Flask](#flask).
 
 You set it up like this:
 
+% skip: next
+
 ```python
+from sqlalchemy import create_engine
+
 engine = create_engine("postgresql://localhost")
 
 def engine_factory():
