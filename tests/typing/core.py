@@ -7,10 +7,10 @@ import sys
 
 from typing import AsyncGenerator, Generator
 
-import svc_reg
+import svcs
 
 
-reg = svc_reg.Registry()
+reg = svcs.Registry()
 
 
 def gen() -> Generator:
@@ -40,7 +40,7 @@ reg.register_factory(int, factory_with_cleanup, ping=async_ping)
 reg.register_value(str, str, ping=lambda: None)
 reg.register_value(str, async_gen)
 
-con = svc_reg.Container(reg)
+con = svcs.Container(reg)
 
 # The type checker believes whatever we tell it.
 o1: object = con.get(object)
@@ -48,11 +48,11 @@ o2: int = con.get(object)
 
 con.close()
 
-with contextlib.closing(svc_reg.Container(reg)) as con:
+with contextlib.closing(svcs.Container(reg)) as con:
     ...
 
 if sys.version_info >= (3, 10):
 
     async def f() -> None:
-        async with contextlib.aclosing(svc_reg.Container(reg)):
+        async with contextlib.aclosing(svcs.Container(reg)):
             ...

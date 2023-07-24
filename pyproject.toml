@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 dynamic = ["version", "readme"]
-name = "svc-reg"
+name = "svcs"
 description = "A Service Locator for Python"
 requires-python = ">=3.8"
 license = "MIT"
@@ -26,12 +26,12 @@ dependencies = ["attrs"]
 [project.optional-dependencies]
 tests = ["pytest", "pytest-asyncio", "sybil"]
 typing = ["mypy>=1.4", "flask"]
-dev = ["svc-reg[tests,typing]", "tox>4", "flask"]
+dev = ["svcs[tests,typing]", "tox>4", "flask"]
 
 [project.urls]
-Changelog = "https://github.com/hynek/svc-reg/blob/main/CHANGELOG.md"
-Documentation = "https://github.com/hynek/svc-reg/blob/main/README.md"
-Source = "https://github.com/hynek/svc-reg"
+Changelog = "https://github.com/hynek/svcs/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/hynek/svcs/blob/main/README.md"
+Source = "https://github.com/hynek/svcs"
 Funding = "https://github.com/sponsors/hynek"
 
 
@@ -52,7 +52,7 @@ text = """
 
 ---
 
-For now, please refer to the [GitHub README](https://github.com/hynek/svc-reg/blob/main/README.md) for latest documentation.
+For now, please refer to the [GitHub README](https://github.com/hynek/svcs/blob/main/README.md) for latest documentation.
 
 
 ## Release Information
@@ -68,7 +68,7 @@ pattern = "\n(###.+?\n)## "
 text = """
 ---
 
-[→ Full Changelog](https://github.com/hynek/svc-reg/blob/main/CHANGELOG.md)
+[→ Full Changelog](https://github.com/hynek/svcs/blob/main/CHANGELOG.md)
 
 
 """
@@ -87,7 +87,7 @@ filterwarnings = ["once::Warning"]
 [tool.coverage.run]
 branch = true
 parallel = true
-source = ["svc_reg"]
+source = ["svcs"]
 
 [tool.coverage.paths]
 source = ["src", ".tox/py*/**/site-packages"]

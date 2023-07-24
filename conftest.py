@@ -9,7 +9,7 @@ import pytest
 from sybil import Sybil
 from sybil.parsers.rest import DocTestParser, PythonCodeBlockParser
 
-import svc_reg
+import svcs
 
 
 pytest_collect_file = Sybil(
@@ -23,9 +23,9 @@ pytest_collect_file = Sybil(
 
 @pytest.fixture(name="registry")
 def _registry():
-    return svc_reg.Registry()
+    return svcs.Registry()
 
 
 @pytest.fixture(name="container")
 def _container(registry):
-    return svc_reg.Container(registry)
+    return svcs.Container(registry)

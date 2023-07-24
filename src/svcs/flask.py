@@ -16,7 +16,7 @@ def init_app(app: Flask, registry: Registry | None = None) -> Flask:
     if registry is None:
         registry = Registry()
 
-    app.config["svc_registry"] = registry
+    app.config["svcsistry"] = registry
     app.teardown_appcontext(teardown)
 
     return app
@@ -40,7 +40,7 @@ def register_factory(
     *,
     ping: Callable | None = None,
 ) -> None:
-    app.config["svc_registry"].register_factory(svc_type, factory, ping=ping)
+    app.config["svcsistry"].register_factory(svc_type, factory, ping=ping)
 
 
 def register_value(
@@ -50,7 +50,7 @@ def register_value(
     *,
     ping: Callable | None = None,
 ) -> None:
-    app.config["svc_registry"].register_value(svc_type, instance, ping=ping)
+    app.config["svcsistry"].register_value(svc_type, instance, ping=ping)
 
 
 def replace_factory(
@@ -95,7 +95,7 @@ def teardown(exc: BaseException | None) -> None:
 
 
 def _ensure_req_data() -> tuple[Registry, Container]:
-    registry: Registry = current_app.config["svc_registry"]
+    registry: Registry = current_app.config["svcsistry"]
     if "svc_container" not in g:
         g.svc_container = Container(registry)
 

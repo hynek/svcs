@@ -151,8 +151,8 @@ jobs:
           python-version-file: .python-version-default
 
       - run: python -Im pip install -e .[dev]
-      - run: python -Ic 'import svc_reg'
-      - run: python -Ic 'import svc_reg.flask'
+      - run: python -Ic 'import svcs'
+      - run: python -Ic 'import svcs.flask'
 
   # Ensure everything required is passing for branch protection.
   required-checks-pass:

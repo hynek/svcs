@@ -8,7 +8,7 @@ from unittest.mock import Mock
 
 import pytest
 
-import svc_reg
+import svcs
 
 
 class Service:
@@ -25,7 +25,7 @@ class YetAnotherService:
 
 @pytest.fixture(name="rs")
 def _rs(svc):
-    return svc_reg.RegisteredService(Service, Service, None)
+    return svcs.RegisteredService(Service, Service, None)
 
 
 @pytest.fixture(name="svc")
@@ -60,7 +60,7 @@ class TestContainer:
         """
         Asking for a service that isn't registered raises a ServiceNotFoundError.
         """
-        with pytest.raises(svc_reg.exceptions.ServiceNotFoundError) as ei:
+        with pytest.raises(svcs.exceptions.ServiceNotFoundError) as ei:
             container.get(Service)
 
         assert Service is ei.value.args[0]
@@ -226,8 +226,8 @@ class TestRegisteredService:
             await asyncio.sleep(0)
             yield 42
 
-        assert svc_reg.RegisteredService(object, factory, None).is_async
-        assert svc_reg.RegisteredService(
+        assert svcs.RegisteredService(object, factory, None).is_async
+        assert svcs.RegisteredService(
             object, factory_cleanup, None
         ).is_async
 
@@ -242,8 +242,8 @@ class TestRegisteredService:
         def factory_cleanup():
             yield 42
 
-        assert not svc_reg.RegisteredService(object, factory, None).is_async
-        assert not svc_reg.RegisteredService(
+        assert not svcs.RegisteredService(object, factory, None).is_async
+        assert not svcs.RegisteredService(
             object, factory_cleanup, None
         ).is_async
 
@@ -254,7 +254,7 @@ class TestServicePing:
         The name property proxies the correct class name.
         """
 
-        assert "Service" == svc_reg.ServicePing(None, rs).name
+        assert "Service" == svcs.ServicePing(None, rs).name
 
     def test_ping(self, registry, container):
         """
