@@ -127,12 +127,18 @@ True
 
 A container lives as long as you want the instances to live -- e.g., as long as a request lives.
 
+Importantly: It is possible to overwrite registered service factories later -- e.g., for testing -- **without monkey-patching**.
+You have to remove possibly cached instances from the container though (`Container.forget_service_type()`).
+The Flask integration takes care of this for you.
+
+How to achieve this in other frameworks elegantly is TBD.
+
 
 #### Cleanup
 
-If a factory is a generator and yields the instance, the generator will be remembered.
+If a factory is a [generator](https://docs.python.org/3/tutorial/classes.html#generators) and *yields* the instance instead of returning it, the generator will be remembered by the container.
 At the end, you run `container.close()` and all generators will be finished (i.e. called `next(factory)` again).
-You can use this to return database connections to a pool, et cetera.
+You can use this to close files, return database connections to a pool, et cetera.
 
 If you have async generators, use `await container.aclose()` instead which calls `await anext(factory)` on all async generators (and `next(factory)` on sync ones).
 
@@ -152,11 +158,6 @@ If you have async resources (either factory or ping callable), you can use `apin
 `aping()` works with sync resources too, so you can use it universally in async code.
 You can look at the `is_async` property to check whether you *need* to use `aget()`, though.
 
-Importantly: It is possible to overwrite registered service factories later -- e.g., for testing -- **without monkey-patching**.
-You have to remove possibly cached instances from the container if you're using nested dependencies (`Container.forget_service_type()`).
-The Flask integration takes care of this for you.
-
-How to achieve this in other frameworks elegantly is TBD.
 
 ### Summary
 
