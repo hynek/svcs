@@ -28,7 +28,7 @@ jobs:
       - uses: hynek/build-and-inspect-python-package@v1
 
   tests:
-    name: Tests on ${{ matrix.python-version }}
+    name: Tests & Mypy on ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     needs: build-package
 
@@ -57,7 +57,8 @@ jobs:
 
       - run: python -Im pip install tox
 
-      - run: |
+      - name: Run tests
+        run: |
           python -Im tox run \
             --installpkg dist/*.whl \
             -f py$(echo ${{ matrix.python-version }} | tr -d .)
@@ -69,7 +70,14 @@ jobs:
           path: .coverage.*
           if-no-files-found: ignore
 
+      - name: Check public API with Mypy
+        run: |
+          python -Im tox run \
+            --installpkg dist/*.whl \
+            -e mypy-api
+
   coverage:
+    name: Ensure 100% test coverage
     runs-on: ubuntu-latest
     needs: tests
     if: always()
