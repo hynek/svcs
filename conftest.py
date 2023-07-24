@@ -15,7 +15,7 @@ import svc_reg
 markdown_examples = Sybil(
     parsers=[
         myst.DocTestDirectiveParser(optionflags=ELLIPSIS),
-        myst.PythonCodeBlockParser(),
+        myst.PythonCodeBlockParser(doctest_optionflags=ELLIPSIS),
         myst.SkipParser(),
     ],
     patterns=["*.md"],
