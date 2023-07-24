@@ -1,6 +1,6 @@
 <!-- begin-pypi -->
 
-# A Service Registry for Dependency Injection
+# A Service Locator for Python
 
 > **Warning**
 > ☠️ Not ready yet! ☠️
@@ -17,14 +17,16 @@ It provides you with a central place to register factories for types/interfaces 
 
 **This allows you to configure and manage resources in *one central place* and access them all in a *consistent* way.**
 
-In practice that means that at runtime, you say, for example, "*Give me a database connection*!", and *svc-reg* will give you whatever you've configured it to return when asked for a database connection.
+---
+
+In practice that means that at runtime, you say "*Give me a database connection*!", and *svc-reg* will give you whatever you've configured it to return when asked for a database connection.
 This can be an actual database connection or it can be a mock object for testing.
 
 If you like the [*Dependency Inversion Principle*](https://en.wikipedia.org/wiki/Dependency_inversion_principle) (aka "*program against interfaces, not implementations*"), you would register concrete factories for abstract interfaces; in Python usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [Abstract Base Class](https://docs.python.org/3.11/library/abc.html).
 
 That:
 
-- unifies **acquisition** and **cleanups**,
+- unifies **acquisition** and **cleanups** of resources,
 - simplifies **testing**,
 - and allows for **easy health** checks across *all* resources.
 
@@ -51,14 +53,18 @@ The latter already works with [Flask](#flask).
 You set it up like this:
 
 ```python
+from sqlalchemy import Connection, create_engine
+
+...
+
 engine = create_engine("postgresql://localhost")
 
 def engine_factory():
     with engine.connect() as conn:
-        yield Database(conn)
+        yield conn
 
 registry = svc_reg.Registry()
-registry.register_factory(Database, engine_factory)
+registry.register_factory(Connection, engine_factory)
 ```
 
 The generator-based setup and cleanup may remind you of [Pytest fixtures](https://docs.pytest.org/en/stable/explanation/fixtures.html).
@@ -76,11 +82,14 @@ You're unlikely to use the core API directly, but knowing what's happening under
 
 *svc-reg* has two essential concepts:
 
+
+### Registries
+
 A **`Registry`** allows to register factories for certain types.
 It's expected to live as long as your application lives.
 Its only job is to store and retrieve factories.
 
-It is possible to register either factories or values:
+It is possible to register either factory callables or values:
 
 ```python
 >>> import svc_reg
@@ -96,9 +105,10 @@ It is possible to register either factories or values:
 The values and return values of the factories don't have to be actual instances of the type they're registered for.
 But the types must be *hashable* because they're used as keys in a lookup dictionary.
 
----
 
-A **`Container`** belongs to a Registry and allows to create instances of the registered types and takes care of their life-cycle:
+### Containers
+
+A **`Container`** belongs to a Registry and allows to create instances of the registered types, taking care of their life-cycle:
 
 ```python
 >>> container = svc_reg.Container(reg)
@@ -117,6 +127,9 @@ True
 
 A container lives as long as you want the instances to live -- e.g., as long as a request lives.
 
+
+#### Cleanup
+
 If a factory is a generator and yields the instance, the generator will be remembered.
 At the end, you run `container.close()` and all generators will be finished (i.e. called `next(factory)` again).
 You can use this to return database connections to a pool, et cetera.
@@ -125,7 +138,12 @@ If you have async generators, use `await container.aclose()` instead which calls
 
 Failing cleanups are logged at `warning` level but otherwise ignored.
 
----
+**The key idea is that your business code doesn't have to care about cleaning up resources it has requested.**
+
+That makes it even easier to test it because the business codes makes fewer assumptions about the object it's getting.
+
+
+#### Health Checks
 
 Additionally, each registered service may have a `ping` callable that you can use for health checks.
 You can request all pingable registered services with `container.get_pings()`.
@@ -140,7 +158,7 @@ The Flask integration takes care of this for you.
 
 How to achieve this in other frameworks elegantly is TBD.
 
----
+### Summary
 
 Generally, the `Registry` object should live on an application-scoped object like Flask's `app.config` object.
 On the other hand, the `Container` object should live on a request-scoped object like Flask's `g` object or Pyramid's `request` object.
@@ -178,14 +196,15 @@ import svc_reg
 
 def create_app(config_filename):
     app = Flask(__name__)
-    app.config.from_pyfile(config_filename)
+
+    ...
 
     ##########################################################################
     # Set up the registry using Flask integration.
     app = svc_reg.flask.init_app(app)
 
     # Now, register a factory that calls `engine.connect()` if you ask for a
-    # Connections. Since we use yield inside of a context manager, the
+    # `Connection`. Since we use yield inside of a context manager, the
     # connection gets cleaned up when the container is closed.
     # If you ask for a ping, it will run `SELECT 1` on a new connection and
     # clean up the connection behind itself.
@@ -214,10 +233,7 @@ def create_app(config_filename):
     )
     ##########################################################################
 
-    from yourapplication.views.admin import admin
-    from yourapplication.views.frontend import frontend
-    app.register_blueprint(admin)
-    app.register_blueprint(frontend)
+    ...
 
     return app
 ```
@@ -225,7 +241,7 @@ def create_app(config_filename):
 Now you can request the `Connection` object in your views:
 
 ```python
-@app.route("/")
+@app.get("/")
 def index() -> flask.ResponseValue:
     conn: Connection = svc_reg.flask.get(Connection)
 ```
@@ -350,6 +366,13 @@ Therefore it returns `Any`, and until Mypy changes its stance, you have to use i
 
 ```python
 conn: Connection = container.get(Connection)
+```
+
+If types are more important to you than a unified interface, you can always wrap it:
+
+```python
+def get_conn(container: reg_svc.Container) -> Connection:
+    return container.get(Connection)
 ```
 
 
