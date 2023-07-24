@@ -96,9 +96,7 @@ class TestFlask:
         """
         It's possible to overwrite an already registered type using a factory.
         """
-        svcs.flask.replace_value(
-            Interface, Interface(), ping=lambda _: None
-        )
+        svcs.flask.replace_value(Interface, Interface(), ping=lambda _: None)
 
         assert isinstance(svcs.flask.get(Interface), Interface)
 

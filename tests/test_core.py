@@ -227,9 +227,7 @@ class TestRegisteredService:
             yield 42
 
         assert svcs.RegisteredService(object, factory, None).is_async
-        assert svcs.RegisteredService(
-            object, factory_cleanup, None
-        ).is_async
+        assert svcs.RegisteredService(object, factory_cleanup, None).is_async
 
     def test_is_async_nope(self):
         """
