@@ -3,7 +3,7 @@
 
 <p align="center">
   <a href="https://github.com/hynek/svcs/">
-    <img src="docs/_static/logo.svg" width="25%" alt="svcs" />
+    <img src="docs/_static/logo.svg" width="30%" alt="svcs" />
   </a>
 </p>
 
