@@ -1,6 +1,5 @@
 <!-- begin-pypi -->
 
-# A Service Locator for Python
 
 <p align="center">
   <a href="https://github.com/hynek/svcs/">
@@ -8,6 +7,8 @@
   </a>
 </p>
 
+
+# A Service Locator for Python
 
 > **Warning**
 > ☠️ Not ready yet! ☠️
