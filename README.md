@@ -247,7 +247,7 @@ def index() -> flask.ResponseValue:
     conn: Connection = svc_reg.flask.get(Connection)
 ```
 
-If you have a health endpoint, it could look like this:
+If you have a [health endpoint](https://kubernetes.io/docs/reference/using-api/health-checks/), it could look like this:
 
 ```python
 @app.get("healthy")
