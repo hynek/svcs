@@ -189,7 +189,7 @@ For instance, to create a factory that uses a SQLAlchemy engine to produce conne
 
 ```python
 from flask import Flask
-from sqlalchemy import Connection
+from sqlalchemy import Connection, create_engine
 from sqlalchemy.sql import text
 
 import svc_reg
