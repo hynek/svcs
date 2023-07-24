@@ -20,7 +20,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ### Changed
 
-- Renamed from *reg-svc* to *svcs*.
+- Renamed from *svc-reg* to *svcs*.
   Sadly the more obvious names are all taken.
 
 
