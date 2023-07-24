@@ -15,6 +15,11 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/23.3.0...HEAD)
 
+### Changed
+
+- Renamed from *reg-svc* to *svcs*.
+  Sadly the more obvious names are all taken.
+
 
 ## [23.3.0](https://github.com/hynek/svcs/compare/23.2.0...23.3.0) - 2023-07-20
 
