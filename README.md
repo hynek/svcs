@@ -371,8 +371,15 @@ conn: Connection = container.get(Connection)
 If types are more important to you than a unified interface, you can always wrap it:
 
 ```python
-def get_conn(container: reg_svc.Container) -> Connection:
-    return container.get(Connection)
+def get_connection() -> Connection:
+    return svc_reg.flask.get(Connection)
+```
+
+Or, if you don't care about `Protocols`:
+
+```python
+def get(svc_type: type[T]) -> T:
+    return svc_reg.flask.get(svc_type)
 ```
 
 
