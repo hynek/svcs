@@ -200,6 +200,9 @@ It:
 You can add support for *svcs* by calling `svcs.flask.init_app(app)` in your [*application factory*](https://flask.palletsprojects.com/en/latest/patterns/appfactories/).
 For instance, to create a factory that uses a SQLAlchemy engine to produce connections, you could do this:
 
+
+; skip: start
+
 ```python
 from flask import Flask
 from sqlalchemy import Connection, create_engine
