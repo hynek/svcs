@@ -9,7 +9,7 @@ import pytest
 from sybil import Sybil
 from sybil.parsers import myst, rest
 
-import svc_reg
+import svcs
 
 
 markdown_examples = Sybil(
@@ -34,9 +34,9 @@ pytest_collect_file = (markdown_examples + rest_examples).pytest()
 
 @pytest.fixture(name="registry")
 def _registry():
-    return svc_reg.Registry()
+    return svcs.Registry()
 
 
 @pytest.fixture(name="container")
 def _container(registry):
-    return svc_reg.Container(registry)
+    return svcs.Container(registry)

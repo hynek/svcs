@@ -1,25 +1,35 @@
 <!-- begin-pypi -->
 
-# A Service Locator for Python
+
+<p align="center">
+  <a href="https://github.com/hynek/svcs/">
+    <img src="https://raw.githubusercontent.com/hynek/svcs/main/docs/_static/logo.svg" width="20%" alt="svcs" />
+  </a>
+</p>
+
+
+# *svcs*: A Service Locator for Python
 
 > **Warning**
 > ☠️ Not ready yet! ☠️
 >
-> This project is only public to [gather feedback](https://github.com/hynek/svc-reg/discussions), and everything can and will change until the project is proclaimed stable.
+> This project is only public to [gather feedback](https://github.com/hynek/svcs/discussions), and everything can and will change until the project is proclaimed stable.
 >
 > Currently only [**Flask** support](#flask) is production-ready, but API details can still change.
 >
 > At this point, it's unclear whether this project will become a "proper Hynek project".
 > I will keep using it for my work projects, but whether this will grow beyond my personal needs depends on community interest.
 
-*svc-reg* is a [service locator](https://en.wikipedia.org/wiki/Service_locator_pattern) for Python.
+*svcs* (pronounced *services*) is a [service locator](https://en.wikipedia.org/wiki/Service_locator_pattern) for Python.
 It provides you with a central place to register factories for types/interfaces and then imperatively request instances of those types with **automatic cleanup** and **health checks**.
-
-**This allows you to configure and manage resources in *one central place* and access them all in a *consistent* way.**
 
 ---
 
-In practice that means that at runtime, you say "*Give me a database connection*!", and *svc-reg* will give you whatever you've configured it to return when asked for a database connection.
+**This allows you to configure and manage all your resources in *one central place* and access them in a *consistent* way.**
+
+---
+
+In practice that means that at runtime, you say "*Give me a database connection*!", and *svcs* will give you whatever you've configured it to return when asked for a database connection.
 This can be an actual database connection or it can be a mock object for testing.
 
 If you like the [*Dependency Inversion Principle*](https://en.wikipedia.org/wiki/Dependency_inversion_principle) (aka "*program against interfaces, not implementations*"), you would register concrete factories for abstract interfaces; in Python usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [Abstract Base Class](https://docs.python.org/3.11/library/abc.html).
@@ -65,7 +75,7 @@ def engine_factory():
     with engine.connect() as conn:
         yield conn
 
-registry = svc_reg.Registry()
+registry = svcs.Registry()
 registry.register_factory(Connection, engine_factory)
 ```
 
@@ -73,7 +83,7 @@ The generator-based setup and cleanup may remind you of [Pytest fixtures](https:
 
 Unlike typical dependency injection that passes your dependencies as arguments, the active obtainment of resources by calling `get()` when you *know* you're going to need it avoids the conundrum of either having to pass a factory (e.g., a connection pool -- which also puts the onus of cleanup on you), or eagerly creating resources that are never used.
 
-*svc-reg* comes with **full async** support via a-prefixed methods (i.e. `aget()` instead of `get()`, et cetera).
+*svcs* comes with **full async** support via a-prefixed methods (i.e. `aget()` instead of `get()`, et cetera).
 
 <!-- end-pypi -->
 
@@ -82,7 +92,7 @@ Unlike typical dependency injection that passes your dependencies as arguments, 
 
 You're unlikely to use the core API directly, but knowing what's happening underneath is good to dispel any concerns about magic.
 
-*svc-reg* has two essential concepts:
+*svcs* has two essential concepts:
 
 
 ### Registries
@@ -94,10 +104,10 @@ Its only job is to store and retrieve factories.
 It is possible to register either factory callables or values:
 
 ```python
->>> import svc_reg
+>>> import svcs
 >>> import uuid
 
->>> reg = svc_reg.Registry()
+>>> reg = svcs.Registry()
 
 >>> reg.register_factory(uuid.UUID, uuid.uuid4)
 >>> reg.register_value(str, "Hello World")
@@ -113,7 +123,7 @@ But the types must be *hashable* because they're used as keys in a lookup dictio
 A **`Container`** belongs to a Registry and allows to create instances of the registered types, taking care of their life-cycle:
 
 ```python
->>> container = svc_reg.Container(reg)
+>>> container = svcs.Container(reg)
 
 >>> u = container.get(uuid.UUID)
 >>> u
@@ -174,19 +184,19 @@ On the other hand, the `Container` object should live on a request-scoped object
 
 ## Flask
 
-*svc-reg* has grown from my frustration with the repetitiveness of using the `get_x` that creates an `x` and then stores it on the `g` object [pattern](https://flask.palletsprojects.com/en/latest/appcontext/#storing-data).
+*svcs* has grown from my frustration with the repetitiveness of using the `get_x` that creates an `x` and then stores it on the `g` object [pattern](https://flask.palletsprojects.com/en/latest/appcontext/#storing-data).
 
-Therefore it comes with Flask support out of the box in the form of the `svc_reg.flask` module.
+Therefore it comes with Flask support out of the box in the form of the `svcs.flask` module.
 It:
 
-- puts the registry into `app.config["svc_registry"]`,
+- puts the registry into `app.config["svcsistry"]`,
 - unifies the putting and caching of services on the `g` object by putting a container into `g.svc_container`,
 - transparently retrieves them from there for you,
 - and installs a [`teardown_appcontext()`](http://flask.pocoo.org/docs/latest/api#flask.Flask.teardown_appcontext) handler that calls `close()` on the container when a request is done.
 
 ---
 
-You can add support for *svc-reg* by calling `svc_reg.flask.init_app(app)` in your [*application factory*](https://flask.palletsprojects.com/en/latest/patterns/appfactories/).
+You can add support for *svcs* by calling `svcs.flask.init_app(app)` in your [*application factory*](https://flask.palletsprojects.com/en/latest/patterns/appfactories/).
 For instance, to create a factory that uses a SQLAlchemy engine to produce connections, you could do this:
 
 ```python
@@ -194,7 +204,7 @@ from flask import Flask
 from sqlalchemy import Connection, create_engine
 from sqlalchemy.sql import text
 
-import svc_reg
+import svcs
 
 
 def create_app(config_filename):
@@ -204,7 +214,7 @@ def create_app(config_filename):
 
     ##########################################################################
     # Set up the registry using Flask integration.
-    app = svc_reg.flask.init_app(app)
+    app = svcs.flask.init_app(app)
 
     # Now, register a factory that calls `engine.connect()` if you ask for a
     # `Connection`. Since we use yield inside of a context manager, the
@@ -217,7 +227,7 @@ def create_app(config_filename):
             yield conn
 
     ping = text("SELECT 1")
-    svc_reg_flask.register_factory(
+    svcs_flask.register_factory(
         # The app argument makes it good for custom init_app() functions.
         app,
         Connection,
@@ -225,13 +235,13 @@ def create_app(config_filename):
         ping=lambda conn: conn.execute(ping)
     )
 
-    # You also use svc_reg WITHIN factories:
-    svc_reg_flask.register_factory(
+    # You also use svcs WITHIN factories:
+    svcs_flask.register_factory(
         app, # <---
         AbstractRepository,
         # No cleanup, so we just return an object using a lambda
         lambda: Repository.from_connection(
-            svc_reg.flask.get(Connection)
+            svcs.flask.get(Connection)
         ),
     )
     ##########################################################################
@@ -246,7 +256,7 @@ Now you can request the `Connection` object in your views:
 ```python
 @app.get("/")
 def index() -> flask.ResponseValue:
-    conn: Connection = svc_reg.flask.get(Connection)
+    conn: Connection = svcs.flask.get(Connection)
 ```
 
 If you have a [health endpoint](https://kubernetes.io/docs/reference/using-api/health-checks/), it could look like this:
@@ -261,7 +271,7 @@ def healthy() -> flask.ResponseValue:
     failing: list[dict[str, str]] = []
     code = 200
 
-    for svc in svc_reg.flask.get_pings():
+    for svc in svcs.flask.get_pings():
         try:
             svc.ping()
             ok.append(svc.name)
@@ -314,7 +324,7 @@ In practice, you can simplify/beautify the code within your views by creating a 
 Say this is `app/services.py`:
 
 ```python
-from svc_reg.flask import (
+from svcs.flask import (
     get,
     get_pings,
     init_app,
@@ -375,19 +385,19 @@ If types are more important to you than a unified interface, you can always wrap
 
 ```python
 def get_connection() -> Connection:
-    return svc_reg.flask.get(Connection)
+    return svcs.flask.get(Connection)
 ```
 
 Or, if you don't care about `Protocols`:
 
 ```python
 def get(svc_type: type[T]) -> T:
-    return svc_reg.flask.get(svc_type)
+    return svcs.flask.get(svc_type)
 ```
 
 
 ## Credits
 
-*svc-reg* is written by [Hynek Schlawack](https://hynek.me/) and distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+*svcs* is written by [Hynek Schlawack](https://hynek.me/) and distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
 
 The development is kindly supported by my employer [Variomedia AG](https://www.variomedia.de/) and all my amazing [GitHub Sponsors](https://github.com/sponsors/hynek).
