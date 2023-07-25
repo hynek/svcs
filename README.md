@@ -31,6 +31,7 @@ It provides you with a central place to register factories for types/interfaces 
 
 In practice that means that at runtime, you say "*Give me a database connection*!", and *svcs* will give you whatever you've configured it to return when asked for a database connection.
 This can be an actual database connection or it can be a mock object for testing.
+All of this happens *within* your application – service locators are **not** related to service discovery.
 
 If you like the [*Dependency Inversion Principle*](https://en.wikipedia.org/wiki/Dependency_inversion_principle) (aka "*program against interfaces, not implementations*"), you would register concrete factories for abstract interfaces; in Python usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [Abstract Base Class](https://docs.python.org/3.11/library/abc.html).
 
@@ -79,7 +80,7 @@ registry.register_factory(Connection, engine_factory)
 
 The generator-based setup and cleanup may remind you of [Pytest fixtures](https://docs.pytest.org/en/stable/explanation/fixtures.html).
 
-Unlike typical dependency injection that passes your dependencies as arguments, the active obtainment of resources by calling `get()` when you *know* you're going to need it avoids the conundrum of either having to pass a factory (e.g., a connection pool -- which also puts the onus of cleanup on you), or eagerly creating resources that are never used.
+Unlike typical dependency injection that passes your dependencies as arguments, the active obtainment of resources by calling `get()` when you *know* you're going to need it avoids the conundrum of either having to pass a factory (e.g., a connection pool – which also puts the onus of cleanup on you), or eagerly creating resources that are never used.
 
 *svcs* comes with **full async** support via a-prefixed methods (i.e. `aget()` instead of `get()`, et cetera).
 
@@ -135,9 +136,9 @@ True
 
 ```
 
-A container lives as long as you want the instances to live -- e.g., as long as a request lives.
+A container lives as long as you want the instances to live – e.g., as long as a request lives.
 
-Importantly: It is possible to overwrite registered service factories later -- e.g., for testing -- **without monkey-patching**.
+Importantly: It is possible to overwrite registered service factories later – e.g., for testing – **without monkey-patching**.
 You have to remove possibly cached instances from the container though (`Container.forget_service_type()`).
 The Flask integration takes care of this for you.
 
