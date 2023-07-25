@@ -7,18 +7,29 @@ from doctest import ELLIPSIS
 import pytest
 
 from sybil import Sybil
-from sybil.parsers.rest import DocTestParser, PythonCodeBlockParser
+from sybil.parsers import myst, rest
 
 import svcs
 
 
-pytest_collect_file = Sybil(
+markdown_examples = Sybil(
     parsers=[
-        DocTestParser(optionflags=ELLIPSIS),
-        PythonCodeBlockParser(),
+        myst.DocTestDirectiveParser(optionflags=ELLIPSIS),
+        myst.PythonCodeBlockParser(doctest_optionflags=ELLIPSIS),
+        myst.SkipParser(),
     ],
-    patterns=["*.md", "*.py"],
-).pytest()
+    patterns=["*.md"],
+)
+
+rest_examples = Sybil(
+    parsers=[
+        rest.DocTestParser(optionflags=ELLIPSIS),
+        rest.PythonCodeBlockParser(),
+    ],
+    patterns=["*.py"],
+)
+
+pytest_collect_file = (markdown_examples + rest_examples).pytest()
 
 
 @pytest.fixture(name="registry")
