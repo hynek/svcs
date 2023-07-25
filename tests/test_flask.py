@@ -72,7 +72,7 @@ class TestFlask:
 
         assert isinstance(svc1, Service1)
         assert isinstance(svc2, Service2)
-        assert 2 == len(flask.g.svc_container.cleanups)
+        assert 2 == len(flask.g.svcs_container.cleanups)
 
         teardown(None)
 
@@ -216,7 +216,7 @@ class TestInitApp:
         app = flask.Flask("tests")
         svcs.flask.init_app(app)
 
-        assert isinstance(app.config["svcsistry"], svcs.Registry)
+        assert isinstance(app.config["svcs_registry"], svcs.Registry)
 
     def test_explicit_registry(self):
         """
@@ -226,4 +226,4 @@ class TestInitApp:
         app = flask.Flask("tests")
         svcs.flask.init_app(app, registry)
 
-        assert registry is app.config["svcsistry"]
+        assert registry is app.config["svcs_registry"]

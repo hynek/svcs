@@ -192,8 +192,8 @@ On the other hand, the `Container` object should live on a request-scoped object
 Therefore it comes with Flask support out of the box in the form of the `svcs.flask` module.
 It:
 
-- puts the registry into `app.config["svcsistry"]`,
-- unifies the putting and caching of services on the `g` object by putting a container into `g.svc_container`,
+- puts the registry into `app.config["svcs_registry"]`,
+- unifies the putting and caching of services on the `g` object by putting a container into `g.svcs_container`,
 - transparently retrieves them from there for you,
 - and installs a [`teardown_appcontext()`](http://flask.pocoo.org/docs/latest/api#flask.Flask.teardown_appcontext) handler that calls `close()` on the container when a request is done.
 
