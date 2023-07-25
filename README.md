@@ -63,7 +63,9 @@ The latter already works with [Flask](#flask).
 
 You set it up like this:
 
-% skip: next
+<!--
+; skip: next
+-->
 
 ```python
 from sqlalchemy import Connection, create_engine
@@ -201,7 +203,9 @@ You can add support for *svcs* by calling `svcs.flask.init_app(app)` in your [*a
 For instance, to create a factory that uses a SQLAlchemy engine to produce connections, you could do this:
 
 
+<!--
 ; skip: start
+-->
 
 ```python
 from flask import Flask
