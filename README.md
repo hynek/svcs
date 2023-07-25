@@ -84,9 +84,34 @@ registry.register_factory(Connection, engine_factory)
 
 The generator-based setup and cleanup may remind you of [Pytest fixtures](https://docs.pytest.org/en/stable/explanation/fixtures.html).
 
-Unlike typical dependency injection that passes your dependencies as arguments, the active obtainment of resources by calling `get()` when you *know* you're going to need it avoids the conundrum of either having to pass a factory (e.g., a connection pool – which also puts the onus of cleanup on you), or eagerly creating resources that are never used.
-
 *svcs* comes with **full async** support via a-prefixed methods (i.e. `aget()` instead of `get()`, et cetera).
+
+
+## Is this Dependency Injection!?
+
+No.
+
+Unlike [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection), which passes your dependencies as arguments, you actively ask a service locator for them. This usually requires less opaque magic since nothing meddles with your function/method definitions. But you can use, e.g., your web framework's injection capabilities to inject the locator object into your views and benefit from *svcs*'s upsides without giving up some of DI's ones.
+
+The active acquisition of resources by calling `get()` when you *know* for sure you're going to need it avoids the conundrum of either having to pass a factory (e.g., a connection pool – which also puts the onus of cleanup on you) or eagerly creating resources that you never use:
+
+<!--
+; skip: next
+-->
+```python
+def view(request):
+    if request.form.valid():
+        # Form is valid; only NOW get a DB connection
+        # and pass it into your business logic.
+        return handle_form_data(
+            request.services.get(Database),
+            form.data,
+        )
+
+    raise InvalidFormError()
+```
+
+The main downside is that it's impossible to verify whether all required dependencies have been configured without running the code.
 
 <!-- end-pypi -->
 
