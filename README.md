@@ -3,7 +3,7 @@
 
 <p align="center">
   <a href="https://github.com/hynek/svcs/">
-    <img src="https://raw.githubusercontent.com/hynek/svcs/main/docs/_static/logo.svg" width="25%" alt="svcs" />
+    <img src="https://raw.githubusercontent.com/hynek/svcs/main/docs/_static/logo.svg" width="20%" alt="svcs" />
   </a>
 </p>
 
@@ -22,6 +22,8 @@
 
 *svcs* (pronounced *services*) is a [service locator](https://en.wikipedia.org/wiki/Service_locator_pattern) for Python.
 It provides you with a central place to register factories for types/interfaces and then imperatively request instances of those types with **automatic cleanup** and **health checks**.
+
+---
 
 **This allows you to configure and manage resources in *one central place* and access them all in a *consistent* way.**
 
