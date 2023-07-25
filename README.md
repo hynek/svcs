@@ -114,7 +114,6 @@ It is possible to register either factory callables or values:
 
 >>> reg.register_factory(uuid.UUID, uuid.uuid4)
 >>> reg.register_value(str, "Hello World")
-
 ```
 
 The values and return values of the factories don't have to be actual instances of the type they're registered for.
@@ -137,7 +136,6 @@ UUID('...')
 True
 >>> container.get(str)
 'Hello World'
-
 ```
 
 A container lives as long as you want the instances to live – e.g., as long as a request lives.
