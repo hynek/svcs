@@ -189,7 +189,7 @@ That makes it even easier to test it because the business codes makes fewer assu
 
 #### Health Checks
 
-Additionally, each registered service may have a `ping` callable that you can use for health checks.
+Each registered service may have a `ping` callable that you can use for health checks.
 You can request all pingable registered services with `container.get_pings()`.
 This returns a list of `ServicePing` objects that currently have a name property to identify the ping and a `ping` method that instantiates the service, adds it to the cleanup list, and runs the ping.
 If you have async resources (either factory or ping callable), you can use `aping()` instead.
