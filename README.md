@@ -82,7 +82,7 @@ def engine_factory():
 
 registry = svcs.Registry()
 registry.register_factory(
-    Connection, engine_factory, on_registry_close=lambda: engine.dispose()
+    Connection, engine_factory, on_registry_close=engine.dispose
 )
 
 @atexit.register
@@ -155,9 +155,13 @@ But the types must be *hashable* because they're used as keys in a lookup dictio
 
 It's possible to register a callback that is called when the *registry* is closed:
 
+<!--
+; skip: next
+-->
+
 ```python
 registry.register_factory(
-    Connection, engine_factory, on_registry_close=lambda: engine.dispose()
+    Connection, engine_factory, on_registry_close=engine.dispose
 )
 ```
 
