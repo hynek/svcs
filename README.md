@@ -153,6 +153,18 @@ It is possible to register either factory callables or values:
 The values and return values of the factories don't have to be actual instances of the type they're registered for.
 But the types must be *hashable* because they're used as keys in a lookup dictionary.
 
+It's possible to register a callback that is called when the *registry* is closed:
+
+```python
+registry.register_factory(
+    Connection, engine_factory, on_registry_close=lambda: engine.dispose()
+)
+```
+
+If this callback fails, it's logged at warning level but otherwise ignored.
+For instance, you could free a database connection pool in an [`atexit` handler](https://docs.python.org/3/library/atexit.html).
+This frees you from keeping track of registered resources yourself.
+
 
 ### Containers
 
