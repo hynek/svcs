@@ -68,6 +68,8 @@ You set it up like this:
 -->
 
 ```python
+import atexit
+
 from sqlalchemy import Connection, create_engine
 
 ...
@@ -79,10 +81,17 @@ def engine_factory():
         yield conn
 
 registry = svcs.Registry()
-registry.register_factory(Connection, engine_factory)
+registry.register_factory(
+    Connection, engine_factory, on_registry_close=lambda: engine.dispose()
+)
+
+@atexit.register
+def cleanup():
+    registry.close()  # calls engine.dispose()
 ```
 
 The generator-based setup and cleanup may remind you of [Pytest fixtures](https://docs.pytest.org/en/stable/explanation/fixtures.html).
+The hooks that are defined as `on_registry_close` are called when you call `Registry.close()` – e.g. when your application is shutting down.
 
 *svcs* comes with **full async** support via a-prefixed methods (i.e. `aget()` instead of `get()`, et cetera).
 

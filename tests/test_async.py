@@ -77,7 +77,7 @@ class TestAsync:
 
         svc = await container.aget(Service)
 
-        assert 1 == len(container.cleanups)
+        assert 1 == len(container._cleanups)
         assert Service() == svc
         assert not cleaned_up
 

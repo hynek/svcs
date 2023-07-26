@@ -72,7 +72,7 @@ class TestFlask:
 
         assert isinstance(svc1, Service1)
         assert isinstance(svc2, Service2)
-        assert 2 == len(flask.g.svcs_container.cleanups)
+        assert 2 == len(flask.g.svcs_container._cleanups)
 
         teardown(None)
 
@@ -151,14 +151,14 @@ class TestFlask:
         svcs.flask.get(Service1)
         svcs.flask.get(Service2)
 
-        assert 2 == len(container.cleanups)
+        assert 2 == len(container._cleanups)
 
         svcs.flask.replace_factory(Service1, Interface)
 
         svcs.flask.get(Service1)
         svcs.flask.get(Service2)
 
-        assert 2 == len(container.cleanups)
+        assert 2 == len(container._cleanups)
 
     @pytest.mark.asyncio()
     async def test_teardown_warns_on_async_cleanups(self, container):
@@ -195,7 +195,7 @@ class TestNonContextHelpers:
 
         svcs.flask.register_factory(app, Interface, Service1)
 
-        assert Interface in registry.services
+        assert Interface in registry._services
 
     def test_register_value_helper(self, registry, app):
         """
@@ -205,7 +205,7 @@ class TestNonContextHelpers:
 
         svcs.flask.register_value(app, Interface, 42)
 
-        assert Interface in registry.services
+        assert Interface in registry._services
 
 
 class TestInitApp:

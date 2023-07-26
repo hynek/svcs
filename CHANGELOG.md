@@ -15,6 +15,11 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/23.4.0...HEAD)
 
+### Added
+
+- Registered factory/value clean up!
+  It is now possible to register an `on_registry_close` hook that is called once the `Registry`'s `(a)close()` method is called.
+
 
 ## [23.4.0](https://github.com/hynek/svcs/compare/23.3.0...23.4.0) - 2023-07-24
 

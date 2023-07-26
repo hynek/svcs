@@ -11,6 +11,16 @@ import svcs
 
 
 reg = svcs.Registry()
+con = svcs.Container(reg)
+
+reg.close()
+with contextlib.closing(reg) as reg:
+    ...
+
+
+async def f() -> None:
+    await reg.aclose()
+    await con.aclose()
 
 
 def gen() -> Generator:
@@ -53,6 +63,9 @@ with contextlib.closing(svcs.Container(reg)) as con:
 
 if sys.version_info >= (3, 10):
 
-    async def f() -> None:
+    async def ctx() -> None:
         async with contextlib.aclosing(svcs.Container(reg)):
+            ...
+
+        async with contextlib.aclosing(svcs.Registry()):
             ...

@@ -33,15 +33,15 @@ class Container:
     """
 
     registry: Registry
-    instantiated: dict[type, object] = attrs.Factory(dict)
-    cleanups: list[
+    _instantiated: dict[type, object] = attrs.Factory(dict)
+    _cleanups: list[
         tuple[RegisteredService, Generator | AsyncGenerator]
     ] = attrs.Factory(list)
 
     def __repr__(self) -> str:
         return (
-            f"<Container(instantiated={len(self.instantiated)}, "
-            f"cleanups={len(self.cleanups)})>"
+            f"<Container(instantiated={len(self._instantiated)}, "
+            f"cleanups={len(self._cleanups)})>"
         )
 
     def get(self, svc_type: type) -> Any:
@@ -53,17 +53,17 @@ class Container:
         Returns:
              Any until https://github.com/python/mypy/issues/4717 is fixed.
         """
-        if (svc := self.instantiated.get(svc_type)) is not None:
+        if (svc := self._instantiated.get(svc_type)) is not None:
             return svc
 
         rs = self.registry.get_registered_service_for(svc_type)
         svc = rs.factory()
 
         if isinstance(svc, Generator):
-            self.cleanups.append((rs, svc))
+            self._cleanups.append((rs, svc))
             svc = next(svc)
 
-        self.instantiated[rs.svc_type] = svc
+        self._instantiated[rs.svc_type] = svc
 
         return svc
 
@@ -76,19 +76,19 @@ class Container:
         Returns:
              Any until https://github.com/python/mypy/issues/4717 is fixed.
         """
-        if (svc := self.instantiated.get(svc_type)) is not None:
+        if (svc := self._instantiated.get(svc_type)) is not None:
             return svc
 
         rs = self.registry.get_registered_service_for(svc_type)
         svc = rs.factory()
 
         if isinstance(svc, AsyncGenerator):
-            self.cleanups.append((rs, svc))
+            self._cleanups.append((rs, svc))
             svc = await anext(svc)
         elif isawaitable(svc):
             svc = await svc
 
-        self.instantiated[rs.svc_type] = svc
+        self._instantiated[rs.svc_type] = svc
 
         return svc
 
@@ -97,7 +97,7 @@ class Container:
         Remove all traces of *svc_type* in ourselves.
         """
         with suppress(KeyError):
-            del self.instantiated[svc_type]
+            del self._instantiated[svc_type]
 
     def close(self) -> None:
         """
@@ -105,8 +105,8 @@ class Container:
 
         Async closes are *not* awaited.
         """
-        while self.cleanups:
-            rs, gen = self.cleanups.pop()
+        while self._cleanups:
+            rs, gen = self._cleanups.pop()
             try:
                 if isinstance(gen, AsyncGenerator):
                     warnings.warn(
@@ -135,8 +135,8 @@ class Container:
         """
         Run *all* registered cleanups -- synchronous **and** asynchronous.
         """
-        while self.cleanups:
-            rs, gen = self.cleanups.pop()
+        while self._cleanups:
+            rs, gen = self._cleanups.pop()
             try:
                 if isinstance(gen, AsyncGenerator):
                     await anext(gen)
@@ -162,7 +162,7 @@ class Container:
         """
         return [
             ServicePing(self, rs)
-            for rs in self.registry.services.values()
+            for rs in self.registry._services.values()
             if rs.ping is not None
         ]
 
@@ -221,7 +221,8 @@ class ServicePing:
 
 @attrs.define
 class Registry:
-    services: dict[type, RegisteredService] = attrs.Factory(dict)
+    _services: dict[type, RegisteredService] = attrs.Factory(dict)
+    _on_close: dict[str, Callable] = attrs.Factory(dict)
 
     def register_factory(
         self,
@@ -229,8 +230,13 @@ class Registry:
         factory: Callable,
         *,
         ping: Callable | None = None,
+        on_registry_close: Callable | None = None,
     ) -> None:
-        self.services[svc_type] = RegisteredService(svc_type, factory, ping)
+        rs = RegisteredService(svc_type, factory, ping)
+        self._services[svc_type] = rs
+
+        if on_registry_close is not None:
+            self._on_close[rs.name] = on_registry_close
 
     def register_value(
         self,
@@ -238,11 +244,66 @@ class Registry:
         instance: object,
         *,
         ping: Callable | None = None,
+        on_registry_close: Callable | None = None,
     ) -> None:
-        self.register_factory(svc_type, lambda: instance, ping=ping)
+        self.register_factory(
+            svc_type,
+            lambda: instance,
+            ping=ping,
+            on_registry_close=on_registry_close,
+        )
 
     def get_registered_service_for(self, svc_type: type) -> RegisteredService:
         try:
-            return self.services[svc_type]
+            return self._services[svc_type]
         except KeyError:
             raise ServiceNotFoundError(svc_type) from None
+
+    def close(self) -> None:
+        """
+        Clear registrations & run synchronous ``on_registry_close`` callbacks.
+        """
+        self._services = {}
+
+        for key in tuple(self._on_close.keys()):
+            if iscoroutinefunction(self._on_close[key]):
+                warnings.warn(
+                    f"Skipped async cleanup for {key!r}. "
+                    "Use aclose() instead.",
+                    # stacklevel doesn't matter here; it's coming from a
+                    # framework.
+                    stacklevel=1,
+                )
+                continue
+
+            oc = self._on_close.pop(key)
+
+            try:
+                oc()
+            except Exception:  # noqa: BLE001, PERF203
+                log.warning(
+                    "Registry's on_close hook failed",
+                    exc_info=True,
+                    extra={"service": key},
+                )
+
+    async def aclose(self) -> None:
+        """
+        Clear registrations & run all ``on_registry_close`` callbacks.
+        """
+        self._services = {}
+
+        for key in tuple(self._on_close.keys()):
+            oc = self._on_close.pop(key)
+
+            try:
+                if iscoroutinefunction(oc) or isawaitable(oc):
+                    await oc()
+                else:
+                    oc()
+            except Exception:  # noqa: BLE001, PERF203
+                log.warning(
+                    "Registry's on_close hook failed",
+                    exc_info=True,
+                    extra={"service": key},
+                )

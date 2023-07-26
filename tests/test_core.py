@@ -3,12 +3,20 @@
 # SPDX-License-Identifier: MIT
 
 import asyncio
+import contextlib
+import inspect
 
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 
 import svcs
+
+
+needs_working_async_mock = pytest.mark.skipif(
+    not inspect.iscoroutinefunction(AsyncMock()),
+    reason="AsyncMock not working",
+)
 
 
 class Service:
@@ -92,12 +100,12 @@ class TestContainer:
         """
         forget_service_type removes the registered service from the container.
         """
-        container.instantiated[rs.svc_type] = (rs, svc)
+        container._instantiated[rs.svc_type] = (rs, svc)
 
         container.forget_service_type(Service)
 
-        assert {} == container.instantiated
-        assert [] == container.cleanups
+        assert {} == container._instantiated
+        assert [] == container._cleanups
 
     @pytest.mark.asyncio()
     async def test_repr(self, registry, container):
@@ -281,3 +289,115 @@ class TestServicePing:
         container.close()
 
         assert cleaned_up
+
+
+class TestRegistry:
+    def test_empty_close(self):
+        """
+        Closing an empty registry does nothing.
+        """
+        svcs.Registry().close()
+
+        with contextlib.closing(svcs.Registry()):
+            ...
+
+    def test_close_closes(self, registry):
+        """
+        Calling close on Registry runs all on_close callbacks.
+        """
+        close_1 = Mock()
+        close_2 = Mock()
+
+        registry.register_factory(Service, Service, on_registry_close=close_1)
+        registry.register_value(
+            AnotherService, AnotherService, on_registry_close=close_2
+        )
+
+        registry.close()
+
+        assert close_1.called
+        assert close_2.called
+        assert not registry._services
+
+    def test_close_warns_about_async(self, registry):
+        """
+        Calling close raises a warning if there are async cleanups.
+        """
+
+        async def hook():
+            ...
+
+        registry.register_factory(Service, Service, on_registry_close=hook)
+
+        with pytest.warns(
+            UserWarning, match="Skipped async cleanup for 'Service'."
+        ):
+            registry.close()
+
+    def test_close_logs_failures(self, registry, caplog):
+        """
+        Closing failures are logged but ignored.
+        """
+        registry.register_factory(
+            Service, Service, on_registry_close=Mock(side_effect=ValueError())
+        )
+
+        with contextlib.closing(registry):
+            ...
+
+        assert "Service" == caplog.records[0].service
+
+    @pytest.mark.skipif(
+        not hasattr(contextlib, "aclosing"),
+        reason="Hasn't contextlib.aclosing()",
+    )
+    @pytest.mark.asyncio()
+    async def test_async_empty_close(self, registry):
+        """
+        Asynchronously closing an empty registry does nothing.
+        """
+        await registry.aclose()
+
+        async with contextlib.aclosing(svcs.Registry()):
+            ...
+
+    @pytest.mark.asyncio()
+    @needs_working_async_mock
+    async def test_aclose_mixed(self, registry):
+        """
+        aclose() closes all services, including async ones.
+        """
+        sync_close = Mock()
+        async_close = AsyncMock()
+
+        registry.register_factory(
+            Service, Service, on_registry_close=sync_close
+        )
+        registry.register_factory(
+            AnotherService, AnotherService, on_registry_close=async_close
+        )
+
+        await registry.aclose()
+
+        assert sync_close.called
+
+        async_close.assert_awaited_once()
+
+    @pytest.mark.asyncio()
+    @needs_working_async_mock
+    async def test_aclose_logs_failures(self, registry, caplog):
+        """
+        Async closing failures are logged but ignored.
+        """
+        close_mock = AsyncMock(side_effect=ValueError())
+
+        registry.register_factory(
+            Service,
+            Service,
+            on_registry_close=close_mock,
+        )
+
+        await registry.aclose()
+
+        close_mock.assert_awaited_once()
+        assert "Service" == caplog.records[0].service

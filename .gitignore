@@ -10,3 +10,4 @@ t.py
 Justfile
 docs/_build
 .tox
+tmp
