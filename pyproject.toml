@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 [project]
 dynamic = ["version", "readme"]
 name = "svcs"
-description = "A Service Locator for Python"
+description = "A Lightweight Service Locator for Python"
 requires-python = ">=3.8"
 license = "MIT"
 keywords = ["dependency injection"]

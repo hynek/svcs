@@ -13,6 +13,11 @@ from ._core import Container, Registry, ServicePing
 
 
 def init_app(app: Flask, registry: Registry | None = None) -> Flask:
+    """
+    Initialize *app* for *svcs*.
+
+    Creates a registry for you if you don't provide one.
+    """
     if registry is None:
         registry = Registry()
 
@@ -24,9 +29,7 @@ def init_app(app: Flask, registry: Registry | None = None) -> Flask:
 
 def get(svc_type: type) -> Any:
     """
-    Get registered service of *svc_type*.
-
-    Return Any until https://github.com/python/mypy/issues/4717 is fixed.
+    Same as :meth:`svcs.Container.get()`, but uses container on ``flask.g``.
     """
     _, container = _ensure_req_data()
 
@@ -40,6 +43,10 @@ def register_factory(
     *,
     ping: Callable | None = None,
 ) -> None:
+    """
+    Same as :meth:`svcs.Registry.register_factory()`, but uses registry on
+    *app*.
+    """
     app.config["svcs_registry"].register_factory(svc_type, factory, ping=ping)
 
 
@@ -50,6 +57,9 @@ def register_value(
     *,
     ping: Callable | None = None,
 ) -> None:
+    """
+    Same as :meth:`svcs.Registry.register_value()`, but uses registry on *app*.
+    """
     app.config["svcs_registry"].register_value(svc_type, instance, ping=ping)
 
 
@@ -59,6 +69,9 @@ def replace_factory(
     *,
     ping: Callable | None = None,
 ) -> None:
+    """
+    Register *factory* for *svc_type* and clear any cached values for it.
+    """
     registry, container = _ensure_req_data()
 
     container.forget_service_type(svc_type)
@@ -71,6 +84,9 @@ def replace_value(
     *,
     ping: Callable | None = None,
 ) -> None:
+    """
+    Register *instance* for *svc_type* and clear any cached values for it.
+    """
     registry, container = _ensure_req_data()
 
     container.forget_service_type(svc_type)
@@ -78,6 +94,9 @@ def replace_value(
 
 
 def get_pings() -> list[ServicePing]:
+    """
+    See :meth:`svcs.Container.get_pings()`.
+    """
     _, container = _ensure_req_data()
 
     return container.get_pings()

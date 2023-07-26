@@ -8,7 +8,7 @@
 </p>
 
 
-# *svcs*: A Service Locator for Python
+# *svcs*: A Lightweight Service Locator for Python
 
 > **Warning**
 > ☠️ Not ready yet! ☠️

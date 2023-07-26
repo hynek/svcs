@@ -94,14 +94,14 @@ class Container:
 
     def forget_service_type(self, svc_type: type) -> None:
         """
-        Remove all traces of *svc_type*.
+        Remove all traces of *svc_type* in ourselves.
         """
         with suppress(KeyError):
             del self.instantiated[svc_type]
 
     def close(self) -> None:
         """
-        Run all synchronous registered cleanups.
+        Run all registered *synchronous* cleanups.
 
         Async closes are *not* awaited.
         """
