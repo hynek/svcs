@@ -35,3 +35,5 @@ svcs.flask.register_value(app, str, str, ping=lambda: None)
 # The type checker believes whatever we tell it.
 o1: object = svcs.flask.get(object)
 o2: int = svcs.flask.get(object)
+
+svcs.flask.close_registry(app)

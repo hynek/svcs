@@ -226,3 +226,28 @@ class TestInitApp:
         svcs.flask.init_app(app, registry)
 
         assert registry is app.config["svcs_registry"]
+
+
+class TestCloseRegistry:
+    def test_nop(self):
+        """
+        close_registry() does nothing if there's no registry in app.
+        """
+        app = flask.Flask("tests")
+        svcs.flask.close_registry(app)
+
+    def test_closes(self, app):
+        """
+        close_registry() runs the registry's close() method.
+        """
+        close = Mock()
+
+        svcs.flask.init_app(app)
+
+        svcs.flask.register_factory(
+            app, Interface, Service1, on_registry_close=close
+        )
+
+        svcs.flask.close_registry(app)
+
+        assert close.called

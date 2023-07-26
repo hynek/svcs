@@ -42,12 +42,15 @@ def register_factory(
     factory: Callable,
     *,
     ping: Callable | None = None,
+    on_registry_close: Callable | None = None,
 ) -> None:
     """
     Same as :meth:`svcs.Registry.register_factory()`, but uses registry on
     *app*.
     """
-    app.config["svcs_registry"].register_factory(svc_type, factory, ping=ping)
+    app.config["svcs_registry"].register_factory(
+        svc_type, factory, ping=ping, on_registry_close=on_registry_close
+    )
 
 
 def register_value(
@@ -56,11 +59,14 @@ def register_value(
     instance: object,
     *,
     ping: Callable | None = None,
+    on_registry_close: Callable | None = None,
 ) -> None:
     """
     Same as :meth:`svcs.Registry.register_value()`, but uses registry on *app*.
     """
-    app.config["svcs_registry"].register_value(svc_type, instance, ping=ping)
+    app.config["svcs_registry"].register_value(
+        svc_type, instance, ping=ping, on_registry_close=on_registry_close
+    )
 
 
 def replace_factory(
@@ -68,6 +74,7 @@ def replace_factory(
     factory: Callable,
     *,
     ping: Callable | None = None,
+    on_registry_close: Callable | None = None,
 ) -> None:
     """
     Register *factory* for *svc_type* and clear any cached values for it.
@@ -75,7 +82,9 @@ def replace_factory(
     registry, container = _ensure_req_data()
 
     container.forget_service_type(svc_type)
-    registry.register_factory(svc_type, factory, ping=ping)
+    registry.register_factory(
+        svc_type, factory, ping=ping, on_registry_close=on_registry_close
+    )
 
 
 def replace_value(
@@ -83,6 +92,7 @@ def replace_value(
     instance: object,
     *,
     ping: Callable | None = None,
+    on_registry_close: Callable | None = None,
 ) -> None:
     """
     Register *instance* for *svc_type* and clear any cached values for it.
@@ -90,7 +100,9 @@ def replace_value(
     registry, container = _ensure_req_data()
 
     container.forget_service_type(svc_type)
-    registry.register_value(svc_type, instance, ping=ping)
+    registry.register_value(
+        svc_type, instance, ping=ping, on_registry_close=on_registry_close
+    )
 
 
 def get_pings() -> list[ServicePing]:
@@ -111,6 +123,14 @@ def teardown(exc: BaseException | None) -> None:
     """
     if has_app_context() and (container := g.pop("svcs_container", None)):
         container.close()
+
+
+def close_registry(app: Flask) -> None:
+    """
+    Close the registry on *app* if present.
+    """
+    if reg := app.config.pop("svcs_registry", None):
+        reg.close()
 
 
 def _ensure_req_data() -> tuple[Registry, Container]:

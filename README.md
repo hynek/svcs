@@ -256,6 +256,8 @@ For instance, to create a factory that uses a SQLAlchemy engine to produce conne
 -->
 
 ```python
+import atexit
+
 from flask import Flask
 from sqlalchemy import Connection, create_engine
 from sqlalchemy.sql import text
@@ -288,7 +290,8 @@ def create_app(config_filename):
         app,
         Connection,
         engine_factory,
-        ping=lambda conn: conn.execute(ping)
+        ping=lambda conn: conn.execute(ping),
+        on_registry_close=engine.dispose,
     )
 
     # You also use svcs WITHIN factories:
@@ -300,6 +303,15 @@ def create_app(config_filename):
             svcs.flask.get(Connection)
         ),
     )
+
+    @atexit.register
+    def cleanup() -> None:
+        """
+        Clean up all pools when the application shuts down.
+        """
+        log.info("app.cleanup.start")
+        svcs.flask.close_registry(app)
+        log.info("app.cleanup.done")
     ##########################################################################
 
     ...
