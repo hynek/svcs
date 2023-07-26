@@ -283,7 +283,9 @@ class Registry:
                 continue
 
             try:
+                log.debug("closing %r", name)
                 oc()
+                log.debug("closed %r", name)
             except Exception:  # noqa: BLE001, PERF203
                 log.warning(
                     "Registry's on_registry_close hook failed for %r.",
@@ -304,9 +306,11 @@ class Registry:
                 if iscoroutinefunction(oc) or isawaitable(oc):
                     log.debug("async closing %r", name)
                     await oc()
+                    log.debug("async closed %r", name)
                 else:
                     log.debug("closing %r", name)
                     oc()
+                    log.debug("closed %r", name)
             except Exception:  # noqa: BLE001, PERF203
                 log.warning(
                     "Registry's on_registry_close hook failed for %r.",
