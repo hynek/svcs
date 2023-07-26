@@ -34,14 +34,14 @@ class Container:
 
     registry: Registry
     _instantiated: dict[type, object] = attrs.Factory(dict)
-    _cleanups: list[
-        tuple[RegisteredService, Generator | AsyncGenerator]
-    ] = attrs.Factory(list)
+    _on_close: list[tuple[str, Generator | AsyncGenerator]] = attrs.Factory(
+        list
+    )
 
     def __repr__(self) -> str:
         return (
             f"<Container(instantiated={len(self._instantiated)}, "
-            f"cleanups={len(self._cleanups)})>"
+            f"cleanups={len(self._on_close)})>"
         )
 
     def get(self, svc_type: type) -> Any:
@@ -60,7 +60,7 @@ class Container:
         svc = rs.factory()
 
         if isinstance(svc, Generator):
-            self._cleanups.append((rs, svc))
+            self._on_close.append((rs.name, svc))
             svc = next(svc)
 
         self._instantiated[rs.svc_type] = svc
@@ -83,7 +83,7 @@ class Container:
         svc = rs.factory()
 
         if isinstance(svc, AsyncGenerator):
-            self._cleanups.append((rs, svc))
+            self._on_close.append((rs.name, svc))
             svc = await anext(svc)
         elif isawaitable(svc):
             svc = await svc
@@ -105,11 +105,11 @@ class Container:
 
         Async closes are *not* awaited.
         """
-        for rs, gen in reversed(self._cleanups):
+        for name, gen in reversed(self._on_close):
             try:
                 if isinstance(gen, AsyncGenerator):
                     warnings.warn(
-                        f"Skipped async cleanup for {rs.name!r}. "
+                        f"Skipped async cleanup for {name!r}. "
                         "Use aclose() instead.",
                         # stacklevel doesn't matter here; it's coming from a framework.
                         stacklevel=1,
@@ -119,7 +119,7 @@ class Container:
                 next(gen)
 
                 warnings.warn(
-                    f"Container clean up for {rs.name!r} didn't stop iterating.",
+                    f"Container clean up for {name!r} didn't stop iterating.",
                     stacklevel=1,
                 )
             except StopIteration:  # noqa: PERF203
@@ -127,19 +127,19 @@ class Container:
             except Exception:  # noqa: BLE001
                 log.warning(
                     "Container clean up failed for %r.",
-                    rs.name,
+                    name,
                     exc_info=True,
-                    extra={"svcs_service_name": rs.name},
+                    extra={"svcs_service_name": name},
                 )
 
-        self._cleanups.clear()
+        self._on_close.clear()
         self._instantiated.clear()
 
     async def aclose(self) -> None:
         """
         Run *all* registered cleanups -- synchronous **and** asynchronous.
         """
-        for rs, gen in reversed(self._cleanups):
+        for name, gen in reversed(self._on_close):
             try:
                 if isinstance(gen, AsyncGenerator):
                     await anext(gen)
@@ -147,7 +147,7 @@ class Container:
                     next(gen)
 
                 warnings.warn(
-                    f"Container clean up for {rs.name!r} didn't stop iterating.",
+                    f"Container clean up for {name!r} didn't stop iterating.",
                     stacklevel=1,
                 )
 
@@ -156,12 +156,12 @@ class Container:
             except Exception:  # noqa: BLE001
                 log.warning(
                     "Container clean up failed for %r.",
-                    rs.name,
+                    name,
                     exc_info=True,
-                    extra={"svcs_service_name": rs.name},
+                    extra={"svcs_service_name": name},
                 )
 
-        self._cleanups.clear()
+        self._on_close.clear()
         self._instantiated.clear()
 
     def get_pings(self) -> list[ServicePing]:

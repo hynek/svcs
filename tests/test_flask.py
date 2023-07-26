@@ -72,7 +72,7 @@ class TestFlask:
 
         assert isinstance(svc1, Service1)
         assert isinstance(svc2, Service2)
-        assert 2 == len(flask.g.svcs_container._cleanups)
+        assert 2 == len(flask.g.svcs_container._on_close)
 
         teardown(None)
 
@@ -151,17 +151,17 @@ class TestFlask:
         svcs.flask.get(Service1)
         svcs.flask.get(Service2)
 
-        assert 2 == len(container._cleanups)
+        assert 2 == len(container._on_close)
 
         svcs.flask.replace_factory(Service1, Interface)
 
         svcs.flask.get(Service1)
         svcs.flask.get(Service2)
 
-        assert 2 == len(container._cleanups)
+        assert 2 == len(container._on_close)
 
     @pytest.mark.asyncio()
-    async def test_teardown_warns_on_async_cleanups(self, container):
+    async def test_teardown_warns_on_async_on_close(self, container):
         """
         teardown() warns if there are async cleanups.
         """

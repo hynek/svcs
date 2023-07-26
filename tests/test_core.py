@@ -105,7 +105,7 @@ class TestContainer:
         container.forget_service_type(Service)
 
         assert {} == container._instantiated
-        assert [] == container._cleanups
+        assert [] == container._on_close
 
     @pytest.mark.asyncio()
     async def test_repr(self, registry, container):
@@ -148,7 +148,7 @@ class TestContainer:
 
         assert cleaned_up
         assert not container._instantiated
-        assert not container._cleanups
+        assert not container._on_close
 
     def test_close_resilient(self, container, registry, caplog):
         """
@@ -291,7 +291,7 @@ class TestServicePing:
 
         assert cleaned_up
         assert not container._instantiated
-        assert not container._cleanups
+        assert not container._on_close
 
 
 class TestRegistry:

@@ -77,7 +77,7 @@ class TestAsync:
 
         svc = await container.aget(Service)
 
-        assert 1 == len(container._cleanups)
+        assert 1 == len(container._on_close)
         assert Service() == svc
         assert not cleaned_up
 
@@ -85,7 +85,7 @@ class TestAsync:
 
         assert cleaned_up
         assert not container._instantiated
-        assert not container._cleanups
+        assert not container._on_close
 
     @pytest.mark.asyncio()
     async def test_aclose_resilient(self, container, registry, caplog):
@@ -133,7 +133,7 @@ class TestAsync:
         )
         assert cleaned_up
         assert not container._instantiated
-        assert not container._cleanups
+        assert not container._on_close
 
     async def test_warns_if_generator_does_not_stop_after_cleanup(
         self, registry, container
