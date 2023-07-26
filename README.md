@@ -77,13 +77,15 @@ from sqlalchemy import Connection, create_engine
 
 engine = create_engine("postgresql://localhost")
 
-def engine_factory():
+def connection_factory():
     with engine.connect() as conn:
         yield conn
 
 registry = svcs.Registry()
 registry.register_factory(
-    Connection, engine_factory, on_registry_close=engine.dispose
+    Connection,
+    connection_factory,
+    on_registry_close=engine.dispose
 )
 
 @atexit.register
