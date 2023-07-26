@@ -37,6 +37,7 @@ If you like the [*Dependency Inversion Principle*](https://en.wikipedia.org/wiki
 
 That:
 
+- **eliminates** tons of repetitive **boilerplate** code,
 - unifies **acquisition** and **cleanups** of resources,
 - simplifies **testing**,
 - and allows for **easy health** checks across *all* resources.
