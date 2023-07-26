@@ -318,6 +318,24 @@ class TestRegistry:
         assert close_2.called
         assert not registry._services
 
+    def test_overwritten_factories_are_not_forgotten(self, registry):
+        """
+        If a factory is overwritten, it's close callback is still called.
+        """
+        close_1 = Mock()
+        close_2 = Mock()
+
+        registry.register_factory(Service, Service, on_registry_close=close_1)
+        registry.register_value(
+            Service, AnotherService, on_registry_close=close_2
+        )
+
+        registry.close()
+
+        assert close_1.called
+        assert close_2.called
+        assert not registry._services
+
     def test_close_warns_about_async(self, registry):
         """
         Calling close raises a warning if there are async cleanups.

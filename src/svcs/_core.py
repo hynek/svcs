@@ -226,7 +226,7 @@ class ServicePing:
 @attrs.define
 class Registry:
     _services: dict[type, RegisteredService] = attrs.Factory(dict)
-    _on_close: dict[str, Callable] = attrs.Factory(dict)
+    _on_close: list[tuple[str, Callable]] = attrs.Factory(list)
 
     def register_factory(
         self,
@@ -240,7 +240,7 @@ class Registry:
         self._services[svc_type] = rs
 
         if on_registry_close is not None:
-            self._on_close[rs.name] = on_registry_close
+            self._on_close.append((rs.name, on_registry_close))
 
     def register_value(
         self,
@@ -267,8 +267,8 @@ class Registry:
         """
         Clear registrations & run synchronous ``on_registry_close`` callbacks.
         """
-        for name, oc in self._on_close.items():
-            if iscoroutinefunction(self._on_close[name]):
+        for name, oc in self._on_close:
+            if iscoroutinefunction(oc):
                 warnings.warn(
                     f"Skipped async cleanup for {name!r}. "
                     "Use aclose() instead.",
@@ -288,14 +288,14 @@ class Registry:
                     extra={"svcs_service_name": name},
                 )
 
-        self._services = {}
-        self._on_close = {}
+        self._services.clear()
+        self._on_close.clear()
 
     async def aclose(self) -> None:
         """
         Clear registrations & run all ``on_registry_close`` callbacks.
         """
-        for name, oc in self._on_close.items():
+        for name, oc in self._on_close:
             try:
                 if iscoroutinefunction(oc) or isawaitable(oc):
                     log.debug("async closing %r", name)
@@ -311,5 +311,5 @@ class Registry:
                     extra={"svcs_service_name": name},
                 )
 
-        self._services = {}
-        self._on_close = {}
+        self._services.clear()
+        self._on_close.clear()
