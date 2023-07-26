@@ -147,6 +147,8 @@ class TestContainer:
         container.close()
 
         assert cleaned_up
+        assert not container._instantiated
+        assert not container._cleanups
 
     def test_close_resilient(self, container, registry, caplog):
         """
@@ -288,6 +290,8 @@ class TestServicePing:
         container.close()
 
         assert cleaned_up
+        assert not container._instantiated
+        assert not container._cleanups
 
 
 class TestRegistry:
@@ -317,6 +321,7 @@ class TestRegistry:
         assert close_1.called
         assert close_2.called
         assert not registry._services
+        assert not registry._on_close
 
     def test_overwritten_factories_are_not_forgotten(self, registry):
         """
@@ -334,7 +339,6 @@ class TestRegistry:
 
         assert close_1.called
         assert close_2.called
-        assert not registry._services
 
     def test_close_warns_about_async(self, registry):
         """

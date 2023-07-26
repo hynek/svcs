@@ -105,8 +105,7 @@ class Container:
 
         Async closes are *not* awaited.
         """
-        while self._cleanups:
-            rs, gen = self._cleanups.pop()
+        for rs, gen in reversed(self._cleanups):
             try:
                 if isinstance(gen, AsyncGenerator):
                     warnings.warn(
@@ -133,12 +132,14 @@ class Container:
                     extra={"svcs_service_name": rs.name},
                 )
 
+        self._cleanups.clear()
+        self._instantiated.clear()
+
     async def aclose(self) -> None:
         """
         Run *all* registered cleanups -- synchronous **and** asynchronous.
         """
-        while self._cleanups:
-            rs, gen = self._cleanups.pop()
+        for rs, gen in reversed(self._cleanups):
             try:
                 if isinstance(gen, AsyncGenerator):
                     await anext(gen)
@@ -159,6 +160,9 @@ class Container:
                     exc_info=True,
                     extra={"svcs_service_name": rs.name},
                 )
+
+        self._cleanups.clear()
+        self._instantiated.clear()
 
     def get_pings(self) -> list[ServicePing]:
         """
@@ -267,7 +271,7 @@ class Registry:
         """
         Clear registrations & run synchronous ``on_registry_close`` callbacks.
         """
-        for name, oc in self._on_close:
+        for name, oc in reversed(self._on_close):
             if iscoroutinefunction(oc):
                 warnings.warn(
                     f"Skipped async cleanup for {name!r}. "
@@ -295,7 +299,7 @@ class Registry:
         """
         Clear registrations & run all ``on_registry_close`` callbacks.
         """
-        for name, oc in self._on_close:
+        for name, oc in reversed(self._on_close):
             try:
                 if iscoroutinefunction(oc) or isawaitable(oc):
                     log.debug("async closing %r", name)

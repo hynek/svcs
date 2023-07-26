@@ -84,6 +84,8 @@ class TestAsync:
         await container.aclose()
 
         assert cleaned_up
+        assert not container._instantiated
+        assert not container._cleanups
 
     @pytest.mark.asyncio()
     async def test_aclose_resilient(self, container, registry, caplog):
@@ -130,6 +132,8 @@ class TestAsync:
             "tests.test_async.Service" == caplog.records[1].svcs_service_name
         )
         assert cleaned_up
+        assert not container._instantiated
+        assert not container._cleanups
 
     async def test_warns_if_generator_does_not_stop_after_cleanup(
         self, registry, container
