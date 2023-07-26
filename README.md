@@ -25,7 +25,7 @@ It provides you with a central place to register factories for types/interfaces 
 
 ---
 
-**This allows you to configure and manage all your resources in *one central place* and access them in a *consistent* way.**
+**This allows you to configure and manage all your resources in *one central place* and access them in a *consistent* way without worrying about *cleaning them up*.**
 
 ---
 
