@@ -177,7 +177,7 @@ class TestContainer:
 
         container.close()
 
-        assert "Service" == caplog.records[0].service
+        assert "tests.test_core.Service" == caplog.records[0].svcs_service_name
         assert cleaned_up
 
     def test_warns_if_generator_does_not_stop_after_cleanup(
@@ -199,9 +199,8 @@ class TestContainer:
             container.close()
 
         assert (
-            "clean up for <RegisteredService("
-            "svc_type=tests.test_core.Service, has_ping=False)> "
-            "didn't stop iterating" == wi.pop().message.args[0]
+            "Container clean up for 'tests.test_core.Service' "
+            "didn't stop iterating." == wi.pop().message.args[0]
         )
 
 
@@ -220,7 +219,7 @@ class TestRegisteredService:
         The name property deducts the correct class name.
         """
 
-        assert "Service" == rs.name
+        assert "tests.test_core.Service" == rs.name
 
     def test_is_async_yep(self):
         """
@@ -260,7 +259,7 @@ class TestServicePing:
         The name property proxies the correct class name.
         """
 
-        assert "Service" == svcs.ServicePing(None, rs).name
+        assert "tests.test_core.Service" == svcs.ServicePing(None, rs).name
 
     def test_ping(self, registry, container):
         """
@@ -330,7 +329,8 @@ class TestRegistry:
         registry.register_factory(Service, Service, on_registry_close=hook)
 
         with pytest.warns(
-            UserWarning, match="Skipped async cleanup for 'Service'."
+            UserWarning,
+            match="Skipped async cleanup for 'tests.test_core.Service'.",
         ):
             registry.close()
 
@@ -345,7 +345,7 @@ class TestRegistry:
         with contextlib.closing(registry):
             ...
 
-        assert "Service" == caplog.records[0].service
+        assert "tests.test_core.Service" == caplog.records[0].svcs_service_name
 
     @pytest.mark.skipif(
         not hasattr(contextlib, "aclosing"),
@@ -400,4 +400,4 @@ class TestRegistry:
         await registry.aclose()
 
         close_mock.assert_awaited_once()
-        assert "Service" == caplog.records[0].service
+        assert "tests.test_core.Service" == caplog.records[0].svcs_service_name

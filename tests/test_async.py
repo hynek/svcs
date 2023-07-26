@@ -122,8 +122,13 @@ class TestAsync:
         await container.aclose()
 
         # Inverse order
-        assert "AnotherService" == caplog.records[0].service
-        assert "Service" == caplog.records[1].service
+        assert (
+            "tests.test_async.AnotherService"
+            == caplog.records[0].svcs_service_name
+        )
+        assert (
+            "tests.test_async.Service" == caplog.records[1].svcs_service_name
+        )
         assert cleaned_up
 
     async def test_warns_if_generator_does_not_stop_after_cleanup(
@@ -145,9 +150,8 @@ class TestAsync:
             await container.aclose()
 
         assert (
-            "clean up for <RegisteredService("
-            "svc_type=tests.test_async.Service, has_ping=False)> "
-            "didn't stop iterating" == wi.pop().message.args[0]
+            "Container clean up for 'tests.test_async.Service' "
+            "didn't stop iterating." == wi.pop().message.args[0]
         )
 
     async def test_aping(self, registry, container):

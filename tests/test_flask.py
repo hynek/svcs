@@ -180,9 +180,8 @@ class TestFlask:
 
         assert 0 == len(wi.list)
         assert (
-            "Skipped async cleanup for "
-            "<RegisteredService(svc_type=tests.test_flask.Service1, "
-            "has_ping=False)>. Use aclose() instead." == w.message.args[0]
+            "Skipped async cleanup for 'tests.test_flask.Service1'. "
+            "Use aclose() instead." == w.message.args[0]
         )
 
 

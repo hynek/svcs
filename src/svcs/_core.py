@@ -110,7 +110,7 @@ class Container:
             try:
                 if isinstance(gen, AsyncGenerator):
                     warnings.warn(
-                        f"Skipped async cleanup for {rs!r}. "
+                        f"Skipped async cleanup for {rs.name!r}. "
                         "Use aclose() instead.",
                         # stacklevel doesn't matter here; it's coming from a framework.
                         stacklevel=1,
@@ -120,15 +120,17 @@ class Container:
                 next(gen)
 
                 warnings.warn(
-                    f"clean up for {rs!r} didn't stop iterating", stacklevel=1
+                    f"Container clean up for {rs.name!r} didn't stop iterating.",
+                    stacklevel=1,
                 )
             except StopIteration:  # noqa: PERF203
                 pass
             except Exception:  # noqa: BLE001
                 log.warning(
-                    "clean up failed",
+                    "Container clean up failed for %r.",
+                    rs.name,
                     exc_info=True,
-                    extra={"service": rs.name},
+                    extra={"svcs_service_name": rs.name},
                 )
 
     async def aclose(self) -> None:
@@ -144,16 +146,18 @@ class Container:
                     next(gen)
 
                 warnings.warn(
-                    f"clean up for {rs!r} didn't stop iterating", stacklevel=1
+                    f"Container clean up for {rs.name!r} didn't stop iterating.",
+                    stacklevel=1,
                 )
 
             except (StopAsyncIteration, StopIteration):  # noqa: PERF203
                 pass
             except Exception:  # noqa: BLE001
                 log.warning(
-                    "clean up failed",
+                    "Container clean up failed for %r.",
+                    rs.name,
                     exc_info=True,
-                    extra={"service": rs.name},
+                    extra={"svcs_service_name": rs.name},
                 )
 
     def get_pings(self) -> list[ServicePing]:
@@ -175,12 +179,12 @@ class RegisteredService:
 
     @property
     def name(self) -> str:
-        return self.svc_type.__qualname__
+        return f"{ self.svc_type.__module__ }.{self.svc_type.__qualname__}"
 
     def __repr__(self) -> str:
         return (
-            f"<RegisteredService(svc_type={ self.svc_type.__module__ }."
-            f"{ self.svc_type.__qualname__ }, "
+            f"<RegisteredService(svc_type="
+            f"{ self.name}, "
             f"has_ping={ self.ping is not None})>"
         )
 
@@ -263,12 +267,10 @@ class Registry:
         """
         Clear registrations & run synchronous ``on_registry_close`` callbacks.
         """
-        self._services = {}
-
-        for key in tuple(self._on_close.keys()):
-            if iscoroutinefunction(self._on_close[key]):
+        for name, oc in self._on_close.items():
+            if iscoroutinefunction(self._on_close[name]):
                 warnings.warn(
-                    f"Skipped async cleanup for {key!r}. "
+                    f"Skipped async cleanup for {name!r}. "
                     "Use aclose() instead.",
                     # stacklevel doesn't matter here; it's coming from a
                     # framework.
@@ -276,34 +278,38 @@ class Registry:
                 )
                 continue
 
-            oc = self._on_close.pop(key)
-
             try:
                 oc()
             except Exception:  # noqa: BLE001, PERF203
                 log.warning(
-                    "Registry's on_close hook failed",
+                    "Registry's on_registry_close hook failed for %r.",
+                    name,
                     exc_info=True,
-                    extra={"service": key},
+                    extra={"svcs_service_name": name},
                 )
+
+        self._services = {}
+        self._on_close = {}
 
     async def aclose(self) -> None:
         """
         Clear registrations & run all ``on_registry_close`` callbacks.
         """
-        self._services = {}
-
-        for key in tuple(self._on_close.keys()):
-            oc = self._on_close.pop(key)
-
+        for name, oc in self._on_close.items():
             try:
                 if iscoroutinefunction(oc) or isawaitable(oc):
+                    log.debug("async closing %r", name)
                     await oc()
                 else:
+                    log.debug("closing %r", name)
                     oc()
             except Exception:  # noqa: BLE001, PERF203
                 log.warning(
-                    "Registry's on_close hook failed",
+                    "Registry's on_registry_close hook failed for %r.",
+                    name,
                     exc_info=True,
-                    extra={"service": key},
+                    extra={"svcs_service_name": name},
                 )
+
+        self._services = {}
+        self._on_close = {}
