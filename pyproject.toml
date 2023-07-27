@@ -48,7 +48,7 @@ start-after = "<!-- begin-logo -->\n"
 end-before = "\n<!-- end-logo -->"
 
 [[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
-text = "# *svcs*: A Lightweight Service Locator\n\n"
+text = "\n\n# *svcs*: A Lightweight Service Locator\n\n"
 
 [[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
 path = "README.md"
