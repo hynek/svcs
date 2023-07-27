@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 [project]
 dynamic = ["version", "readme"]
 name = "svcs"
-description = "A Lightweight Service Locator for Python"
+description = "A Lightweight Service Locator"
 requires-python = ">=3.8"
 license = "MIT"
 keywords = ["dependency injection"]
@@ -41,6 +41,14 @@ raw-options = { local_scheme = "no-local-version" }
 
 [tool.hatch.metadata.hooks.fancy-pypi-readme]
 content-type = "text/markdown"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+path = "README.md"
+start-after = "<!-- begin-logo -->\n"
+end-before = "\n<!-- end-logo -->"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+text = "# *svcs*: A Lightweight Service Locator\n\n"
 
 [[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
 path = "README.md"

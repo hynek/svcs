@@ -1,14 +1,14 @@
-<!-- begin-pypi -->
-
-
+<!— begin-logo —>
 <p align="center">
   <a href="https://github.com/hynek/svcs/">
     <img src="https://raw.githubusercontent.com/hynek/svcs/main/docs/_static/logo.svg" width="20%" alt="svcs" />
   </a>
 </p>
-
+<!— end-logo —>
 
 # *svcs*: A Lightweight Service Locator for Python
+
+<!— begin-pypi —>
 
 > **Warning**
 > ☠️ Not ready yet! ☠️
