@@ -165,16 +165,15 @@ ignore = [
   "ARG005", # we need stub lambdas
   "S101",   # assert
   "SIM300", # Yoda rocks in asserts
-  "PT005",  # we always add underscores and explicit name
+  "PT005",  # we always add underscores and explicit names
   "PT011",  # broad is fine
   "TRY002", # stock exceptions are fine in tests
   "EM101",  # no need for exception msg hygiene in tests
 ]
 
 "conftest.py" = [
-  "PT005", # we always add underscores and explicit name
+  "PT005", # we always add underscores and explicit names
 ]
-
 
 [tool.ruff.isort]
 lines-between-types = 1
