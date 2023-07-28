@@ -447,7 +447,7 @@ def index():
 ## Caveats
 
 One would expect the the `Container.get()` method would have a type signature like `get(type: type[T]) -> T`.
-Unfortunately, that's currently impossible because it [precludes the usage of `Protocols` as service types](https://github.com/python/mypy/issues/4717), making this package pointless.
+Unfortunately, that's currently impossible because it [precludes the usage of `Protocols` and *abstract base classes* as service types](https://github.com/python/mypy/issues/4717), making this package pointless.
 
 Therefore it returns `Any`, and until Mypy changes its stance, you have to use it like this:
 
