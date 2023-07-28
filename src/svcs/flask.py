@@ -81,7 +81,7 @@ def replace_factory(
     """
     registry, container = _ensure_req_data()
 
-    container.forget_service_type(svc_type)
+    container.forget_about(svc_type)
     registry.register_factory(
         svc_type, factory, ping=ping, on_registry_close=on_registry_close
     )
@@ -99,7 +99,7 @@ def replace_value(
     """
     registry, container = _ensure_req_data()
 
-    container.forget_service_type(svc_type)
+    container.forget_about(svc_type)
     registry.register_value(
         svc_type, instance, ping=ping, on_registry_close=on_registry_close
     )

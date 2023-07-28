@@ -90,19 +90,19 @@ class TestContainer:
             ping._rs.svc_type for ping in container.get_pings()
         ]
 
-    def test_forget_service_type_nothing_registered(self, container):
+    def test_forget_about_nothing_registered(self, container):
         """
-        forget_service_type does nothing if nothing has been registered.
+        forget_about does nothing if nothing has been registered.
         """
-        container.forget_service_type(Service)
+        container.forget_about(Service)
 
-    def test_forget_service_type_no_cleanup(self, container, rs, svc):
+    def test_forget_about_no_cleanup(self, container, rs, svc):
         """
-        forget_service_type removes the registered service from the container.
+        forget_about removes the registered service from the container.
         """
         container._instantiated[rs.svc_type] = (rs, svc)
 
-        container.forget_service_type(Service)
+        container.forget_about(Service)
 
         assert {} == container._instantiated
         assert [] == container._on_close

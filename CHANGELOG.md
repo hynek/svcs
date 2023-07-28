@@ -15,6 +15,10 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/23.5.0...HEAD)
 
+### Changed
+
+- Renamed `Container.forget_service_type()` to `Container.forget_about()`.
+
 
 ## [23.5.0](https://github.com/hynek/svcs/compare/23.4.0...23.5.0) - 2023-07-26
 

@@ -197,7 +197,7 @@ True
 A container lives as long as you want the instances to live – e.g., as long as a request lives.
 
 Importantly: It is possible to overwrite registered service factories later – e.g., for testing – **without monkey-patching**.
-You have to remove possibly cached instances from the container though (`Container.forget_service_type()`).
+You have to remove possibly cached instances from the container though (`Container.forget_about()`).
 The Flask integration takes care of this for you.
 
 How to achieve this in other frameworks elegantly is TBD.

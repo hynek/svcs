@@ -92,9 +92,9 @@ class Container:
 
         return svc
 
-    def forget_service_type(self, svc_type: type) -> None:
+    def forget_about(self, svc_type: type) -> None:
         """
-        Remove all traces of *svc_type* in ourselves.
+        Remove all traces of *svc_type* from ourselves.
         """
         with suppress(KeyError):
             del self._instantiated[svc_type]
