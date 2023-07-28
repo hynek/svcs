@@ -103,7 +103,10 @@ The hooks that are defined as `on_registry_close` are called when you call `Regi
 
 No.
 
-Unlike [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection), which passes your dependencies as arguments, you actively ask a service locator for them. This usually requires less opaque magic since nothing meddles with your function/method definitions. But you can use, e.g., your web framework's injection capabilities to inject the locator object into your views and benefit from *svcs*'s upsides without giving up some of DI's ones.
+Although the concepts are related and share the idea of having a central registry of services, the ways they provide those services are fundamentally different:
+[Dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) always passes your dependencies as arguments while you actively ask a service locator for them when you need them.
+That usually requires less opaque magic since nothing meddles with your function/method definitions.
+But you can use, e.g., your web framework's injection capabilities to inject the locator object into your views and benefit from *svcs*'s upsides without giving up some of DI's ones.
 
 The active acquisition of resources by calling `get()` when you *know* for sure you're going to need it avoids the conundrum of either having to pass a factory (e.g., a connection pool – which also puts the onus of cleanup on you) or eagerly creating resources that you never use:
 
