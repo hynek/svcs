@@ -20,6 +20,11 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 - Renamed `Container.forget_service_type()` to `Container.forget_about()`.
 
 
+### Fixed
+
+- `svcs.flask.init_app()`'s type hints now take into account custom `flask.Flask` subclasses.
+
+
 ## [23.5.0](https://github.com/hynek/svcs/compare/23.4.0...23.5.0) - 2023-07-26
 
 ### Added

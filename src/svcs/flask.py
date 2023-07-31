@@ -5,14 +5,17 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any
+from typing import Any, TypeVar
 
 from flask import Flask, current_app, g, has_app_context
 
 from ._core import Container, Registry, ServicePing
 
 
-def init_app(app: Flask, registry: Registry | None = None) -> Flask:
+FlaskAppT = TypeVar("FlaskAppT", bound=Flask)
+
+
+def init_app(app: FlaskAppT, registry: Registry | None = None) -> FlaskAppT:
     """
     Initialize *app* for *svcs*.
 

@@ -37,3 +37,10 @@ o1: object = svcs.flask.get(object)
 o2: int = svcs.flask.get(object)
 
 svcs.flask.close_registry(app)
+
+
+class CustomApp(Flask):
+    pass
+
+
+app = svcs.flask.init_app(CustomApp("tests"))
