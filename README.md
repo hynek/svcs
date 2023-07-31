@@ -35,12 +35,12 @@ All of this happens *within* your application – service locators are **not** r
 
 If you like the [*Dependency Inversion Principle*](https://en.wikipedia.org/wiki/Dependency_inversion_principle) (aka "*program against interfaces, not implementations*"), you would register concrete factories for abstract interfaces; in Python usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [Abstract Base Class](https://docs.python.org/3.11/library/abc.html).
 
-That:
+Benefits:
 
-- **eliminates** tons of repetitive **boilerplate** code,
+- Eliminates tons of repetitive **boilerplate** code,
 - unifies **acquisition** and **cleanups** of resources,
 - simplifies **testing**,
-- and allows for **easy health** checks across *all* resources.
+- and allows for easy **health checks** across *all* resources.
 
 No global mutable state is necessary – but possible for extra comfort.
 
