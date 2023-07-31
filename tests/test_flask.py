@@ -219,7 +219,7 @@ class TestInitApp:
 
     def test_explicit_registry(self):
         """
-        If a registry is passsed to init_app(), it's used.
+        If a registry is passed to init_app(), it's used.
         """
         registry = svcs.Registry()
         app = flask.Flask("tests")
