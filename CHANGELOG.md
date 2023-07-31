@@ -13,6 +13,9 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 <!-- changelog follows -->
 
 
+## [Unreleased](https://github.com/hynek/svcs/compare/23.6.0...HEAD)
+
+
 ## [23.6.0](https://github.com/hynek/svcs/compare/23.5.0...23.6.0) - 2023-07-31
 
 ### Changed
