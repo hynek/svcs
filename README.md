@@ -462,7 +462,7 @@ def get_connection() -> Connection:
     return svcs.flask.get(Connection)
 ```
 
-Or, if you don't care about `Protocols`:
+Or, if you don't care about `Protocols` and abstract base classes:
 
 ```python
 def get(svc_type: type[T]) -> T:
