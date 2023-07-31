@@ -167,7 +167,7 @@ It's possible to register a callback that is called when the *registry* is close
 
 ```python
 registry.register_factory(
-    Connection, engine_factory, on_registry_close=engine.dispose
+    Connection, connection_factory, on_registry_close=engine.dispose
 )
 ```
 
@@ -247,7 +247,7 @@ Therefore it comes with Flask support out of the box in the form of the `svcs.fl
 It:
 
 - puts the registry into `app.config["svcs_registry"]`,
-- unifies the putting and caching of services on the `g` object by putting a container into `g.svcs_container`,
+- unifies the caching of services on the `g` object by putting a container into `g.svcs_container`,
 - transparently retrieves them from there for you,
 - and installs a [`teardown_appcontext()`](http://flask.pocoo.org/docs/latest/api#flask.Flask.teardown_appcontext) handler that calls `close()` on the container when a request is done.
 
@@ -286,7 +286,7 @@ def create_app(config_filename):
     # If you ask for a ping, it will run `SELECT 1` on a new connection and
     # clean up the connection behind itself.
     engine = create_engine("postgresql://localhost")
-    def engine_factory():
+    def connection_factory():
         with engine.connect() as conn:
             yield conn
 
@@ -295,7 +295,7 @@ def create_app(config_filename):
         # The app argument makes it good for custom init_app() functions.
         app,
         Connection,
-        engine_factory,
+        connection_factory,
         ping=lambda conn: conn.execute(ping),
         on_registry_close=engine.dispose,
     )
@@ -316,7 +316,7 @@ def create_app(config_filename):
         Clean up all pools when the application shuts down.
         """
         log.info("app.cleanup.start")
-        svcs.flask.close_registry(app)
+        svcs.flask.close_registry(app)  # calls engine.dispose()
         log.info("app.cleanup.done")
     ##########################################################################
 
