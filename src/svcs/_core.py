@@ -286,7 +286,7 @@ class Registry:
                 log.debug("closing %r", name)
                 oc()
                 log.debug("closed %r", name)
-            except Exception:  # noqa: BLE001, PERF203
+            except Exception:  # noqa: BLE001
                 log.warning(
                     "Registry's on_registry_close hook failed for %r.",
                     name,
