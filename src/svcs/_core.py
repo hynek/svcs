@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import inspect
 import logging
 import sys
 import warnings
@@ -57,7 +58,7 @@ class Container:
             return svc
 
         rs = self.registry.get_registered_service_for(svc_type)
-        svc = rs.factory()
+        svc = rs.factory(self) if rs.takes_container else rs.factory()
 
         if isinstance(svc, Generator):
             self._on_close.append((rs.name, svc))
@@ -179,6 +180,7 @@ class Container:
 class RegisteredService:
     svc_type: type
     factory: Callable = attrs.field(hash=False)
+    takes_container: bool
     ping: Callable | None = attrs.field(hash=False)
 
     @property
@@ -188,8 +190,11 @@ class RegisteredService:
     def __repr__(self) -> str:
         return (
             f"<RegisteredService(svc_type="
-            f"{ self.name}, "
-            f"has_ping={ self.ping is not None})>"
+            f"{self.name}, "
+            f"{self.factory}, "
+            f"takes_container={self.takes_container}, "
+            f"has_ping={ self.ping is not None}"
+            ")>"
         )
 
     @property
@@ -240,7 +245,9 @@ class Registry:
         ping: Callable | None = None,
         on_registry_close: Callable | None = None,
     ) -> None:
-        rs = RegisteredService(svc_type, factory, ping)
+        rs = RegisteredService(
+            svc_type, factory, _takes_container(factory), ping
+        )
         self._services[svc_type] = rs
 
         if on_registry_close is not None:
@@ -321,3 +328,25 @@ class Registry:
 
         self._services.clear()
         self._on_close.clear()
+
+
+def _takes_container(factory: Callable) -> bool:
+    """
+    Return True if *factory* takes a svcs.Container as its first argument.
+    """
+    sig = inspect.signature(factory)
+    if not sig.parameters:
+        return False
+
+    if len(sig.parameters) != 1:
+        msg = "Factories must take 0 or 1 parameters."
+        raise TypeError(msg)
+
+    ((name, p),) = tuple(sig.parameters.items())
+    if name == "svcs_container":
+        return True
+
+    if (annot := p.annotation) is Container or annot == "svcs.Container":
+        return True
+
+    return False

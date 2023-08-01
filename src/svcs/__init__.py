@@ -17,7 +17,6 @@ __all__ = [
     "Container",
     "RegisteredService",
     "Registry",
-    "ServiceNotFoundError",
     "ServicePing",
     "exceptions",
 ]
@@ -26,3 +25,12 @@ try:
     from . import flask  # noqa: F401
 except ImportError:
     __all__.append("flask")
+
+
+# Make nicer public names.
+__locals = locals()
+for __name in __all__:
+    if not __name.startswith("__") and not __name.islower():
+        __locals[__name].__module__ = "svcs"
+del __locals
+del __name

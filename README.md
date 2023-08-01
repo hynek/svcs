@@ -196,11 +196,26 @@ True
 
 A container lives as long as you want the instances to live – e.g., as long as a request lives.
 
-Importantly: It is possible to overwrite registered service factories later – e.g., for testing – **without monkey-patching**.
-You have to remove possibly cached instances from the container though (`Container.forget_about()`).
-The Flask integration takes care of this for you.
+If a factory takes a first argument called `svcs_container` or the first argument of any name that is annotated as being `svcs.Container`, the current container instance is passed into the factory as the first *positional* argument:
 
-How to achieve this in other frameworks elegantly is TBD.
+```python
+>>> def factory(svcs_container) -> str:
+...     return svcs_container.get(uuid.UUID).hex
+
+>>> reg.register_factory(str, factory)
+
+% skip: next
+
+>>> container.get(str)
+'86d342d6652d4d7faa912769dff0793e'
+```
+
+> [!NOTE]
+> It is possible to overwrite registered service factories later – e.g., for testing – **without monkey-patching**.
+> You have to remove possibly cached instances from the container though (`Container.forget_about()`).
+> The Flask integration takes care of this for you.
+>
+> How to achieve this in other frameworks elegantly is TBD.
 
 
 #### Cleanup

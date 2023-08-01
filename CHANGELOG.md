@@ -15,6 +15,13 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/23.6.0...HEAD)
 
+### Added
+
+- Factories now may take a parameter called `svcs_container` or that is annotated to be `svcs.Container`.
+  In this case the factory will receive the current container as a first positional argument.
+  This allows for recursive factories without global state.
+  [#10](https://github.com/hynek/svcs/pull/10)
+
 
 ## [23.6.0](https://github.com/hynek/svcs/compare/23.5.0...23.6.0) - 2023-07-31
 
