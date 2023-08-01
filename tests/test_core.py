@@ -33,7 +33,7 @@ class YetAnotherService:
 
 @pytest.fixture(name="rs")
 def _rs(svc):
-    return svcs.RegisteredService(Service, Service, False, None)
+    return svcs.RegisteredService(Service, Service, False, False, None)
 
 
 @pytest.fixture(name="svc")
@@ -256,41 +256,6 @@ class TestRegisteredService:
 
         assert "tests.test_core.Service" == rs.name
 
-    def test_is_async_yep(self):
-        """
-        The is_async property returns True if the factory needs to be awaited.
-        """
-
-        async def factory():
-            return 42
-
-        async def factory_cleanup():
-            await asyncio.sleep(0)
-            yield 42
-
-        assert svcs.RegisteredService(object, factory, False, None).is_async
-        assert svcs.RegisteredService(
-            object, factory_cleanup, False, None
-        ).is_async
-
-    def test_is_async_nope(self):
-        """
-        is_async is False for sync factories.
-        """
-
-        def factory():
-            return 42
-
-        def factory_cleanup():
-            yield 42
-
-        assert not svcs.RegisteredService(
-            object, factory, False, None
-        ).is_async
-        assert not svcs.RegisteredService(
-            object, factory_cleanup, False, None
-        ).is_async
-
 
 class TestServicePing:
     def test_name(self, rs):
@@ -405,6 +370,54 @@ class TestRegistry:
             ...
 
         assert "tests.test_core.Service" == caplog.records[0].svcs_service_name
+
+    def test_detects_async_factories(self, registry):
+        """
+        The is_async property of the RegisteredService is True if the factory
+        needs to be awaited.
+        """
+
+        async def factory():
+            return 42
+
+        async def factory_cleanup():
+            await asyncio.sleep(0)
+            yield str(42)
+
+        registry.register_factory(int, factory)
+        registry.register_factory(str, factory_cleanup)
+
+        assert (
+            svcs.RegisteredService(int, factory, False, True, None)
+            == registry._services[int]
+        )
+        assert (
+            svcs.RegisteredService(str, factory_cleanup, False, True, None)
+            == registry._services[str]
+        )
+
+    def test_no_false_positive_async(self, registry):
+        """
+        is_async is False for sync factories.
+        """
+
+        def factory():
+            return 42
+
+        def factory_cleanup():
+            yield "42"
+
+        registry.register_factory(int, factory)
+        registry.register_factory(str, factory_cleanup)
+
+        assert (
+            svcs.RegisteredService(int, factory, False, False, None)
+            == registry._services[int]
+        )
+        assert (
+            svcs.RegisteredService(str, factory_cleanup, False, False, None)
+            == registry._services[str]
+        )
 
     @pytest.mark.skipif(
         not hasattr(contextlib, "aclosing"),

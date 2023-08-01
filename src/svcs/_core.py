@@ -181,6 +181,7 @@ class RegisteredService:
     svc_type: type
     factory: Callable = attrs.field(hash=False)
     takes_container: bool
+    is_async: bool
     ping: Callable | None = attrs.field(hash=False)
 
     @property
@@ -195,12 +196,6 @@ class RegisteredService:
             f"takes_container={self.takes_container}, "
             f"has_ping={ self.ping is not None}"
             ")>"
-        )
-
-    @property
-    def is_async(self) -> bool:
-        return iscoroutinefunction(self.factory) or isasyncgenfunction(
-            self.factory
         )
 
 
@@ -246,7 +241,11 @@ class Registry:
         on_registry_close: Callable | None = None,
     ) -> None:
         rs = RegisteredService(
-            svc_type, factory, _takes_container(factory), ping
+            svc_type,
+            factory,
+            _takes_container(factory),
+            iscoroutinefunction(factory) or isasyncgenfunction(factory),
+            ping,
         )
         self._services[svc_type] = rs
 
