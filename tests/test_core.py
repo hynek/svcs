@@ -33,12 +33,50 @@ class YetAnotherService:
 
 @pytest.fixture(name="rs")
 def _rs(svc):
-    return svcs.RegisteredService(Service, Service, None)
+    return svcs.RegisteredService(Service, Service, False, None)
 
 
 @pytest.fixture(name="svc")
 def _svc():
     return Service()
+
+
+class TestIntegration:
+    def test_passes_container_bc_name(self, registry, container):
+        """
+        If the factory takes an argument called `svcs_container`, it is passed
+        on instantiation.
+        """
+        called = False
+
+        def factory(svcs_container):
+            assert container is svcs_container
+            nonlocal called
+            called = True
+
+        registry.register_factory(Service, factory)
+
+        container.get(Service)
+
+        assert called
+
+    def test_passes_container_bc_annotation(self, registry, container):
+        """
+        If the factory takes an argument annotated with svcs.Container, it is
+        passed on instantiation.
+        """
+        called = False
+
+        def factory(foo: svcs.Container):
+            assert container is foo
+            nonlocal called
+            called = True
+
+        registry.register_factory(Service, factory)
+
+        container.get(Service)
+
+        assert called
 
 
 class TestContainer:
@@ -213,7 +251,10 @@ class TestRegisteredService:
         """
 
         assert (
-            "<RegisteredService(svc_type=tests.test_core.Service, has_ping=False)>"
+            "<RegisteredService(svc_type=tests.test_core.Service, "
+            "<class 'tests.test_core.Service'>, takes_container=False, "
+            "has_ping=False"
+            ")>"
         ) == repr(rs)
 
     def test_name(self, rs):
@@ -235,8 +276,10 @@ class TestRegisteredService:
             await asyncio.sleep(0)
             yield 42
 
-        assert svcs.RegisteredService(object, factory, None).is_async
-        assert svcs.RegisteredService(object, factory_cleanup, None).is_async
+        assert svcs.RegisteredService(object, factory, False, None).is_async
+        assert svcs.RegisteredService(
+            object, factory_cleanup, False, None
+        ).is_async
 
     def test_is_async_nope(self):
         """
@@ -249,9 +292,11 @@ class TestRegisteredService:
         def factory_cleanup():
             yield 42
 
-        assert not svcs.RegisteredService(object, factory, None).is_async
         assert not svcs.RegisteredService(
-            object, factory_cleanup, None
+            object, factory, False, None
+        ).is_async
+        assert not svcs.RegisteredService(
+            object, factory_cleanup, False, None
         ).is_async
 
 
@@ -423,3 +468,74 @@ class TestRegistry:
 
         close_mock.assert_awaited_once()
         assert "tests.test_core.Service" == caplog.records[0].svcs_service_name
+
+
+def factory_wrong_annotation(foo: svcs.Registry) -> int:
+    return 42
+
+
+class TestTakesContainer:
+    @pytest.mark.parametrize(
+        "factory",
+        [lambda: None, lambda container: None, factory_wrong_annotation],
+    )
+    def test_nope(self, factory):
+        """
+        Functions with different names and annotations are ignored.
+        """
+        assert not svcs._core._takes_container(factory)
+
+    def test_name(self):
+        """
+        Return True if the name is `svcs_container`.
+        """
+
+        def factory(svcs_container):
+            return 42
+
+        assert svcs._core._takes_container(factory)
+
+    def test_annotation(self):
+        """
+        Return true if the first argument is annotated as `svcs.Container`.
+        """
+
+        def factory(foo: svcs.Container):
+            return 42
+
+        assert svcs._core._takes_container(factory)
+
+    def test_annotation_str(self):
+        """
+        Return true if the first argument is annotated as `svcs.Container`
+        using a string.
+        """
+
+        def factory(bar: "svcs.Container"):
+            return 42
+
+        assert svcs._core._takes_container(factory)
+
+    def test_catches_invalid_sigs(self):
+        """
+        If the factory takes more than one parameter, raise an TypeError.
+        """
+
+        def factory(foo, bar):
+            return 42
+
+        with pytest.raises(
+            TypeError, match="Factories must take 0 or 1 parameters."
+        ):
+            svcs._core._takes_container(factory)
+
+    def test_call_works(self):
+        """
+        Does not raise if the factory is a class with __call__.
+        """
+
+        class Factory:
+            def __call__(self, svcs_container):
+                return 42
+
+        assert svcs._core._takes_container(Factory())

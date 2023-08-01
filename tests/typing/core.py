@@ -35,6 +35,10 @@ def factory_with_cleanup() -> Generator[int, None, None]:
     yield 1
 
 
+def factory_that_takes_container_by_annotation(foo: svcs.Container) -> int:
+    return 1
+
+
 async def async_ping() -> None:
     pass
 
