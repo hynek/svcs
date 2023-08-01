@@ -47,36 +47,28 @@ class TestIntegration:
         If the factory takes an argument called `svcs_container`, it is passed
         on instantiation.
         """
-        called = False
 
         def factory(svcs_container):
-            assert container is svcs_container
-            nonlocal called
-            called = True
+            return str(svcs_container.get(int))
 
-        registry.register_factory(Service, factory)
+        registry.register_value(int, 42)
+        registry.register_factory(str, factory)
 
-        container.get(Service)
-
-        assert called
+        assert "42" == container.get(str)
 
     def test_passes_container_bc_annotation(self, registry, container):
         """
         If the factory takes an argument annotated with svcs.Container, it is
         passed on instantiation.
         """
-        called = False
 
         def factory(foo: svcs.Container):
-            assert container is foo
-            nonlocal called
-            called = True
+            return str(foo.get(int))
 
-        registry.register_factory(Service, factory)
+        registry.register_value(int, 42)
+        registry.register_factory(str, factory)
 
-        container.get(Service)
-
-        assert called
+        assert "42" == container.get(str)
 
 
 class TestContainer:
