@@ -212,6 +212,8 @@ If a factory takes a first argument called `svcs_container` or the first argumen
 
 > [!NOTE]
 > It is possible to overwrite registered service factories later – e.g., for testing – **without monkey-patching**.
+> This is especially interesting if you want to replace a low-level service with a mock without re-jiggering all services that depend on it.
+>
 > You have to remove possibly cached instances from the container though (`Container.forget_about()`).
 > The Flask integration takes care of this for you.
 >
@@ -402,7 +404,7 @@ def test_handles_db_failure():
 
 > [!IMPORTANT]
 > The `replace_(factory|value)` method *requires* an application context and ensures that if a factory/value has already been created *and cached*, they're removed before the new factory/value is registered.
->>
+>
 > Possible situations where this can occur are Pytest fixtures where you don't control the order in which they're called.
 
 
