@@ -10,7 +10,7 @@
 
 <!-- begin-pypi -->
 
-> **Warning**
+> [!WARNING]
 > ☠️ Not ready yet! ☠️
 >
 > This project is only public to [gather feedback](https://github.com/hynek/svcs/discussions), and everything can and will change until the project is proclaimed stable.
@@ -234,7 +234,7 @@ Generally, the `Registry` object should live on an application-scoped object lik
 On the other hand, the `Container` object should live on a request-scoped object like Flask's `g` object or Pyramid's `request` object.
 
 
-> **Note**
+> [!NOTE]
 > The core APIs only use vanilla objects without any global state but also without any comfort.
 > It gets more interesting when using framework-specific integrations where the life-cycle of the container and, thus, services is handled automatically.
 
@@ -385,7 +385,7 @@ def test_handles_db_failure():
         assert response.status_code == 500
 ```
 
-> **Note**
+> [!IMPORTANT]
 > The `replace_(factory|value)` method *requires* an application context and ensures that if a factory/value has already been created *and cached*, they're removed before the new factory/value is registered.
 >>
 > Possible situations where this can occur are Pytest fixtures where you don't control the order in which they're called.
