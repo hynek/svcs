@@ -20,7 +20,9 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Typing :: Typed",
 ]
-dependencies = ["attrs"]
+dependencies = [
+  "attrs>=21.3.0", # attrs namespace
+]
 
 [project.optional-dependencies]
 tests = ["pytest", "pytest-asyncio", "sybil"]
