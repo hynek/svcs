@@ -12,17 +12,7 @@ import pytest
 
 import svcs
 
-
-class Service:
-    pass
-
-
-class AnotherService:
-    pass
-
-
-class YetAnotherService:
-    pass
+from .ifaces import AnotherService, Service
 
 
 needs_working_async_mock = pytest.mark.skipif(
@@ -89,7 +79,7 @@ class TestRegistry:
 
         with pytest.warns(
             UserWarning,
-            match="Skipped async cleanup for 'tests.test_registry.Service'.",
+            match="Skipped async cleanup for 'tests.ifaces.Service'.",
         ):
             registry.close()
 
@@ -104,10 +94,7 @@ class TestRegistry:
         with contextlib.closing(registry):
             ...
 
-        assert (
-            "tests.test_registry.Service"
-            == caplog.records[0].svcs_service_name
-        )
+        assert "tests.ifaces.Service" == caplog.records[0].svcs_service_name
 
     def test_detects_async_factories(self, registry):
         """
@@ -210,10 +197,7 @@ class TestRegistry:
         await registry.aclose()
 
         close_mock.assert_awaited_once()
-        assert (
-            "tests.test_registry.Service"
-            == caplog.records[0].svcs_service_name
-        )
+        assert "tests.ifaces.Service" == caplog.records[0].svcs_service_name
 
 
 class TestRegisteredService:
