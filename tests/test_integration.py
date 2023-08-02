@@ -11,154 +11,157 @@ import svcs
 from .ifaces import AnotherService, Service, YetAnotherService
 
 
-class TestIntegration:
-    def test_register_factory_get(self, registry, container):
-        """
-        register_factory registers a factory and get returns the service.
+def test_register_factory_get(registry, container):
+    """
+    register_factory registers a factory and get returns the service.
 
-        The service is cached.
-        """
-        registry.register_factory(Service, Service)
+    The service is cached.
+    """
+    registry.register_factory(Service, Service)
 
-        svc = container.get(Service)
+    svc = container.get(Service)
 
-        assert isinstance(svc, Service)
-        assert svc is container.get(Service)
+    assert isinstance(svc, Service)
+    assert svc is container.get(Service)
 
-    def test_register_value_get(self, registry, container, svc):
-        """
-        register_value registers a service object and get returns it.
-        """
-        registry.register_value(Service, svc)
 
-        assert svc is container.get(Service)
-        assert svc is container.get(Service)
+def test_register_value_get(registry, container, svc):
+    """
+    register_value registers a service object and get returns it.
+    """
+    registry.register_value(Service, svc)
 
-    def test_get_not_found(self, container):
-        """
-        Asking for a service that isn't registered raises a ServiceNotFoundError.
-        """
-        with pytest.raises(svcs.exceptions.ServiceNotFoundError) as ei:
-            container.get(Service)
+    assert svc is container.get(Service)
+    assert svc is container.get(Service)
 
-        assert Service is ei.value.args[0]
 
-    def test_passes_container_bc_name(self, registry, container):
-        """
-        If the factory takes an argument called `svcs_container`, it is passed
-        on instantiation.
-        """
-
-        def factory(svcs_container):
-            return str(svcs_container.get(int))
-
-        registry.register_value(int, 42)
-        registry.register_factory(str, factory)
-
-        assert "42" == container.get(str)
-
-    def test_passes_container_bc_annotation(self, registry, container):
-        """
-        If the factory takes an argument annotated with svcs.Container, it is
-        passed on instantiation.
-        """
-
-        def factory(foo: svcs.Container):
-            return str(foo.get(int))
-
-        registry.register_value(int, 42)
-        registry.register_factory(str, factory)
-
-        assert "42" == container.get(str)
-
-    def test_get_pings(self, registry, container, svc):
-        """
-        get_pings returns a list of ServicePings.
-        """
-        registry.register_factory(AnotherService, AnotherService)
-        registry.register_value(Service, svc, ping=lambda _: None)
-
-        assert [Service] == [
-            ping._rs.svc_type for ping in container.get_pings()
-        ]
-
-    def test_cleanup_called(self, registry, container):
-        """
-        Services that have a cleanup have them called on cleanup.
-        """
-        cleaned_up = False
-
-        def factory():
-            nonlocal cleaned_up
-            yield 42
-            cleaned_up = True
-
-        registry.register_factory(Service, factory)
-
+def test_get_not_found(container):
+    """
+    Asking for a service that isn't registered raises a ServiceNotFoundError.
+    """
+    with pytest.raises(svcs.exceptions.ServiceNotFoundError) as ei:
         container.get(Service)
 
-        assert not cleaned_up
+    assert Service is ei.value.args[0]
 
+
+def test_passes_container_bc_name(registry, container):
+    """
+    If the factory takes an argument called `svcs_container`, it is passed on
+    instantiation.
+    """
+
+    def factory(svcs_container):
+        return str(svcs_container.get(int))
+
+    registry.register_value(int, 42)
+    registry.register_factory(str, factory)
+
+    assert "42" == container.get(str)
+
+
+def test_passes_container_bc_annotation(registry, container):
+    """
+    If the factory takes an argument annotated with svcs.Container, it is
+    passed on instantiation.
+    """
+
+    def factory(foo: svcs.Container):
+        return str(foo.get(int))
+
+    registry.register_value(int, 42)
+    registry.register_factory(str, factory)
+
+    assert "42" == container.get(str)
+
+
+def test_get_pings(registry, container, svc):
+    """
+    get_pings returns a list of ServicePings.
+    """
+    registry.register_factory(AnotherService, AnotherService)
+    registry.register_value(Service, svc, ping=lambda _: None)
+
+    assert [Service] == [ping._rs.svc_type for ping in container.get_pings()]
+
+
+def test_cleanup_called(registry, container):
+    """
+    Services that have a cleanup have them called on cleanup.
+    """
+    cleaned_up = False
+
+    def factory():
+        nonlocal cleaned_up
+        yield 42
+        cleaned_up = True
+
+    registry.register_factory(Service, factory)
+
+    container.get(Service)
+
+    assert not cleaned_up
+
+    container.close()
+
+    assert cleaned_up
+    assert not container._instantiated
+    assert not container._on_close
+
+
+def test_close_resilient(container, registry, caplog):
+    """
+    Failing cleanups are logged and ignored. They do not break the cleanup
+    process.
+    """
+
+    def factory():
+        yield 1
+        raise Exception
+
+    cleaned_up = False
+
+    def factory_no_boom():
+        nonlocal cleaned_up
+
+        yield 3
+
+        cleaned_up = True
+
+    registry.register_factory(Service, factory)
+    registry.register_factory(YetAnotherService, factory_no_boom)
+
+    assert 1 == container.get(Service)
+    assert 3 == container.get(YetAnotherService)
+
+    assert not cleaned_up
+
+    container.close()
+
+    assert "tests.ifaces.Service" == caplog.records[0].svcs_service_name
+    assert cleaned_up
+
+
+def test_warns_if_generator_does_not_stop_after_cleanup(registry, container):
+    """
+    If a generator doesn't stop after cleanup, a warning is emitted.
+    """
+
+    def factory():
+        yield Service()
+        yield 42
+
+    registry.register_factory(Service, factory)
+
+    container.get(Service)
+
+    with pytest.warns(UserWarning) as wi:
         container.close()
 
-        assert cleaned_up
-        assert not container._instantiated
-        assert not container._on_close
-
-    def test_close_resilient(self, container, registry, caplog):
-        """
-        Failing cleanups are logged and ignored. They do not break the
-        cleanup process.
-        """
-
-        def factory():
-            yield 1
-            raise Exception
-
-        cleaned_up = False
-
-        def factory_no_boom():
-            nonlocal cleaned_up
-
-            yield 3
-
-            cleaned_up = True
-
-        registry.register_factory(Service, factory)
-        registry.register_factory(YetAnotherService, factory_no_boom)
-
-        assert 1 == container.get(Service)
-        assert 3 == container.get(YetAnotherService)
-
-        assert not cleaned_up
-
-        container.close()
-
-        assert "tests.ifaces.Service" == caplog.records[0].svcs_service_name
-        assert cleaned_up
-
-    def test_warns_if_generator_does_not_stop_after_cleanup(
-        self, registry, container
-    ):
-        """
-        If a generator doesn't stop after cleanup, a warning is emitted.
-        """
-
-        def factory():
-            yield Service()
-            yield 42
-
-        registry.register_factory(Service, factory)
-
-        container.get(Service)
-
-        with pytest.warns(UserWarning) as wi:
-            container.close()
-
-        assert (
-            "Container clean up for 'tests.ifaces.Service' "
-            "didn't stop iterating." == wi.pop().message.args[0]
-        )
+    assert (
+        "Container clean up for 'tests.ifaces.Service' "
+        "didn't stop iterating." == wi.pop().message.args[0]
+    )
 
 
 @pytest.mark.asyncio()
