@@ -32,7 +32,7 @@ def init_app(app: FlaskAppT, registry: Registry | None = None) -> FlaskAppT:
 
 def get(svc_type: type) -> Any:
     """
-    Same as :meth:`svcs.Container.get()`, but uses container on ``flask.g``.
+    Same as :meth:`svcs.Container.get()`, but uses container on :obj:`flask.g`.
     """
     _, container = _ensure_req_data()
 
@@ -59,7 +59,7 @@ def register_factory(
 def register_value(
     app: Flask,
     svc_type: type,
-    instance: object,
+    value: object,
     *,
     ping: Callable | None = None,
     on_registry_close: Callable | None = None,
@@ -68,7 +68,7 @@ def register_value(
     Same as :meth:`svcs.Registry.register_value()`, but uses registry on *app*.
     """
     app.config["svcs_registry"].register_value(
-        svc_type, instance, ping=ping, on_registry_close=on_registry_close
+        svc_type, value, ping=ping, on_registry_close=on_registry_close
     )
 
 
@@ -92,7 +92,7 @@ def replace_factory(
 
 def replace_value(
     svc_type: type,
-    instance: object,
+    value: object,
     *,
     ping: Callable | None = None,
     on_registry_close: Callable | None = None,
@@ -104,7 +104,7 @@ def replace_value(
 
     container.forget_about(svc_type)
     registry.register_value(
-        svc_type, instance, ping=ping, on_registry_close=on_registry_close
+        svc_type, value, ping=ping, on_registry_close=on_registry_close
     )
 
 
@@ -119,7 +119,7 @@ def get_pings() -> list[ServicePing]:
 
 def teardown(exc: BaseException | None) -> None:
     """
-    To be used with Flask.teardown_appcontext that requires to take an
+    To be used with :meth:`Flask.teardown_appcontext` that requires to take an
     exception.
 
     The app context is torn down after the response is sent.

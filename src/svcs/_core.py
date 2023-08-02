@@ -52,7 +52,8 @@ class Container:
         Instantiate it if necessary and register its cleanup.
 
         Returns:
-             Any until https://github.com/python/mypy/issues/4717 is fixed.
+             :class:`typing.Any` until
+             https://github.com/python/mypy/issues/4717 is fixed.
         """
         if (svc := self._instantiated.get(svc_type)) is not None:
             return svc
@@ -75,7 +76,8 @@ class Container:
         Instantiate it asynchronously if necessary and register its cleanup.
 
         Returns:
-             Any until https://github.com/python/mypy/issues/4717 is fixed.
+             :class:`typing.Any` until
+             https://github.com/python/mypy/issues/4717 is fixed.
         """
         if (svc := self._instantiated.get(svc_type)) is not None:
             return svc
@@ -255,14 +257,14 @@ class Registry:
     def register_value(
         self,
         svc_type: type,
-        instance: object,
+        value: object,
         *,
         ping: Callable | None = None,
         on_registry_close: Callable | None = None,
     ) -> None:
         self.register_factory(
             svc_type,
-            lambda: instance,
+            lambda: value,
             ping=ping,
             on_registry_close=on_registry_close,
         )
