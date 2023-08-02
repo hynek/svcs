@@ -75,7 +75,7 @@ def view():
     api = services.get(WebAPIClient)
 ```
 
-The latter already works with [Flask](#flask) by utilizing the `g` object.
+The latter already works with [Flask](#flask) by utilizing the [`g` object](https://flask.palletsprojects.com/en/latest/api/#flask.g).
 
 You set it up like this:
 
