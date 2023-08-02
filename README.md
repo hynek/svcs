@@ -1,12 +1,30 @@
 <!-- begin-logo -->
 <p align="center">
   <a href="https://github.com/hynek/svcs/">
-    <img src="https://raw.githubusercontent.com/hynek/svcs/main/docs/_static/logo.svg" width="20%" alt="svcs" />
+    <img src="docs/_static/logo_with_name.svg" width="25%" alt="svcs logo showing a radar" />
   </a>
 </p>
+
+<p align="center">
+  A Lightweight Service Locator for Python.
+</p>
+
 <!-- end-logo -->
 
-# *svcs*: A Lightweight Service Locator for Python
+<p align="center">
+  <img alt="PyPI - Status" src="https://img.shields.io/pypi/status/svcs">
+  <a href="./LICENSE">
+    <img alt="PyPI - License" src="https://img.shields.io/pypi/l/svcs">
+  </a>
+  <a href="https://pypi.org/project/svcs/">
+    <img alt="PyPI" src="https://img.shields.io/pypi/v/svcs">
+  </a>
+  <a href="https://pypi.org/project/svcs/">
+    <img alt="PyPI - Supported Python versions" src="https://img.shields.io/pypi/pyversions/svcs.svg">
+  </a>
+</p>
+
+---
 
 <!-- begin-pypi -->
 
@@ -32,7 +50,7 @@ In practice that means that at runtime, you say "*Give me a database connection*
 This can be an actual database connection or it can be a mock object for testing.
 All of this happens *within* your application – service locators are **not** related to service discovery.
 
-If you like the [*Dependency Inversion Principle*](https://en.wikipedia.org/wiki/Dependency_inversion_principle) (aka "*program against interfaces, not implementations*"), you would register concrete factories for abstract interfaces; in Python usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [Abstract Base Class](https://docs.python.org/3.11/library/abc.html).
+If you follow the [*Dependency Inversion Principle*](https://en.wikipedia.org/wiki/Dependency_inversion_principle) (aka "*program against interfaces, not implementations*"), you would register concrete factories for abstract interfaces; in Python usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [*abstract base class*](https://docs.python.org/3.11/library/abc.html).
 
 Benefits:
 
@@ -40,8 +58,6 @@ Benefits:
 - unifies **acquisition** and **cleanups** of resources,
 - simplifies **testing**,
 - and allows for easy **health checks** across *all* resources.
-
-No global mutable state is necessary – but possible for extra comfort.
 
 The goal is to minimize your business code to:
 
@@ -51,7 +67,7 @@ def view(request):
     api = request.services.get(WebAPIClient)
 ```
 
-or even:
+or, if you don't shy away from some global state, even:
 
 ```python
 def view():
@@ -59,7 +75,7 @@ def view():
     api = services.get(WebAPIClient)
 ```
 
-The latter already works with [Flask](#flask).
+The latter already works with [Flask](#flask) by utilizing the `g` object.
 
 You set it up like this:
 
@@ -92,10 +108,14 @@ def cleanup():
     registry.close()  # calls engine.dispose()
 ```
 
-The generator-based setup and cleanup may remind you of [Pytest fixtures](https://docs.pytest.org/en/stable/explanation/fixtures.html).
+The generator-based setup and cleanup may remind you of [*pytest* fixtures](https://docs.pytest.org/en/stable/explanation/fixtures.html).
 The hooks that are defined as `on_registry_close` are called when you call `Registry.close()` – e.g. when your application is shutting down.
 
 *svcs* comes with **full async** support via a-prefixed methods (i.e. `aget()` instead of `get()`, et cetera).
+
+> [!IMPORTANT]
+> All of this may look over-engineered if you have only one or two resources.
+> However, it starts paying dividends *very fast* once you go past that.
 
 
 ## Is this Dependency Injection!?
@@ -130,11 +150,11 @@ The main downside is that it's impossible to verify whether all required depende
 <!-- end-pypi -->
 
 
-## Low-Level Core API
+## Low-Level API
 
-You're unlikely to use the core API directly, but knowing what's happening underneath is good to dispel any concerns about magic.
+You will probably use some framework integration and not the low-level API directly, but knowing what's happening underneath is good to dispel any concerns about magic.
 
-*svcs* has two essential concepts:
+*svcs* has two core concepts: `Registry`s and `Container`s that have different life cycles and responsibilities.
 
 
 ### Registries
@@ -404,7 +424,7 @@ def test_handles_db_failure():
 > [!IMPORTANT]
 > The `replace_(factory|value)` method *requires* an application context and ensures that if a factory/value has already been created *and cached*, they're removed before the new factory/value is registered.
 >
-> Possible situations where this can occur are Pytest fixtures where you don't control the order in which they're called.
+> Possible situations where this can occur are *pytest* fixtures where you don't control the order in which they're called.
 
 
 ### Quality of Life
@@ -488,6 +508,6 @@ def get(svc_type: type[T]) -> T:
 
 ## Credits
 
-*svcs* is written by [Hynek Schlawack](https://hynek.me/) and distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+*svcs* is written by [Hynek Schlawack](https://hynek.me/) and distributed under the terms of the [MIT](./LICENSE) license.
 
 The development is kindly supported by my employer [Variomedia AG](https://www.variomedia.de/) and all my amazing [GitHub Sponsors](https://github.com/sponsors/hynek).

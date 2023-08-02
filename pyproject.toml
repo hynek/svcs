@@ -9,7 +9,6 @@ name = "svcs"
 description = "A Lightweight Service Locator"
 requires-python = ">=3.8"
 license = "MIT"
-keywords = ["dependency injection"]
 authors = [{ name = "Hynek Schlawack", email = "hs@ox.cx" }]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -48,9 +47,6 @@ start-after = "<!-- begin-logo -->\n"
 end-before = "\n<!-- end-logo -->"
 
 [[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
-text = "\n\n# *svcs*: A Lightweight Service Locator\n\n"
-
-[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
 path = "README.md"
 start-after = "<!-- begin-pypi -->\n"
 end-before = "\n<!-- end-pypi -->"
@@ -84,6 +80,18 @@ text = """
 [[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
 path = "README.md"
 start-at = "## Credits"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '> \[!(.*)\]'
+replacement = '> **\1**'
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = ']\(\./(.*)\)'
+replacement = '](https://github.com/hynek/svcs/blob/main/\1)'
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '(docs/_static/.*")'
+replacement = 'https://raw.githubusercontent.com/hynek/svcs/main/\1"'
 
 
 [tool.pytest.ini_options]
