@@ -234,6 +234,9 @@ class Registry:
     _services: dict[type, RegisteredService] = attrs.Factory(dict)
     _on_close: list[tuple[str, Callable]] = attrs.Factory(list)
 
+    def __repr__(self) -> str:
+        return f"<svcs.Registry(num_services={len(self._services)})>"
+
     def register_factory(
         self,
         svc_type: type,
@@ -242,6 +245,25 @@ class Registry:
         ping: Callable | None = None,
         on_registry_close: Callable | None = None,
     ) -> None:
+        """
+        Register *factory* for *svc_type*.
+
+        Args:
+            svc_type: The type of the service to register.
+
+            factory: A callable that is used to instantiated *svc_type* if
+                asked. If it's a generator, a cleanup is registered after
+                instantiation. Can be also async or an async generator.
+
+            ping: A callable that marks the service as having a health check.
+                The service iss returned when :meth:`Container.get_pings` is
+                called and *ping* is called as part of :meth:`ServicePing.ping`
+                or :meth:`ServicePing.aping`.
+
+            on_registry_close: A callable that is called when the
+                :meth:`Registry.close()` method is called. Can be async, then
+                :meth:`Registry.aclose()` must be called.
+        """
         rs = RegisteredService(
             svc_type,
             factory,
@@ -262,6 +284,10 @@ class Registry:
         ping: Callable | None = None,
         on_registry_close: Callable | None = None,
     ) -> None:
+        """
+        Syntactic sugar for ``register_factory(svc_type, lambda: value,
+        ping=ping, on_registry_close=on_registry_close)``.
+        """
         self.register_factory(
             svc_type,
             lambda: value,

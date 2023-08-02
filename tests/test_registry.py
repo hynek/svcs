@@ -22,6 +22,21 @@ needs_working_async_mock = pytest.mark.skipif(
 
 
 class TestRegistry:
+    def test_repr_empty(self, registry):
+        """
+        repr of an empty registry says 0 registered services.
+        """
+        assert "<svcs.Registry(num_services=0)>" == repr(registry)
+
+    def test_repr_counts(self, registry):
+        """
+        repr counts 2 registered services as 2.
+        """
+        registry.register_factory(Service, Service)
+        registry.register_factory(AnotherService, AnotherService)
+
+        assert "<svcs.Registry(num_services=2)>" == repr(registry)
+
     def test_empty_close(self):
         """
         Closing an empty registry does nothing.
