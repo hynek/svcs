@@ -199,7 +199,7 @@ This frees you from keeping track of registered resources yourself.
 
 ### Containers
 
-A **`Container`** belongs to a Registry and allows to create instances of the registered types, taking care of their life-cycle:
+A **`Container`** uses a `Registry` to lookup registered types and uses that information to create instances and to take care of their life cycles:
 
 ```python
 >>> container = svcs.Container(reg)
