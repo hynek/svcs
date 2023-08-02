@@ -199,7 +199,7 @@ This frees you from keeping track of registered resources yourself.
 
 ### Containers
 
-A **`svcs.Container`** uses a registry to lookup registered types and uses that information to create instances and to take care of their life cycles:
+A **`svcs.Container`** uses a `svcs.Registry` to lookup registered types and uses that information to create instances and to take care of their life cycles:
 
 ```python
 >>> container = svcs.Container(reg)
