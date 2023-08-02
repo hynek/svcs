@@ -215,9 +215,9 @@ True
 'Hello World'
 ```
 
-A container lives as long as you want the instances to live – e.g., as long as a request lives.
+A container lives as long as you want the instances to live – for example, as long as a request lives.
 
-If a factory takes a first argument called `svcs_container` or the first argument of any name that is annotated as being `svcs.Container`, the current container instance is passed into the factory as the first *positional* argument:
+If a factory takes a first argument called `svcs_container` or the first argument (of any name) is annotated as being `svcs.Container`, the current container instance is passed into the factory as the first *positional* argument allowing for recursive service acquisition:
 
 ```python
 >>> container = svcs.Container(reg)
@@ -226,7 +226,7 @@ If a factory takes a first argument called `svcs_container` or the first argumen
 >>> reg.register_value(uuid.UUID, uuid.UUID('639c0a5c-8d93-4a67-8341-fe43367308a5'))
 
 >>> def factory(svcs_container) -> str:
-...     return svcs_container.get(uuid.UUID).hex
+...     return svcs_container.get(uuid.UUID).hex  # get the UUID, then work on it
 
 >>> reg.register_factory(str, factory)
 
