@@ -9,6 +9,13 @@ predicatable repr.
 
 import dataclasses
 
+from typing import Protocol, runtime_checkable
+
+
+@runtime_checkable
+class Interface(Protocol):
+    pass
+
 
 @dataclasses.dataclass
 class Service:
