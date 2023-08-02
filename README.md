@@ -147,6 +147,8 @@ def view(request):
 
 The main downside is that it's impossible to verify whether all required dependencies have been configured without running the code.
 
+If you still prefer dependency injection, check out [*incant*](https://github.com/Tinche/incant).
+
 <!-- end-pypi -->
 
 
