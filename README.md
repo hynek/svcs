@@ -156,7 +156,7 @@ If you still prefer dependency injection, check out [*incant*](https://github.co
 
 You will probably use some framework integration and not the low-level API directly, but knowing what's happening underneath is good to dispel any concerns about magic.
 
-*svcs* has two core concepts: `Registry`s and `Container`s that have different life cycles and responsibilities.
+*svcs* has two core concepts: **registries** and **containers** that have different life cycles and responsibilities.
 
 
 ### Registries
