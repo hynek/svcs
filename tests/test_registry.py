@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-import asyncio
 import contextlib
 import inspect
 
@@ -12,6 +11,12 @@ import pytest
 
 import svcs
 
+from .fake_factories import (
+    async_int_factory,
+    async_str_cleanup_factory,
+    int_factory,
+    str_cleanup_factory,
+)
 from .ifaces import AnotherService, Service
 
 
@@ -117,22 +122,17 @@ class TestRegistry:
         needs to be awaited.
         """
 
-        async def factory():
-            return 42
-
-        async def factory_cleanup():
-            await asyncio.sleep(0)
-            yield str(42)
-
-        registry.register_factory(int, factory)
-        registry.register_factory(str, factory_cleanup)
+        registry.register_factory(int, async_int_factory)
+        registry.register_factory(str, async_str_cleanup_factory)
 
         assert (
-            svcs.RegisteredService(int, factory, False, True, None)
+            svcs.RegisteredService(int, async_int_factory, False, True, None)
             == registry._services[int]
         )
         assert (
-            svcs.RegisteredService(str, factory_cleanup, False, True, None)
+            svcs.RegisteredService(
+                str, async_str_cleanup_factory, False, True, None
+            )
             == registry._services[str]
         )
 
@@ -140,22 +140,17 @@ class TestRegistry:
         """
         is_async is False for sync factories.
         """
-
-        def factory():
-            return 42
-
-        def factory_cleanup():
-            yield "42"
-
-        registry.register_factory(int, factory)
-        registry.register_factory(str, factory_cleanup)
+        registry.register_factory(int, int_factory)
+        registry.register_factory(str, str_cleanup_factory)
 
         assert (
-            svcs.RegisteredService(int, factory, False, False, None)
+            svcs.RegisteredService(int, int_factory, False, False, None)
             == registry._services[int]
         )
         assert (
-            svcs.RegisteredService(str, factory_cleanup, False, False, None)
+            svcs.RegisteredService(
+                str, str_cleanup_factory, False, False, None
+            )
             == registry._services[str]
         )
 
@@ -236,14 +231,22 @@ class TestRegisteredService:
         assert "tests.ifaces.Service" == rs.name
 
 
-def factory_wrong_annotation(foo: svcs.Registry) -> int:
-    return 42
+def wrong_annotation(foo: svcs.Registry) -> int:
+    ...
+
+
+def no_args():
+    ...
+
+
+def diff_name():
+    ...
 
 
 class TestTakesContainer:
     @pytest.mark.parametrize(
         "factory",
-        [lambda: None, lambda container: None, factory_wrong_annotation],
+        [no_args, diff_name, wrong_annotation],
     )
     def test_nope(self, factory):
         """
@@ -257,7 +260,7 @@ class TestTakesContainer:
         """
 
         def factory(svcs_container):
-            return 42
+            ...
 
         assert svcs._core._takes_container(factory)
 
@@ -267,7 +270,7 @@ class TestTakesContainer:
         """
 
         def factory(foo: svcs.Container):
-            return 42
+            ...
 
         assert svcs._core._takes_container(factory)
 
@@ -278,7 +281,7 @@ class TestTakesContainer:
         """
 
         def factory(bar: "svcs.Container"):
-            return 42
+            ...
 
         assert svcs._core._takes_container(factory)
 
@@ -288,7 +291,7 @@ class TestTakesContainer:
         """
 
         def factory(foo, bar):
-            return 42
+            ...
 
         with pytest.raises(
             TypeError, match="Factories must take 0 or 1 parameters."
@@ -302,6 +305,6 @@ class TestTakesContainer:
 
         class Factory:
             def __call__(self, svcs_container):
-                return 42
+                ...
 
         assert svcs._core._takes_container(Factory())

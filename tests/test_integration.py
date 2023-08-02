@@ -8,6 +8,7 @@ import pytest
 
 import svcs
 
+from .fake_factories import nop
 from .ifaces import AnotherService, Service, YetAnotherService
 
 
@@ -80,7 +81,7 @@ def test_get_pings(registry, container, svc):
     get_pings returns a list of ServicePings.
     """
     registry.register_factory(AnotherService, AnotherService)
-    registry.register_value(Service, svc, ping=lambda _: None)
+    registry.register_value(Service, svc, ping=nop)
 
     assert [Service] == [ping._rs.svc_type for ping in container.get_pings()]
 

@@ -105,7 +105,7 @@ filterwarnings = ["once::Warning"]
 [tool.coverage.run]
 branch = true
 parallel = true
-source = ["svcs"]
+source = ["svcs", "tests"]
 
 [tool.coverage.paths]
 source = ["src", ".tox/py*/**/site-packages"]

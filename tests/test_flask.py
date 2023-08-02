@@ -8,6 +8,7 @@ import pytest
 
 import svcs
 
+from .fake_factories import nop
 from .ifaces import AnotherService, Interface, Service
 
 
@@ -73,7 +74,7 @@ class TestFlask:
         """
         It's possible to overwrite an already registered type.
         """
-        registry.register_value(Interface, Service(), ping=lambda _: None)
+        registry.register_value(Interface, Service(), ping=nop)
 
         assert isinstance(svcs.flask.get(Interface), Interface)
 
@@ -82,11 +83,11 @@ class TestFlask:
         assert isinstance(svcs.flask.get(Interface), AnotherService)
         assert [] == svcs.flask.get_pings()
 
-    def test_overwrite_factory(self, container):
+    def test_overwrite_factory(self):
         """
         It's possible to overwrite an already registered type using a factory.
         """
-        svcs.flask.replace_value(Interface, Service(), ping=lambda _: None)
+        svcs.flask.replace_value(Interface, Service(), ping=nop)
 
         assert isinstance(svcs.flask.get(Interface), Interface)
 
@@ -117,9 +118,7 @@ class TestFlask:
         get_pingable returns only pingable svcs.
         """
         svcs.flask.replace_factory(Service, Service)
-        svcs.flask.replace_factory(
-            AnotherService, AnotherService, ping=lambda _: None
-        )
+        svcs.flask.replace_factory(AnotherService, AnotherService, ping=nop)
 
         assert [AnotherService] == [
             ping._rs.svc_type for ping in svcs.flask.get_pings()
