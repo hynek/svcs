@@ -64,7 +64,7 @@ class Container:
             self._on_close.append((rs.name, svc))
             svc = next(svc)
 
-        self._instantiated[rs.svc_type] = svc
+        self._instantiated[svc_type] = svc
 
         return svc
 
