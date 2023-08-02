@@ -161,9 +161,9 @@ You will probably use some framework integration and not the low-level API direc
 
 ### Registries
 
-A **`Registry`** allows to register factories for certain types.
+A **`svcs.Registry`** allows to register factories for types.
 It's expected to live as long as your application lives.
-Its only job is to store and retrieve factories.
+Its only job is to store and retrieve factories along with some metadata.
 
 It is possible to register either factory callables or values:
 
@@ -199,7 +199,7 @@ This frees you from keeping track of registered resources yourself.
 
 ### Containers
 
-A **`Container`** uses a `Registry` to lookup registered types and uses that information to create instances and to take care of their life cycles:
+A **`svcs.Container`** uses a registry to lookup registered types and uses that information to create instances and to take care of their life cycles:
 
 ```python
 >>> container = svcs.Container(reg)
@@ -220,15 +220,18 @@ A container lives as long as you want the instances to live – e.g., as long as
 If a factory takes a first argument called `svcs_container` or the first argument of any name that is annotated as being `svcs.Container`, the current container instance is passed into the factory as the first *positional* argument:
 
 ```python
+>>> container = svcs.Container(reg)
+
+# Let's make the UUID predictable for our test!
+>>> reg.register_value(uuid.UUID, uuid.UUID('639c0a5c-8d93-4a67-8341-fe43367308a5'))
+
 >>> def factory(svcs_container) -> str:
 ...     return svcs_container.get(uuid.UUID).hex
 
 >>> reg.register_factory(str, factory)
 
-% skip: next
-
 >>> container.get(str)
-'86d342d6652d4d7faa912769dff0793e'
+'639c0a5c8d934a678341fe43367308a5'
 ```
 
 > [!NOTE]
@@ -268,13 +271,13 @@ You can look at the `is_async` property to check whether you *need* to use `aget
 
 ### Summary
 
-Generally, the `Registry` object should live on an application-scoped object like Flask's `app.config` object.
-On the other hand, the `Container` object should live on a request-scoped object like Flask's `g` object or Pyramid's `request` object.
+The `svc.Registry` object should live on an application-scoped object like Flask's `app.config` object.
+On the other hand, the `svc.Container` object should live on a request-scoped object like Flask's `g` object or Pyramid's `request` object.
 
 
 > [!NOTE]
 > The core APIs only use vanilla objects without any global state but also without any comfort.
-> It gets more interesting when using framework-specific integrations where the life-cycle of the container and, thus, services is handled automatically.
+> It gets more interesting when using framework-specific integrations where the life cycle of the container and, thus, services is handled automatically.
 
 
 ## Flask
