@@ -8,6 +8,7 @@ import pytest
 
 from sybil import Sybil
 from sybil.parsers import myst, rest
+from tests.ifaces import Service
 
 import svcs
 
@@ -30,6 +31,16 @@ rest_examples = Sybil(
 )
 
 pytest_collect_file = (markdown_examples + rest_examples).pytest()
+
+
+@pytest.fixture(name="svc")
+def _svc():
+    return Service()
+
+
+@pytest.fixture(name="rs")
+def _rs(svc):
+    return svcs.RegisteredService(Service, Service, False, False, None)
 
 
 @pytest.fixture(name="registry")
