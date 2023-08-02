@@ -30,5 +30,6 @@ repos:
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
+        exclude: ".*\\.svg$"
       - id: check-toml
       - id: check-yaml
