@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  A Lightweight Service Locator for Python.
+  <em>A Lightweight Service Locator for Python.</em>
 </p>
 
 <!-- end-logo -->
