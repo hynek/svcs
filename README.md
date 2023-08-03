@@ -51,7 +51,9 @@ This can be an actual database connection or it can be a mock object for testing
 All of this happens *within* your application – service locators are **not** related to service discovery.
 
 If you follow the [**_Dependency Inversion Principle_**](https://en.wikipedia.org/wiki/Dependency_inversion_principle) (aka "*program against interfaces, not implementations*"), you would register concrete factories for abstract interfaces; in Python usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [*abstract base class*](https://docs.python.org/3.11/library/abc.html).
+
 If you follow the [**_Hexagonal Architecture_**](https://alistair.cockburn.us/hexagonal-architecture/) (aka "*ports and adapters*"), the registered types are *ports* and the factories produce the *adapters*.
+*svcs* gives you a well-defined way to make your application *pluggable*.
 
 Benefits:
 
