@@ -42,7 +42,7 @@ It provides you with a central place to register factories for types/interfaces 
 
 ---
 
-**This allows you to configure and manage all your resources in *one central place* and access them in a *consistent* way without worrying about *cleaning them up*.**
+**This allows you to configure and manage all your resources in *one central place*, access them in a *consistent* way without worrying about *cleaning them up* and achieve *loose coupling*.**
 
 ---
 
@@ -50,13 +50,14 @@ In practice that means that at runtime, you say "*Give me a database connection*
 This can be an actual database connection or it can be a mock object for testing.
 All of this happens *within* your application – service locators are **not** related to service discovery.
 
-If you follow the [*Dependency Inversion Principle*](https://en.wikipedia.org/wiki/Dependency_inversion_principle) (aka "*program against interfaces, not implementations*"), you would register concrete factories for abstract interfaces; in Python usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [*abstract base class*](https://docs.python.org/3.11/library/abc.html).
+If you follow the [**_Dependency Inversion Principle_**](https://en.wikipedia.org/wiki/Dependency_inversion_principle) (aka "*program against interfaces, not implementations*"), you would register concrete factories for abstract interfaces; in Python usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [*abstract base class*](https://docs.python.org/3.11/library/abc.html).
+If you follow the [**_Hexagonal Architecture_**](https://alistair.cockburn.us/hexagonal-architecture/) (aka "*ports and adapters*"), the registered types are *ports* and the factories produce the *adapters*.
 
 Benefits:
 
 - Eliminates tons of repetitive **boilerplate** code,
 - unifies **acquisition** and **cleanups** of resources,
-- simplifies **testing**,
+- simplifies **testing** through **loose coupling**,
 - and allows for easy **health checks** across *all* resources.
 
 The goal is to minimize your business code to:
