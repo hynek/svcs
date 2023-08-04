@@ -18,6 +18,8 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 ### Added
 
 - It's now possible to request multiple services at once by passing multiple types to `Container.get()` and `Container.aget()`.
+  [#15](https://github.com/hynek/svcs/pull/15)
+
 
 
 ## [23.7.0](https://github.com/hynek/svcs/compare/23.6.0...23.7.0) - 2023-08-02
