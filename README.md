@@ -28,7 +28,8 @@
 
 <!-- begin-pypi -->
 
-> [!WARNING] ☠️ Not ready yet! ☠️
+> [!WARNING]
+> ☠️ Not ready yet! ☠️
 >
 > This project is only public to [gather feedback](https://github.com/hynek/svcs/discussions), and everything can and will change until the project is proclaimed stable.
 >
