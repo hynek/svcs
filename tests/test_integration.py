@@ -26,14 +26,16 @@ def test_register_factory_get(registry, container):
     assert svc is container.get(Service)
 
 
-def test_register_value_get(registry, container, svc):
+def test_register_value_multiple(registry, container):
     """
-    register_value registers a service object and get returns it.
+    register_value registers a service object and get returns as many values as
+    are requeste.
     """
-    registry.register_value(Service, svc)
+    registry.register_value(Service, 1)
+    registry.register_value(AnotherService, 2)
 
-    assert svc is container.get(Service)
-    assert svc is container.get(Service)
+    assert [1, 2] == container.get(Service, AnotherService)
+    assert [1, 2] == container.get(Service, AnotherService)
 
 
 def test_get_not_found(container):
@@ -196,8 +198,10 @@ class TestAsync:
         A value instead of a factory does not break aget().
         """
         registry.register_value(Service, 42)
+        registry.register_value(AnotherService, 23)
 
-        assert 42 == (await container.aget(Service))
+        assert [42, 23] == (await container.aget(Service, AnotherService))
+        assert [42, 23] == (await container.aget(Service, AnotherService))
 
     async def test_async_cleanup(self, registry, container):
         """

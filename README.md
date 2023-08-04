@@ -70,15 +70,19 @@ def view(request):
     api = request.services.get(WebAPIClient)
 ```
 
-or, if you don't shy away from some global state, even:
+You can also ask for multiple services at once:
+
+```python
+def view(request):
+    db, api = request.services.get(Database, WebAPIClient)
+```
+
+Or, if you don't shy away from some global state and your web framework supports it, even:
 
 ```python
 def view():
-    db = services.get(Database)
-    api = services.get(WebAPIClient)
+    db, api = svcs.flask.get(Database, WebAPIClient)
 ```
-
-The latter already works with [Flask](#flask) by utilizing the [`g` object](https://flask.palletsprojects.com/en/latest/api/#flask.g).
 
 You set it up like this:
 

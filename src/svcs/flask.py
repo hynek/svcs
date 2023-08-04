@@ -30,13 +30,13 @@ def init_app(app: FlaskAppT, registry: Registry | None = None) -> FlaskAppT:
     return app
 
 
-def get(svc_type: type) -> Any:
+def get(*svc_types: type) -> Any:
     """
     Same as :meth:`svcs.Container.get()`, but uses container on :obj:`flask.g`.
     """
     _, container = _ensure_req_data()
 
-    return container.get(svc_type)
+    return container.get(*svc_types)
 
 
 def register_factory(

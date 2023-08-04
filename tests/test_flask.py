@@ -39,6 +39,17 @@ def _container(clean_app_ctx):
 
 @pytest.mark.usefixtures("clean_app_ctx")
 class TestFlask:
+    def test_register_value_multiple(self, app, registry):
+        """
+        register_value registers a service object on an app and get returns as
+        many values as are requeste.
+        """
+        registry.register_value(Service, 1)
+        registry.register_value(AnotherService, 2)
+
+        assert [1, 2] == svcs.flask.get(Service, AnotherService)
+        assert [1, 2] == svcs.flask.get(Service, AnotherService)
+
     def test_cleanup_added(self, registry):
         """
         get() handles the case where there is already a cleanup registered.

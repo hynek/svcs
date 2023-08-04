@@ -60,6 +60,8 @@ con = svcs.Container(reg)
 o1: object = con.get(object)
 o2: int = con.get(object)
 
+o, i = con.get(object, int)
+
 con.close()
 
 with contextlib.closing(svcs.Container(reg)) as con:

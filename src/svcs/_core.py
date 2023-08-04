@@ -45,55 +45,79 @@ class Container:
             f"cleanups={len(self._on_close)})>"
         )
 
-    def get(self, svc_type: type) -> Any:
+    def get(self, *svc_types: type) -> Any:
         """
         Get an instance of *svc_type*.
 
         Instantiate it if necessary and register its cleanup.
 
         Returns:
-             :class:`typing.Any` until
+             If one service is requested, it's returned directly. If multiple
+             are requested, a sequence of services is returned.
+
+        Note:
+             Returns :class:`typing.Any` until
              https://github.com/python/mypy/issues/4717 is fixed.
         """
-        if (svc := self._instantiated.get(svc_type)) is not None:
-            return svc
+        rv = []
+        for svc_type in svc_types:
+            if (svc := self._instantiated.get(svc_type)) is not None:
+                rv.append(svc)
+                continue
 
-        rs = self.registry.get_registered_service_for(svc_type)
-        svc = rs.factory(self) if rs.takes_container else rs.factory()
+            rs = self.registry.get_registered_service_for(svc_type)
+            svc = rs.factory(self) if rs.takes_container else rs.factory()
 
-        if isinstance(svc, Generator):
-            self._on_close.append((rs.name, svc))
-            svc = next(svc)
+            if isinstance(svc, Generator):
+                self._on_close.append((rs.name, svc))
+                svc = next(svc)
 
-        self._instantiated[svc_type] = svc
+            self._instantiated[svc_type] = svc
 
-        return svc
+            rv.append(svc)
 
-    async def aget(self, svc_type: type) -> Any:
+        if len(rv) == 1:
+            return rv[0]
+
+        return rv
+
+    async def aget(self, *svc_types: type) -> Any:
         """
         Get an instance of *svc_type*.
 
         Instantiate it asynchronously if necessary and register its cleanup.
 
         Returns:
-             :class:`typing.Any` until
+             If one service is requested, it's returned directly. If multiple
+             are requested, a sequence of services is returned.
+
+        Note:
+             Returns :class:`typing.Any` until
              https://github.com/python/mypy/issues/4717 is fixed.
         """
-        if (svc := self._instantiated.get(svc_type)) is not None:
-            return svc
+        rv = []
+        for svc_type in svc_types:
+            if (svc := self._instantiated.get(svc_type)) is not None:
+                rv.append(svc)
+                continue
 
-        rs = self.registry.get_registered_service_for(svc_type)
-        svc = rs.factory()
+            rs = self.registry.get_registered_service_for(svc_type)
+            svc = rs.factory()
 
-        if isinstance(svc, AsyncGenerator):
-            self._on_close.append((rs.name, svc))
-            svc = await anext(svc)
-        elif isawaitable(svc):
-            svc = await svc
+            if isinstance(svc, AsyncGenerator):
+                self._on_close.append((rs.name, svc))
+                svc = await anext(svc)
+            elif isawaitable(svc):
+                svc = await svc
 
-        self._instantiated[rs.svc_type] = svc
+            self._instantiated[rs.svc_type] = svc
 
-        return svc
+            rv.append(svc)
+
+        if len(rv) == 1:
+            return rv[0]
+
+        return rv
 
     def forget_about(self, svc_type: type) -> None:
         """
