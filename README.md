@@ -1,7 +1,7 @@
 <!-- begin-logo -->
 <p align="center">
   <a href="https://github.com/hynek/svcs/">
-    <img src="docs/_static/logo_with_name.svg" width="30%" alt="svcs logo showing a radar" />
+    <img src="docs/_static/logo_with_name.svg" width="35%" alt="svcs logo showing a radar" />
   </a>
 </p>
 
