@@ -523,3 +523,5 @@ def get(svc_type: type[T]) -> T:
 *svcs* is written by [Hynek Schlawack](https://hynek.me/) and distributed under the terms of the [MIT](./LICENSE) license.
 
 The development is kindly supported by my employer [Variomedia AG](https://www.variomedia.de/) and all my amazing [GitHub Sponsors](https://github.com/sponsors/hynek).
+
+The hexagonal locator logo is made by [Lynn Root](https://www.roguelynn.com), based on an [Font Awesome](https://fontawesome.com) Icon.
