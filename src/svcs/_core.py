@@ -45,6 +45,9 @@ class Container:
             f"cleanups={len(self._on_close)})>"
         )
 
+    def __contains__(self, svc_type: type) -> bool:
+        return svc_type in self._instantiated
+
     def get(self, *svc_types: type) -> Any:
         """
         Get an instance of *svc_type*.

@@ -56,6 +56,19 @@ class TestContainer:
 
         assert "<Container(instantiated=2, cleanups=2)>" == repr(container)
 
+    def test_contains(self, container):
+        """
+        If a service is instantiated within a container, `in` returns True,
+        False otherwise.
+        """
+        container.registry.register_value(int, 42)
+
+        assert int not in container
+
+        container.get(int)
+
+        assert int in container
+
 
 class TestServicePing:
     def test_name(self, rs):

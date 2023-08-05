@@ -17,7 +17,9 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ### Added
 
-- It is now possible to check if a service is registered with a `Registry` by using `in`.
+- It is now possible to check if a service type is registered with a `Registry` by using `in`.
+
+- It is now possible to check if a service type has a cached instance within a `Container` by using `in`.
 
 
 ## [23.8.0](https://github.com/hynek/svcs/compare/23.7.0...23.8.0) - 2023-08-04

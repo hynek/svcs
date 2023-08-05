@@ -218,9 +218,13 @@ A **`svcs.Container`** uses a `svcs.Registry` to lookup registered types and use
 ```python
 >>> container = svcs.Container(reg)
 
+>>> uuid.UUID in container
+False
 >>> u = container.get(uuid.UUID)
 >>> u
 UUID('...')
+>>> uuid.UUID in container
+True
 >>> # Calling get() again returns the SAME UUID instance!
 >>> # Good for DB connections, bad for UUIDs.
 >>> u is container.get(uuid.UUID)
