@@ -5,7 +5,7 @@
 import contextlib
 import sys
 
-from typing import AsyncGenerator, Generator
+from typing import AsyncGenerator, Generator, Protocol
 
 import svcs
 
@@ -28,7 +28,12 @@ async def f() -> None:
         reg2.register_factory(int, int)
 
         async with svcs.Container(reg2) as con2:
-            await con2.aget(int)
+            a: int
+            b: str
+            c: bool
+            d: tuple
+            e: object
+            a, b, c, d, e = await con2.aget(int, str, bool, tuple, object)
 
 
 def gen() -> Generator:
@@ -66,9 +71,22 @@ con = svcs.Container(reg)
 
 # The type checker believes whatever we tell it.
 o1: object = con.get(object)
-o2: int = con.get(object)
+o2: int = con.get(int)
 
-o, i = con.get(object, int)
+a: int
+b: str
+c: bool
+d: tuple
+e: object
+a, b, c, d, e = con.get(int, str, bool, tuple, object)
+
+
+class P(Protocol):
+    def m(self) -> None:
+        ...
+
+
+p: P = con.get_abstract(P)
 
 con.close()
 

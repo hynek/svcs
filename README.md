@@ -71,7 +71,9 @@ def view(request):
     api = request.services.get(WebAPIClient)
 ```
 
-You can also ask for multiple services at once:
+With proper typing: `db` has the type `Database` and `api` has the type `WebAPIClient` to the type checker.
+
+You can also ask for multiple services at once with the same typing benefits:
 
 ```python
 def view(request):
@@ -505,30 +507,36 @@ def index():
 🧑‍🍳💋
 
 
-## Caveats
+## Typing Caveats
 
-One would expect the the `Container.get()` method would have a type signature like `get(type: type[T]) -> T`.
-Unfortunately, that's currently impossible because it [precludes the usage of `Protocols` and *abstract base classes* as service types](https://github.com/python/mypy/issues/4717), making this package pointless.
+If you try to `get()` an abstract class like an `Protocol` or an *abstract base classes* you'll get a Mypy error like this:
 
-Therefore it returns `Any`, and until Mypy changes its stance, you have to use it like this:
-
-```python
-conn: Connection = container.get(Connection)
+```
+error: Only concrete class can be given where "type[P]" is expected  [type-abstract]
 ```
 
-If types are more important to you than a unified interface, you can always wrap it:
+Unfortunately it's [impossible](https://github.com/python/mypy/issues/4717) to type-hint `type[P]` when `P` is abstract.
+
+As a stopgap, until we get something better in Python typing, *svcs* comes with `Container.get_abstract()` and `Container.aget_abstract()` that are type-hinted to return `Any`.
+Since `Any` disables any kind of type-checking, you have to use it like this:
+
+```python
+ac: SomeAbstractClass = container.get_abstract(SomeAbstractClass)
+```
+
+You can also create quality-of-life wrappers for your resources:
 
 ```python
 def get_connection() -> Connection:
     return svcs.flask.get(Connection)
 ```
 
-Or, if you don't care about `Protocols` and abstract base classes:
+Sadly, this is the best compromise to date.
 
-```python
-def get(svc_type: type[T]) -> T:
-    return svcs.flask.get(svc_type)
-```
+---
+
+Another caveat is that it's necessary to define multiple return values for `get()` for every single arity.
+We've done it for up to ten service types which should be plenty.
 
 
 ## Credits

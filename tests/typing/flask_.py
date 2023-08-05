@@ -32,11 +32,15 @@ svcs.flask.register_factory(app, str, str)
 svcs.flask.register_factory(app, int, factory_with_cleanup)
 svcs.flask.register_value(app, str, str, ping=lambda: None)
 
-# The type checker believes whatever we tell it.
 o1: object = svcs.flask.get(object)
-o2: int = svcs.flask.get(object)
 
-o1, o2 = svcs.flask.get(object, int)
+a: int
+b: str
+c: bool
+d: tuple
+e: object
+a, b, c, d, e = svcs.flask.get(int, str, bool, tuple, object)
+
 
 svcs.flask.close_registry(app)
 

@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, TypeVar
+from typing import Any, TypeVar, overload
 
 from flask import Flask, current_app, g, has_app_context
 
@@ -13,6 +13,11 @@ from ._core import Container, Registry, ServicePing
 
 
 FlaskAppT = TypeVar("FlaskAppT", bound=Flask)
+T1 = TypeVar("T1")
+T2 = TypeVar("T2")
+T3 = TypeVar("T3")
+T4 = TypeVar("T4")
+T5 = TypeVar("T5")
 
 
 def init_app(app: FlaskAppT, registry: Registry | None = None) -> FlaskAppT:
@@ -30,13 +35,65 @@ def init_app(app: FlaskAppT, registry: Registry | None = None) -> FlaskAppT:
     return app
 
 
-def get(*svc_types: type) -> Any:
+@overload
+def get(svc_type: type[T1], /) -> T1:
+    ...
+
+
+@overload
+def get(svc_type1: type[T1], svc_type2: type[T2], /) -> tuple[T1, T2]:
+    ...
+
+
+@overload
+def get(
+    svc_type1: type[T1], svc_type2: type[T2], svc_type3: type[T3], /
+) -> tuple[T1, T2, T3]:
+    ...
+
+
+@overload
+def get(
+    svc_type1: type[T1],
+    svc_type2: type[T2],
+    svc_type3: type[T3],
+    svc_type4: type[T4],
+    /,
+) -> tuple[T1, T2, T3, T4]:
+    ...
+
+
+@overload
+def get(
+    svc_type1: type[T1],
+    svc_type2: type[T2],
+    svc_type3: type[T3],
+    svc_type4: type[T4],
+    svc_type5: type[T5],
+    /,
+) -> tuple[T1, T2, T3, T4, T5]:
+    ...
+
+
+def get(*svc_types: type) -> object:
     """
     Same as :meth:`svcs.Container.get()`, but uses container on :obj:`flask.g`.
     """
     _, container = _ensure_req_data()
 
     return container.get(*svc_types)
+
+
+def get_abstract(*svc_types: type) -> Any:
+    """
+    Like :func:`get` but is annotated to return `Any` which allows it to be
+    used with abstract types like :class:`typing.Protocol` or :mod:`abc`
+    classes.
+
+    Note:
+        See https://github.com/python/mypy/issues/4717 why this is necessary.
+    """
+    return get(*svc_types)
 
 
 def register_factory(

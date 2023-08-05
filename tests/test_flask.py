@@ -39,7 +39,7 @@ def _container(clean_app_ctx):
 
 @pytest.mark.usefixtures("clean_app_ctx")
 class TestFlask:
-    def test_register_value_multiple(self, app, registry):
+    def test_register_value_multiple(self, registry):
         """
         register_value registers a service object on an app and get returns as
         many values as are requeste.
@@ -185,6 +185,19 @@ class TestFlask:
             "Skipped async cleanup for 'tests.ifaces.Service'. "
             "Use aclose() instead." == w.message.args[0]
         )
+
+    def test_register_factory_get_abstract(self, registry, container):
+        """
+        register_factory registers a factory and get_abstract returns the service.
+
+        The service is cached.
+        """
+        registry.register_factory(Interface, Service)
+
+        svc = container.get_abstract(Interface)
+
+        assert isinstance(svc, Interface)
+        assert svc is svcs.flask.get_abstract(Interface)
 
 
 class TestNonContextHelpers:

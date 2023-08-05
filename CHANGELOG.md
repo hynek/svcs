@@ -15,7 +15,16 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/23.8.0...HEAD)
 
+### Changed
+
+- `Container.get()` and `Container.aget()` now have type hints that only work with concrete classes but allow for type checking without repeating yourself.
+  If you want to use abstract classes like `typing.Protocol` or ABCs, you can use `Container.get_abstract()` and `Container.aget_abstract()` instead.
+
+
 ### Added
+
+- `Container.get_abstract()` and `Container.aget_abstract()`.
+  They behave like `Container.get()` and `Container.aget()` before.
 
 - It is now possible to check if a service type is registered with a `Registry` by using `in`.
 

@@ -12,7 +12,7 @@ import warnings
 from collections.abc import Callable
 from contextlib import suppress
 from inspect import isasyncgenfunction, isawaitable, iscoroutinefunction
-from typing import Any, AsyncGenerator, Generator
+from typing import Any, AsyncGenerator, Generator, TypeVar, overload
 
 import attrs
 
@@ -25,198 +25,6 @@ if sys.version_info < (3, 10):
 
     def anext(gen: AsyncGenerator) -> Any:
         return gen.__anext__()
-
-
-@attrs.define
-class Container:
-    """
-    A per-context container for instantiated services & cleanups.
-    """
-
-    registry: Registry
-    _instantiated: dict[type, object] = attrs.Factory(dict)
-    _on_close: list[tuple[str, Generator | AsyncGenerator]] = attrs.Factory(
-        list
-    )
-
-    def __repr__(self) -> str:
-        return (
-            f"<Container(instantiated={len(self._instantiated)}, "
-            f"cleanups={len(self._on_close)})>"
-        )
-
-    def __contains__(self, svc_type: type) -> bool:
-        return svc_type in self._instantiated
-
-    def __enter__(self) -> Container:
-        return self
-
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
-        self.close()
-
-    async def __aenter__(self) -> Container:
-        return self
-
-    async def __aexit__(
-        self, exc_type: Any, exc_val: Any, exc_tb: Any
-    ) -> None:
-        await self.aclose()
-
-    def get(self, *svc_types: type) -> Any:
-        """
-        Get an instance of *svc_type*.
-
-        Instantiate it if necessary and register its cleanup.
-
-        Returns:
-             If one service is requested, it's returned directly. If multiple
-             are requested, a sequence of services is returned.
-
-        Note:
-             Returns :class:`typing.Any` until
-             https://github.com/python/mypy/issues/4717 is fixed.
-        """
-        rv = []
-        for svc_type in svc_types:
-            if (svc := self._instantiated.get(svc_type)) is not None:
-                rv.append(svc)
-                continue
-
-            rs = self.registry.get_registered_service_for(svc_type)
-            svc = rs.factory(self) if rs.takes_container else rs.factory()
-
-            if isinstance(svc, Generator):
-                self._on_close.append((rs.name, svc))
-                svc = next(svc)
-
-            self._instantiated[svc_type] = svc
-
-            rv.append(svc)
-
-        if len(rv) == 1:
-            return rv[0]
-
-        return rv
-
-    async def aget(self, *svc_types: type) -> Any:
-        """
-        Get an instance of *svc_type*.
-
-        Instantiate it asynchronously if necessary and register its cleanup.
-
-        Returns:
-             If one service is requested, it's returned directly. If multiple
-             are requested, a sequence of services is returned.
-
-        Note:
-             Returns :class:`typing.Any` until
-             https://github.com/python/mypy/issues/4717 is fixed.
-        """
-        rv = []
-        for svc_type in svc_types:
-            if (svc := self._instantiated.get(svc_type)) is not None:
-                rv.append(svc)
-                continue
-
-            rs = self.registry.get_registered_service_for(svc_type)
-            svc = rs.factory()
-
-            if isinstance(svc, AsyncGenerator):
-                self._on_close.append((rs.name, svc))
-                svc = await anext(svc)
-            elif isawaitable(svc):
-                svc = await svc
-
-            self._instantiated[rs.svc_type] = svc
-
-            rv.append(svc)
-
-        if len(rv) == 1:
-            return rv[0]
-
-        return rv
-
-    def forget_about(self, svc_type: type) -> None:
-        """
-        Remove all traces of *svc_type* from ourselves.
-        """
-        with suppress(KeyError):
-            del self._instantiated[svc_type]
-
-    def close(self) -> None:
-        """
-        Run all registered *synchronous* cleanups.
-
-        Async closes are *not* awaited.
-        """
-        for name, gen in reversed(self._on_close):
-            try:
-                if isinstance(gen, AsyncGenerator):
-                    warnings.warn(
-                        f"Skipped async cleanup for {name!r}. "
-                        "Use aclose() instead.",
-                        # stacklevel doesn't matter here; it's coming from a framework.
-                        stacklevel=1,
-                    )
-                    continue
-
-                next(gen)
-
-                warnings.warn(
-                    f"Container clean up for {name!r} didn't stop iterating.",
-                    stacklevel=1,
-                )
-            except StopIteration:  # noqa: PERF203
-                pass
-            except Exception:  # noqa: BLE001
-                log.warning(
-                    "Container clean up failed for %r.",
-                    name,
-                    exc_info=True,
-                    extra={"svcs_service_name": name},
-                )
-
-        self._on_close.clear()
-        self._instantiated.clear()
-
-    async def aclose(self) -> None:
-        """
-        Run *all* registered cleanups -- synchronous **and** asynchronous.
-        """
-        for name, gen in reversed(self._on_close):
-            try:
-                if isinstance(gen, AsyncGenerator):
-                    await anext(gen)
-                else:
-                    next(gen)
-
-                warnings.warn(
-                    f"Container clean up for {name!r} didn't stop iterating.",
-                    stacklevel=1,
-                )
-
-            except (StopAsyncIteration, StopIteration):  # noqa: PERF203
-                pass
-            except Exception:  # noqa: BLE001
-                log.warning(
-                    "Container clean up failed for %r.",
-                    name,
-                    exc_info=True,
-                    extra={"svcs_service_name": name},
-                )
-
-        self._on_close.clear()
-        self._instantiated.clear()
-
-    def get_pings(self) -> list[ServicePing]:
-        """
-        Get all pingable services and bind them to ourselves for cleanups.
-        """
-        return [
-            ServicePing(self, rs)
-            for rs in self.registry._services.values()
-            if rs.ping is not None
-        ]
 
 
 @attrs.frozen
@@ -248,11 +56,11 @@ class ServicePing:
     _rs: RegisteredService
 
     def ping(self) -> None:
-        svc = self._container.get(self._rs.svc_type)
+        svc: Any = self._container.get(self._rs.svc_type)
         self._rs.ping(svc)  # type: ignore[misc]
 
     async def aping(self) -> None:
-        svc = await self._container.aget(self._rs.svc_type)
+        svc: Any = await self._container.aget(self._rs.svc_type)
         if iscoroutinefunction(self._rs.ping):
             await self._rs.ping(svc)
         else:
@@ -435,3 +243,450 @@ def _takes_container(factory: Callable) -> bool:
         return True
 
     return False
+
+
+T1 = TypeVar("T1")
+T2 = TypeVar("T2")
+T3 = TypeVar("T3")
+T4 = TypeVar("T4")
+T5 = TypeVar("T5")
+T6 = TypeVar("T6")
+T7 = TypeVar("T7")
+T8 = TypeVar("T8")
+T9 = TypeVar("T9")
+T10 = TypeVar("T10")
+
+
+@attrs.define
+class Container:
+    """
+    A per-context container for instantiated services & cleanups.
+    """
+
+    registry: Registry
+    _instantiated: dict[type, object] = attrs.Factory(dict)
+    _on_close: list[tuple[str, Generator | AsyncGenerator]] = attrs.Factory(
+        list
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"<Container(instantiated={len(self._instantiated)}, "
+            f"cleanups={len(self._on_close)})>"
+        )
+
+    def __contains__(self, svc_type: type) -> bool:
+        return svc_type in self._instantiated
+
+    def __enter__(self) -> Container:
+        return self
+
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        self.close()
+
+    async def __aenter__(self) -> Container:
+        return self
+
+    async def __aexit__(
+        self, exc_type: Any, exc_val: Any, exc_tb: Any
+    ) -> None:
+        await self.aclose()
+
+    def forget_about(self, svc_type: type) -> None:
+        """
+        Remove all traces of *svc_type* from ourselves.
+        """
+        with suppress(KeyError):
+            del self._instantiated[svc_type]
+
+    def close(self) -> None:
+        """
+        Run all registered *synchronous* cleanups.
+
+        Async closes are *not* awaited.
+        """
+        for name, gen in reversed(self._on_close):
+            try:
+                if isinstance(gen, AsyncGenerator):
+                    warnings.warn(
+                        f"Skipped async cleanup for {name!r}. "
+                        "Use aclose() instead.",
+                        # stacklevel doesn't matter here; it's coming from a framework.
+                        stacklevel=1,
+                    )
+                    continue
+
+                next(gen)
+
+                warnings.warn(
+                    f"Container clean up for {name!r} didn't stop iterating.",
+                    stacklevel=1,
+                )
+            except StopIteration:  # noqa: PERF203
+                pass
+            except Exception:  # noqa: BLE001
+                log.warning(
+                    "Container clean up failed for %r.",
+                    name,
+                    exc_info=True,
+                    extra={"svcs_service_name": name},
+                )
+
+        self._on_close.clear()
+        self._instantiated.clear()
+
+    async def aclose(self) -> None:
+        """
+        Run *all* registered cleanups -- synchronous **and** asynchronous.
+        """
+        for name, gen in reversed(self._on_close):
+            try:
+                if isinstance(gen, AsyncGenerator):
+                    await anext(gen)
+                else:
+                    next(gen)
+
+                warnings.warn(
+                    f"Container clean up for {name!r} didn't stop iterating.",
+                    stacklevel=1,
+                )
+
+            except (StopAsyncIteration, StopIteration):  # noqa: PERF203
+                pass
+            except Exception:  # noqa: BLE001
+                log.warning(
+                    "Container clean up failed for %r.",
+                    name,
+                    exc_info=True,
+                    extra={"svcs_service_name": name},
+                )
+
+        self._on_close.clear()
+        self._instantiated.clear()
+
+    def get_pings(self) -> list[ServicePing]:
+        """
+        Get all pingable services and bind them to ourselves for cleanups.
+        """
+        return [
+            ServicePing(self, rs)
+            for rs in self.registry._services.values()
+            if rs.ping is not None
+        ]
+
+    def get_abstract(self, *svc_types: type) -> Any:
+        """
+        Like :meth:`get` but is annotated to return `Any` which allows it to be
+        used with abstract types like :class:`typing.Protocol` or :mod:`abc`
+        classes.
+
+        Note:
+             See https://github.com/python/mypy/issues/4717 why this is
+             necessary.
+        """
+        return self.get(*svc_types)
+
+    async def aget_abstract(self, *svc_types: type) -> Any:
+        """
+        Like :meth:`aget` but has returns `Any` which allows it to be used with
+        abstract types like :class:`typing.Protocol` or :mod:`abc` classes.
+        """
+        return await self.aget(*svc_types)
+
+    @overload
+    def get(self, svc_type: type[T1], /) -> T1:
+        ...
+
+    @overload
+    def get(
+        self, svc_type1: type[T1], svc_type2: type[T2], /
+    ) -> tuple[T1, T2]:
+        ...
+
+    @overload
+    def get(
+        self, svc_type1: type[T1], svc_type2: type[T2], svc_type3: type[T3], /
+    ) -> tuple[T1, T2, T3]:
+        ...
+
+    @overload
+    def get(
+        self,
+        svc_type1: type[T1],
+        svc_type2: type[T2],
+        svc_type3: type[T3],
+        svc_type4: type[T4],
+        /,
+    ) -> tuple[T1, T2, T3, T4]:
+        ...
+
+    @overload
+    def get(
+        self,
+        svc_type1: type[T1],
+        svc_type2: type[T2],
+        svc_type3: type[T3],
+        svc_type4: type[T4],
+        svc_type5: type[T5],
+        /,
+    ) -> tuple[T1, T2, T3, T4, T5]:
+        ...
+
+    @overload
+    def get(
+        self,
+        svc_type1: type[T1],
+        svc_type2: type[T2],
+        svc_type3: type[T3],
+        svc_type4: type[T4],
+        svc_type5: type[T5],
+        svc_type6: type[T6],
+        /,
+    ) -> tuple[T1, T2, T3, T4, T5, T6]:
+        ...
+
+    @overload
+    def get(
+        self,
+        svc_type1: type[T1],
+        svc_type2: type[T2],
+        svc_type3: type[T3],
+        svc_type4: type[T4],
+        svc_type5: type[T5],
+        svc_type6: type[T6],
+        svc_type7: type[T7],
+        /,
+    ) -> tuple[T1, T2, T3, T4, T5, T6, T7]:
+        ...
+
+    @overload
+    def get(
+        self,
+        svc_type1: type[T1],
+        svc_type2: type[T2],
+        svc_type3: type[T3],
+        svc_type4: type[T4],
+        svc_type5: type[T5],
+        svc_type6: type[T6],
+        svc_type7: type[T7],
+        svc_type8: type[T8],
+        /,
+    ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8]:
+        ...
+
+    @overload
+    def get(
+        self,
+        svc_type1: type[T1],
+        svc_type2: type[T2],
+        svc_type3: type[T3],
+        svc_type4: type[T4],
+        svc_type5: type[T5],
+        svc_type6: type[T6],
+        svc_type7: type[T7],
+        svc_type8: type[T8],
+        svc_type9: type[T9],
+        /,
+    ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9]:
+        ...
+
+    @overload
+    def get(
+        self,
+        svc_type1: type[T1],
+        svc_type2: type[T2],
+        svc_type3: type[T3],
+        svc_type4: type[T4],
+        svc_type5: type[T5],
+        svc_type6: type[T6],
+        svc_type7: type[T7],
+        svc_type8: type[T8],
+        svc_type9: type[T9],
+        svc_type10: type[T10],
+        /,
+    ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]:
+        ...
+
+    def get(self, *svc_types: type) -> object:
+        """
+        Get an instance of *svc_type*s.
+
+        Instantiate them if necessary and register their cleanup.
+
+        Returns:
+             If one service is requested, it's returned directly. If multiple
+             are requested, a sequence of services is returned.
+        """
+        rv = []
+        for svc_type in svc_types:
+            if (svc := self._instantiated.get(svc_type)) is not None:
+                rv.append(svc)
+                continue
+
+            rs = self.registry.get_registered_service_for(svc_type)
+            svc = rs.factory(self) if rs.takes_container else rs.factory()
+
+            if isinstance(svc, Generator):
+                self._on_close.append((rs.name, svc))
+                svc = next(svc)
+
+            self._instantiated[svc_type] = svc
+
+            rv.append(svc)
+
+        if len(rv) == 1:
+            return rv[0]
+
+        return rv
+
+    @overload
+    async def aget(self, svc_type: type[T1], /) -> T1:
+        ...
+
+    @overload
+    async def aget(
+        self, svc_type1: type[T1], svc_type2: type[T2], /
+    ) -> tuple[T1, T2]:
+        ...
+
+    @overload
+    async def aget(
+        self, svc_type1: type[T1], svc_type2: type[T2], svc_type3: type[T3], /
+    ) -> tuple[T1, T2, T3]:
+        ...
+
+    @overload
+    async def aget(
+        self,
+        svc_type1: type[T1],
+        svc_type2: type[T2],
+        svc_type3: type[T3],
+        svc_type4: type[T4],
+        /,
+    ) -> tuple[T1, T2, T3, T4]:
+        ...
+
+    @overload
+    async def aget(
+        self,
+        svc_type1: type[T1],
+        svc_type2: type[T2],
+        svc_type3: type[T3],
+        svc_type4: type[T4],
+        svc_type5: type[T5],
+        /,
+    ) -> tuple[T1, T2, T3, T4, T5]:
+        ...
+
+    @overload
+    async def aget(
+        self,
+        svc_type1: type[T1],
+        svc_type2: type[T2],
+        svc_type3: type[T3],
+        svc_type4: type[T4],
+        svc_type5: type[T5],
+        svc_type6: type[T6],
+        /,
+    ) -> tuple[T1, T2, T3, T4, T5, T6]:
+        ...
+
+    @overload
+    async def aget(
+        self,
+        svc_type1: type[T1],
+        svc_type2: type[T2],
+        svc_type3: type[T3],
+        svc_type4: type[T4],
+        svc_type5: type[T5],
+        svc_type6: type[T6],
+        svc_type7: type[T7],
+        /,
+    ) -> tuple[T1, T2, T3, T4, T5, T6, T7]:
+        ...
+
+    @overload
+    async def aget(
+        self,
+        svc_type1: type[T1],
+        svc_type2: type[T2],
+        svc_type3: type[T3],
+        svc_type4: type[T4],
+        svc_type5: type[T5],
+        svc_type6: type[T6],
+        svc_type7: type[T7],
+        svc_type8: type[T8],
+        /,
+    ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8]:
+        ...
+
+    @overload
+    async def aget(
+        self,
+        svc_type1: type[T1],
+        svc_type2: type[T2],
+        svc_type3: type[T3],
+        svc_type4: type[T4],
+        svc_type5: type[T5],
+        svc_type6: type[T6],
+        svc_type7: type[T7],
+        svc_type8: type[T8],
+        svc_type9: type[T9],
+        /,
+    ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9]:
+        ...
+
+    @overload
+    async def aget(
+        self,
+        svc_type1: type[T1],
+        svc_type2: type[T2],
+        svc_type3: type[T3],
+        svc_type4: type[T4],
+        svc_type5: type[T5],
+        svc_type6: type[T6],
+        svc_type7: type[T7],
+        svc_type8: type[T8],
+        svc_type9: type[T9],
+        svc_type10: type[T10],
+        /,
+    ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]:
+        ...
+
+    async def aget(self, *svc_types: type) -> object:
+        """
+        Get an instance of *svc_type*.
+
+        Instantiate it asynchronously if necessary and register its cleanup.
+
+        Returns:
+             If one service is requested, it's returned directly. If multiple
+             are requested, a sequence of services is returned.
+
+        Note:
+             See https://github.com/python/mypy/issues/4717 why this is
+             necessary.
+        """
+        rv = []
+        for svc_type in svc_types:
+            if (svc := self._instantiated.get(svc_type)) is not None:
+                rv.append(svc)
+                continue
+
+            rs = self.registry.get_registered_service_for(svc_type)
+            svc = rs.factory()
+
+            if isinstance(svc, AsyncGenerator):
+                self._on_close.append((rs.name, svc))
+                svc = await anext(svc)
+            elif isawaitable(svc):
+                svc = await svc
+
+            self._instantiated[rs.svc_type] = svc
+
+            rv.append(svc)
+
+        if len(rv) == 1:
+            return rv[0]
+
+        return rv
