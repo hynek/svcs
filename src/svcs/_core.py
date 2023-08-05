@@ -261,6 +261,9 @@ class Registry:
     def __repr__(self) -> str:
         return f"<svcs.Registry(num_services={len(self._services)})>"
 
+    def __contains__(self, svc_type: type) -> bool:
+        return svc_type in self._services
+
     def register_factory(
         self,
         svc_type: type,

@@ -15,6 +15,10 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/23.8.0...HEAD)
 
+### Added
+
+- It is now possible to check if a service is registered with a `Registry` by using `in`.
+
 
 ## [23.8.0](https://github.com/hynek/svcs/compare/23.7.0...23.8.0) - 2023-08-04
 
@@ -22,7 +26,6 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 - It's now possible to request multiple services at once by passing multiple types to `Container.get()` and `Container.aget()`.
   [#15](https://github.com/hynek/svcs/pull/15)
-
 
 
 ## [23.7.0](https://github.com/hynek/svcs/compare/23.6.0...23.7.0) - 2023-08-02

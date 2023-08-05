@@ -209,6 +209,16 @@ class TestRegistry:
         close_mock.assert_awaited_once()
         assert "tests.ifaces.Service" == caplog.records[0].svcs_service_name
 
+    def test_contains(self, registry):
+        """
+        If a service is registered with a registry, `in` returns True, False
+        otherwise.
+        """
+        registry.register_factory(Service, Service)
+
+        assert Service in registry
+        assert AnotherService not in registry
+
 
 class TestRegisteredService:
     def test_repr(self, rs):

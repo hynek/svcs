@@ -183,6 +183,12 @@ It is possible to register either factory callables or values:
 
 >>> reg.register_factory(uuid.UUID, uuid.uuid4)
 >>> reg.register_value(str, "Hello World")
+>>> uuid.UUID in reg
+True
+>>> str in reg
+True
+>>> int in reg
+False
 ```
 
 The values and return values of the factories don't have to be actual instances of the type they're registered for.
