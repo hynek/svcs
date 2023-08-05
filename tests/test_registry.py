@@ -48,7 +48,7 @@ class TestRegistry:
         """
         svcs.Registry().close()
 
-        with contextlib.closing(svcs.Registry()):
+        with svcs.Registry():
             ...
 
     def test_close_closes(self, registry):
@@ -111,10 +111,34 @@ class TestRegistry:
             Service, Service, on_registry_close=Mock(side_effect=ValueError())
         )
 
-        with contextlib.closing(registry):
+        with registry:
             ...
 
         assert "tests.ifaces.Service" == caplog.records[0].svcs_service_name
+
+    def test_context_manager(self):
+        """
+        The registry is also a context manager that closes on exit.
+        """
+        orc = Mock()
+
+        with svcs.Registry() as registry:
+            registry.register_factory(Service, Service, on_registry_close=orc)
+
+        orc.assert_called_once_with()
+
+    @needs_working_async_mock
+    @pytest.mark.asyncio()
+    async def test_async_context_manager(self):
+        """
+        The registry is also an async context manager that acloses on exit.
+        """
+        orc = AsyncMock()
+
+        async with svcs.Registry() as registry:
+            registry.register_factory(Service, Service, on_registry_close=orc)
+
+        orc.assert_awaited_once_with()
 
     def test_detects_async_factories(self, registry):
         """
@@ -165,7 +189,7 @@ class TestRegistry:
         """
         await registry.aclose()
 
-        async with contextlib.aclosing(svcs.Registry()):
+        async with svcs.Registry():
             ...
 
     @pytest.mark.asyncio()

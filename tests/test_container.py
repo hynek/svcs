@@ -69,6 +69,43 @@ class TestContainer:
 
         assert int in container
 
+    def test_context_manager(self, container):
+        """
+        The container is also a context manager that closes on exit.
+        """
+        closed = False
+
+        def factory():
+            yield 42
+            nonlocal closed
+            closed = True
+
+        container.registry.register_factory(int, factory)
+
+        with container:
+            assert 42 == container.get(int)
+
+        assert closed
+
+    @pytest.mark.asyncio()
+    async def test_async_context_manager(self, container):
+        """
+        The container is also an async context manager that acloses on exit.
+        """
+        closed = False
+
+        async def factory():
+            yield 42
+            nonlocal closed
+            closed = True
+
+        container.registry.register_factory(int, factory)
+
+        async with container:
+            assert 42 == await container.aget(int)
+
+        assert closed
+
 
 class TestServicePing:
     def test_name(self, rs):

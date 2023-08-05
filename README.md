@@ -209,6 +209,7 @@ registry.register_factory(
 If this callback fails, it's logged at warning level but otherwise ignored.
 For instance, you could free a database connection pool in an [`atexit` handler](https://docs.python.org/3/library/atexit.html).
 This frees you from keeping track of registered resources yourself.
+You can also use `Registry` as an (async) context manager that (a)closes automatically on exit.
 
 
 ### Containers
@@ -269,6 +270,7 @@ At the end, you run `container.close()` and all generators will be finished (i.e
 You can use this to close files, return database connections to a pool, et cetera.
 
 If you have async generators, use `await container.aclose()` instead which calls `await anext(factory)` on all async generators (and `next(factory)` on sync ones).
+You can also use `Registry` as an (async) context manager that (a)closes automatically on exit.
 
 Failing cleanups are logged at `warning` level but otherwise ignored.
 

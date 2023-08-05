@@ -21,6 +21,8 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 - It is now possible to check if a service type has a cached instance within a `Container` by using `in`.
 
+- `Registry` and `Container` are now also an (async) context managers that call `close()` / `aclose()` on exit automatically.
+
 
 ## [23.8.0](https://github.com/hynek/svcs/compare/23.7.0...23.8.0) - 2023-08-04
 

@@ -48,6 +48,20 @@ class Container:
     def __contains__(self, svc_type: type) -> bool:
         return svc_type in self._instantiated
 
+    def __enter__(self) -> Container:
+        return self
+
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        self.close()
+
+    async def __aenter__(self) -> Container:
+        return self
+
+    async def __aexit__(
+        self, exc_type: Any, exc_val: Any, exc_tb: Any
+    ) -> None:
+        await self.aclose()
+
     def get(self, *svc_types: type) -> Any:
         """
         Get an instance of *svc_type*.
@@ -266,6 +280,20 @@ class Registry:
 
     def __contains__(self, svc_type: type) -> bool:
         return svc_type in self._services
+
+    def __enter__(self) -> Registry:
+        return self
+
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        self.close()
+
+    async def __aenter__(self) -> Registry:
+        return self
+
+    async def __aexit__(
+        self, exc_type: Any, exc_val: Any, exc_tb: Any
+    ) -> None:
+        await self.aclose()
 
     def register_factory(
         self,

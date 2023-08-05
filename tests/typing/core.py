@@ -16,11 +16,19 @@ con = svcs.Container(reg)
 reg.close()
 with contextlib.closing(reg) as reg:
     ...
+with reg as reg:
+    reg.register_factory(int, int)
 
 
 async def f() -> None:
     await reg.aclose()
     await con.aclose()
+
+    async with svcs.Registry() as reg2:
+        reg2.register_factory(int, int)
+
+        async with svcs.Container(reg2) as con2:
+            await con2.aget(int)
 
 
 def gen() -> Generator:
@@ -66,6 +74,9 @@ con.close()
 
 with contextlib.closing(svcs.Container(reg)) as con:
     ...
+
+with svcs.Container(reg) as con:
+    i2: int = con.get(int)
 
 if sys.version_info >= (3, 10):
 
