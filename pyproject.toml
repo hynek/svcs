@@ -27,11 +27,20 @@ dependencies = [
 [project.optional-dependencies]
 tests = ["pytest", "pytest-asyncio", "sybil"]
 typing = ["mypy>=1.4", "flask"]
+docs = [
+  "sphinx",
+  "furo",
+  "myst-parser",
+  "sphinx-notfound-page",
+  "flask",
+  "sybil",
+  "pytest",
+]
 dev = ["svcs[tests,typing]", "tox>4", "flask"]
 
 [project.urls]
 Changelog = "https://github.com/hynek/svcs/blob/main/CHANGELOG.md"
-Documentation = "https://github.com/hynek/svcs/blob/main/README.md"
+Documentation = "https://svcs.hynek.me/"
 Source = "https://github.com/hynek/svcs"
 Funding = "https://github.com/sponsors/hynek"
 
@@ -45,13 +54,13 @@ content-type = "text/markdown"
 
 [[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
 path = "README.md"
-start-after = "<!-- begin-logo -->\n"
-end-before = "\n<!-- end-logo -->"
+start-after = "<!-- begin logo -->\n"
+end-before = "\n<!-- end logo -->"
 
 [[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
 path = "README.md"
-start-after = "<!-- begin-pypi -->\n"
-end-before = "\n<!-- end-pypi -->"
+start-after = "<!-- begin pypi -->\n"
+end-before = "\n<!-- end pypi -->"
 
 [[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
 text = """
