@@ -67,8 +67,8 @@ The goal is to minimize your business code to:
 
 ```python
 def view(request):
-    db = request.services.get(Database)
-    api = request.services.get(WebAPIClient)
+    db = request.svcs.get(Database)
+    api = request.svcs.get(WebAPIClient)
 ```
 
 With proper typing: `db` has the type `Database` and `api` has the type `WebAPIClient` to the type checker.
@@ -77,7 +77,7 @@ You can also ask for multiple services at once with the same typing benefits:
 
 ```python
 def view(request):
-    db, api = request.services.get(Database, WebAPIClient)
+    db, api = request.svcs.get(Database, WebAPIClient)
 ```
 
 Or, if you don't shy away from some global state and your web framework supports it, even:
