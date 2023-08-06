@@ -88,7 +88,7 @@ If you don't use a type checker, that information is simply ignored without any 
 
 ---
 
-Please read the [*Why?*](https://svcs.hynek.me/) section of our documentation to learn more.
+Please read the [*Why?*](https://svcs.hynek.me/en/latest/why.html) section of our documentation to learn more.
 
 
 ## Project Information
