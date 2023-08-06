@@ -60,7 +60,7 @@ def view(request):
     api = request.svcs.get(WebAPIClient)
 ```
 
-With proper typing: `db` has the type `Database` and `api` has the type `WebAPIClient` to the type checker.
+To the type checker (e.g. [Mypy](https://mypy-lang.org)), `db` has the type `Database` and `api` has the type `WebAPIClient` and verifies your code as such.
 
 You can also ask for multiple services at once with the same typing benefits:
 
