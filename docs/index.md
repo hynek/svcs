@@ -18,7 +18,7 @@ I will keep using it for my work projects, but whether this will grow beyond my 
 :end-before: "<!-- end index -->"
 ```
 
-Read on in {doc}`why` if you find that intriguing!
+Read on in *{doc}`why`*, if you find that intriguing!
 
 
 ## User's Guide
@@ -30,15 +30,15 @@ why
 core-concepts
 flask
 typing-caveats
-security
 glossary
+security
 ```
 
 
-## Project Information
+## Project Links
 
 ```{include} ../README.md
-:start-after: "## Project Information"
+:start-after: "## Project Links"
 ```
 
 

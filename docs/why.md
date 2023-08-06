@@ -1,11 +1,6 @@
 # Why?
 
-A *service locator* like *svcs* allows you to configure and manage all your resources in *one central place*, access them in a *consistent* way without worrying about *cleaning them up* and achieve *loose coupling*.
-
-::: {important}
-The term {term}`service` is unfortunately very overloaded in the software world, but we've resisted to come up with a confusing new term.
-We use the term *resource* interchangeably, though.
-:::
+A {term}`service locator` like *svcs* allows you to configure and manage all your {term}`service`s in *one central place*, access them in a *consistent* way without worrying about *cleaning them up* and achieve *loose coupling*.
 
 ---
 
@@ -13,9 +8,9 @@ In practice that means that at runtime, you say "*Give me a database connection*
 This can be an actual database connection or it can be a mock object for testing.
 All of this happens *within* your application – service locators are **not** related to service discovery.
 
-If you follow the [**_Dependency Inversion Principle_**](https://en.wikipedia.org/wiki/Dependency_inversion_principle) (aka "*program against interfaces, not implementations*"), you would register concrete factories for abstract interfaces; in Python usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [*abstract base class*](https://docs.python.org/3.11/library/abc.html).
+If you follow the **{term}`Dependency Inversion Principle`**, you would register concrete factories for abstract interfaces; in Python usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [*abstract base class*](https://docs.python.org/3.11/library/abc.html).
 
-If you follow the [**_Hexagonal Architecture_**](https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)) (aka "*ports and adapters*"), the registered types are *ports* and the factories produce the *adapters*.
+If you follow the **{term}`Hexagonal Architecture`** (aka "*ports and adapters*"), the registered types are *ports* and the factories produce the *adapters*.
 *svcs* gives you a well-defined way to make your application *pluggable*.
 
 ```{include} ../README.md
@@ -110,7 +105,7 @@ However, it starts paying dividends *very fast* once you go past that.
 No.
 
 Although the concepts are related and share the idea of having a central registry of services, the ways they provide those services are fundamentally different:
-[Dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) always passes your dependencies as arguments while you actively ask a service locator for them when you need them.
+{term}`Dependency injection` always passes your dependencies as arguments while you actively ask a service locator for them when you need them.
 That usually requires less opaque magic since nothing meddles with your function/method definitions.
 But you can use, e.g., your web framework's injection capabilities to inject the locator object into your views and benefit from *svcs*'s upsides without giving up some of DI's ones.
 
@@ -147,3 +142,5 @@ If you're still interested, learn about our [core concepts](core-concepts) first
 Once you've understood the life cycles of registries and containers, you can look our framework integrations that get you started in no time:
 
 - [Flask](flask)
+
+If you get overwhelmed by the jargon, always feel free to check our [glossary](glossary)!
