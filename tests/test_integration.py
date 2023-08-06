@@ -9,7 +9,7 @@ import pytest
 import svcs
 
 from .fake_factories import nop
-from .ifaces import AnotherService, Service, YetAnotherService
+from .ifaces import AnotherService, Interface, Service, YetAnotherService
 
 
 def test_register_factory_get(registry, container):
@@ -24,6 +24,20 @@ def test_register_factory_get(registry, container):
 
     assert isinstance(svc, Service)
     assert svc is container.get(Service)
+
+
+def test_register_factory_get_abstract(registry, container):
+    """
+    register_factory registers a factory and get_abstract returns the service.
+
+    The service is cached.
+    """
+    registry.register_factory(Interface, Service)
+
+    svc = container.get_abstract(Interface)
+
+    assert isinstance(svc, Interface)
+    assert svc is container.get(Interface)
 
 
 def test_register_value_multiple(registry, container):
@@ -202,6 +216,16 @@ class TestAsync:
 
         assert [42, 23] == (await container.aget(Service, AnotherService))
         assert [42, 23] == (await container.aget(Service, AnotherService))
+
+    async def test_aget_abstract_works_with_value(self, registry, container):
+        """
+        A value instead of a factory does not break aget_abstract().
+        """
+        registry.register_value(int, 42)
+        registry.register_value(str, "42")
+
+        assert [42, "42"] == (await container.aget_abstract(int, str))
+        assert [42, "42"] == (await container.aget_abstract(int, str))
 
     async def test_async_cleanup(self, registry, container):
         """
