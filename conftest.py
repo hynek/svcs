@@ -32,6 +32,12 @@ rest_examples = Sybil(
 
 pytest_collect_file = (markdown_examples + rest_examples).pytest()
 
+collect_ignore = []
+try:
+    import sphinx  # noqa: F401
+except ImportError:
+    collect_ignore.extend(["docs"])
+
 
 @pytest.fixture(name="svc")
 def _svc():

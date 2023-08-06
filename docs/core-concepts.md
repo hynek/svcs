@@ -37,9 +37,7 @@ But the types must be *hashable* because they're used as keys in a lookup dictio
 
 It's possible to register a callback that is called when the *registry* is closed:
 
-<!--
-; skip: next
--->
+% skip: next
 
 ```python
 registry.register_factory(

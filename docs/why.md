@@ -25,9 +25,7 @@ If you follow the [**_Hexagonal Architecture_**](https://en.wikipedia.org/wiki/H
 
 You set it up like this:
 
-<!--
-; skip: next
--->
+% skip: next
 
 ```python
 import atexit
@@ -62,6 +60,8 @@ Next, if you've registered health checks (called *pings*) for your services, you
 This is how it could look in Pyramid[^flask]:
 
 [^flask]: See the [Flask integration](flask.md) chapter for a Flask equivalent.
+
+% skip: next
 
 ```python
 @view_config(route_name="healthy")
@@ -110,9 +110,7 @@ But you can use, e.g., your web framework's injection capabilities to inject the
 
 The active acquisition of resources by calling `get()` when you *know* for sure you're going to need it avoids the conundrum of either having to pass a factory (e.g., a connection pool – which also puts the onus of cleanup on you) or eagerly creating resources that you never use:
 
-<!--
-; skip: next
--->
+% skip: next
 ```python
 def view(request):
     if request.form.valid():

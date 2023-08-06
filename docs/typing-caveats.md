@@ -13,6 +13,8 @@ Unfortunately it's [impossible](https://github.com/python/mypy/issues/4717) to t
 As a stopgap, until we get something better in Python typing, *svcs* comes with `Container.get_abstract()` and `Container.aget_abstract()` that are type-hinted to return `Any`.
 Since `Any` disables any kind of type-checking, you have to use it like this:
 
+% skip: start
+
 ```python
 ac: SomeAbstractClass = container.get_abstract(SomeAbstractClass)
 ```

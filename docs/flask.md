@@ -17,9 +17,7 @@ You can add support for *svcs* by calling `svcs.flask.init_app(app)` in your [*a
 For instance, to create a factory that uses a SQLAlchemy engine to produce connections, you could do this:
 
 
-<!--
-; skip: start
--->
+% skip: start
 
 ```python
 import atexit
