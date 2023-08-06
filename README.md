@@ -77,6 +77,13 @@ def view():
 ```
 
 <!-- end benefits -->
+<!-- begin typing -->
+While *svcs* has first-class support for static typing, it is **strictly optional** and will always remain so.
+*svcs* also doesn't check your types at runtime.
+
+It only forwards the type you have asked for to the type checker.
+If you don't use a type checker, that information is simply ignored without any runtime overhead.
+<!-- end typing -->
 <!-- end index -->
 
 ---

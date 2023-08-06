@@ -98,6 +98,12 @@ However, it starts paying dividends *very fast* once you go past that.
 *svcs* comes with **full async** support via a-prefixed methods (i.e. `aget()` instead of `get()`, et cetera).
 
 
+## Static Typing
+
+```{include} ../README.md
+:start-after: "<!-- begin typing -->"
+:end-before: "<!-- end typing -->"
+```
 
 ## Is this Dependency Injection!?
 
