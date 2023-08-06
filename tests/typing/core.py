@@ -20,7 +20,7 @@ with reg as reg:
     reg.register_factory(int, int)
 
 
-async def f() -> None:
+async def func() -> None:
     await reg.aclose()
     await con.aclose()
 
@@ -33,7 +33,14 @@ async def f() -> None:
             c: bool
             d: tuple
             e: object
-            a, b, c, d, e = await con2.aget(int, str, bool, tuple, object)
+            f: float
+            g: list
+            h: dict
+            i: set
+            j: bytes
+            a, b, c, d, e, f, g, h, i, j = await con2.aget(
+                int, str, bool, tuple, object, float, list, dict, set, bytes
+            )
 
 
 def gen() -> Generator:
@@ -78,7 +85,14 @@ b: str
 c: bool
 d: tuple
 e: object
-a, b, c, d, e = con.get(int, str, bool, tuple, object)
+f: float
+g: list
+h: dict
+i: set
+j: bytes
+a, b, c, d, e, f, g, h, i, j = con.get(
+    int, str, bool, tuple, object, float, list, dict, set, bytes
+)
 
 
 class P(Protocol):

@@ -39,7 +39,14 @@ b: str
 c: bool
 d: tuple
 e: object
-a, b, c, d, e = svcs.flask.get(int, str, bool, tuple, object)
+f: float
+g: list
+h: dict
+i: set
+j: bytes
+a, b, c, d, e, f, g, h, i, j = svcs.flask.get(
+    int, str, bool, tuple, object, float, list, dict, set, bytes
+)
 
 
 svcs.flask.close_registry(app)
