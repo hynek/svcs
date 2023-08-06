@@ -29,6 +29,7 @@ Read on in *{doc}`why`*, if you find that intriguing!
 why
 core-concepts
 flask
+custom
 typing-caveats
 glossary
 security
