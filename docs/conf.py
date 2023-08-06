@@ -101,4 +101,8 @@ linkcheck_ignore = [
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "flask": ("https://flask.palletsprojects.com/en/latest/", None),
+    "pyramid": (
+        "https://docs.pylonsproject.org/projects/pyramid/en/main/",
+        None,
+    ),
 }
