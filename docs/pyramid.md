@@ -21,14 +21,14 @@ So you application factory is going to look something like this:
 def make_app():
     ...
 
-    config = Configurator(settings=settings)
+    with Configurator(settings=settings) as config:
+        svcs.pyramid.init(config)
+        svcs.pyramid.register_factory(config, Database, db_factory)
 
-    svcs.pyramid.init(config)
-    svcs.pyramid.register_factory(config, Database, db_factory)
+        ...
 
-    ...
+        return config.make_wsgi_app()
 
-    return config.make_wsgi_app()
 ```
 
 ## Cleanup
