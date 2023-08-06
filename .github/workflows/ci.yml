@@ -182,6 +182,7 @@ jobs:
       - coverage
       - install-dev
       - mypy-pkg
+      - docs
 
     runs-on: ubuntu-latest
 
