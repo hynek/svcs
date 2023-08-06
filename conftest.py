@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+import sys
+
 from doctest import ELLIPSIS
 
 import pytest
@@ -37,6 +39,9 @@ try:
     import sphinx  # noqa: F401
 except ImportError:
     collect_ignore.extend(["docs"])
+
+if sys.version_info >= (3, 12):
+    collect_ignore.extend(["tests/test_pyramid.py"])
 
 
 @pytest.fixture(name="svc")

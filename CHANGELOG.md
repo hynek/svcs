@@ -21,6 +21,11 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   I guess it's getting serious.
   [#17](https://github.com/hynek/svcs/pull/17)
 
+- Pyramid integration.
+
+  Please note that not all integrations will be shipped with *svcs* proper once it is stable.
+  Some will be moved to separate packages and Pyramid is a prime contender for that.
+
 
 ## [23.9.0](https://github.com/hynek/svcs/compare/23.8.0...23.9.0) - 2023-08-06
 

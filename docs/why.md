@@ -142,5 +142,7 @@ If you're still interested, learn about our [core concepts](core-concepts) first
 Once you've understood the life cycles of registries and containers, you can look our framework integrations that get you started in no time:
 
 - [Flask](flask)
+- [Pyramid](pyramid)
+- Or learn how to write [your own](custom)!
 
 If you get overwhelmed by the jargon, always feel free to check our [glossary](glossary)!

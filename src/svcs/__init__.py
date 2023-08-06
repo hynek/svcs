@@ -26,6 +26,11 @@ try:
 except ImportError:
     __all__.append("flask")
 
+try:
+    from . import pyramid  # noqa: F401
+except ImportError:
+    __all__.append("pyramid")
+
 
 # Make nicer public names.
 __locals = locals()
