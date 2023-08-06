@@ -13,7 +13,10 @@
 
 <p align="center">
   <img alt="PyPI - Status" src="https://img.shields.io/pypi/status/svcs">
-  <a href="./LICENSE">
+  <a href="https://svcs.hynek.me">
+    <img alt="Documentation at ReadTheDocs" src="https://img.shields.io/badge/Docs-Read%20The%20Docs-black">
+  </a>
+  <a href="LICENSE">
     <img alt="PyPI - License" src="https://img.shields.io/pypi/l/svcs">
   </a>
   <a href="https://pypi.org/project/svcs/">
