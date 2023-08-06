@@ -1,6 +1,10 @@
 # Pyramid
 
-The most important integration API for Pyramid is `svcs.pyramid.init()` that takes an {class}`pyramid.config.Configurator` and optionally the positions where to put its [Tween](https://docs.pylonsproject.org/projects/pyramid/en/main/glossary.html#term-tween) using the *tween_under* and *tween_over* arguments.
+*svcs*'s Pyramid integration uses Pyramid's {class}`pyramid.registry.Registry` to store its own `svcs.Registry` (yes, unfortunate name clash) and a [Tween] that attaches a fresh `svcs.Container` to every request.
+
+---
+
+The most important integration API for Pyramid is `svcs.pyramid.init()` that takes an {class}`pyramid.config.Configurator` and optionally the positions where to put its [Tween] using the *tween_under* and *tween_over* arguments.
 
 Now every {class}`pyramid.request.Request` object that is passed into views will have an `svcs` attribute that is a `svcs.Container` that is scoped to the request:
 
@@ -50,3 +54,5 @@ def view(request):
     service1 = svcs.pyramid.get(Service)
     service2 = svcs.pyramid.get_abstract(AbstractService)
 ```
+
+[Tween]: https://docs.pylonsproject.org/projects/pyramid/en/main/glossary.html#term-tween
