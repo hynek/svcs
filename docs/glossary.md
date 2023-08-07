@@ -54,7 +54,7 @@ Service Layer
             unit_of_work.commit()
     ```
 
-    In this case, the `unit_of_work` and `mail_q` parameters are services that are used by the service `add_user_to_org()` and are *injected* by the {term}`composition root`.
+    In this case, the `unit_of_work` and `mail_q` parameters are services that are used by the service `add_user_to_org()` and are passed – or: *injected* – by the {term}`composition root`.
 
     The business rules are enforced by `domain_model.check_if_can_add_user_to_org()` which is a pure function working on plain domain objects and doesn't use any services.
 
