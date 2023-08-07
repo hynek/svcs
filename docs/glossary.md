@@ -5,7 +5,8 @@
 Service
     Unfortunately, a "service" is a highly overloaded term in software engineering, but we've resisted to come up with a new term that's even more confusing.
 
-    In our context, it's a runtime-{term}`resource` managed by *svcs*.  This can be anything you'd like to be loosely coupled to your application code.
+    In our context, it's a *local* runtime-{term}`resource` managed by *svcs*.
+    This can be anything you'd like to be loosely coupled to your application code.
     For example, a database connection, a web API client, or a cache.
 
     It's usually also something you need to configure before using and can't just instantiate directly in your business code.
@@ -104,7 +105,9 @@ Hexagonal Architecture
     :::
 
 Service Discovery
-    An completely unrelated concept of finding services (e.g., web services) running elsewhere.
+    An completely unrelated concept for finding *remote* services (e.g., web services, database servers, ...).
+
+    Another sad consequence of the overloaded term {term}`service`.
 
     Common examples of implementations are [Consul](https://www.consul.io), [*etcd*](https://etcd.io), or [Apache ZooKeeper](https://zookeeper.apache.org).
 :::
