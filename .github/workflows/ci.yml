@@ -135,6 +135,29 @@ jobs:
 
       - run: python -Im tox run -e mypy-pkg
 
+  pyright:
+    name: Pyright
+    runs-on: ubuntu-latest
+    needs: build-package
+
+    steps:
+      - name: Download pre-built packages
+        uses: actions/download-artifact@v3
+        with:
+          name: Packages
+          path: dist
+      - run: tar xf dist/*.tar.gz --strip-components=1  # needed for config files
+      - uses: actions/setup-python@v4
+        with:
+          cache: pip
+          python-version-file: .python-version-default
+
+      - run: |
+          python -Im venv .venv
+          .venv/bin/python -Im pip install .[typing]
+          echo "$PWD/.venv/bin" >> $GITHUB_PATH
+      - uses: jakebailey/pyright-action@v1
+
   docs:
     name: Build docs & run doctests
     needs: build-package
@@ -173,6 +196,7 @@ jobs:
       - run: python -Im pip install -e .[dev]
       - run: python -Ic 'import svcs'
       - run: python -Ic 'import svcs.flask'
+      - run: python -Ic 'import svcs.pyramid'
 
   # Ensure everything required is passing for branch protection.
   required-checks-pass:
@@ -182,6 +206,7 @@ jobs:
       - coverage
       - install-dev
       - mypy-pkg
+      - pyright
       - docs
 
     runs-on: ubuntu-latest

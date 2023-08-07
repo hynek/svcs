@@ -26,7 +26,7 @@ dependencies = [
 
 [project.optional-dependencies]
 tests = ["pytest", "pytest-asyncio", "sybil"]
-typing = ["mypy>=1.4", "flask"]
+typing = ["mypy>=1.4", "flask", "pyramid"]
 docs = [
   "sphinx",
   "furo",
@@ -157,6 +157,16 @@ ignore_errors = true
 [[tool.mypy.overrides]]
 module = "tests.typing.*"
 ignore_errors = false
+
+
+[tool.pyright]
+ignore = [
+  "src/svcs/pyramid.py",
+  "tests/typing/pyramid.py",
+  "tests",
+  "docs",
+  "conftest.py",
+]
 
 
 [tool.black]

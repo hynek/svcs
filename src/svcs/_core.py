@@ -127,7 +127,8 @@ class Registry:
                 or :meth:`ServicePing.aping`.
 
             on_registry_close: A callable that is called when the
-                :meth:`Registry.close()` method is called. Can be async, then
+                :meth:`Registry.close()` method is called. Can be an async
+                callable or an :class:`collections.abc.Awaitable`, then
                 :meth:`Registry.aclose()` must be called.
         """
         rs = RegisteredService(
@@ -203,9 +204,12 @@ class Registry:
         """
         for name, oc in reversed(self._on_close):
             try:
-                if iscoroutinefunction(oc) or isawaitable(oc):
+                if iscoroutinefunction(oc):
+                    oc = oc()  # noqa: PLW2901
+
+                if isawaitable(oc):
                     log.debug("async closing %r", name)
-                    await oc()
+                    await oc
                     log.debug("async closed %r", name)
                 else:
                     log.debug("closing %r", name)

@@ -38,4 +38,4 @@ for __name in __all__:
     if not __name.startswith("__") and not __name.islower():
         __locals[__name].__module__ = "svcs"
 del __locals
-del __name
+del __name  # pyright: ignore[reportUnboundVariable]
