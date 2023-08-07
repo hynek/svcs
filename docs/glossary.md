@@ -17,6 +17,8 @@ Service
     They query a database, make HTTP requests, store data in a cache, or delete files.
 
     But they don't do anything business-relevant neither with the data they send out, nor with the data they get back.
+
+    In an ideal world, they only pass data hence and forth with the domain model which decides what happens next based on plain objects.
     :::
 
 
@@ -25,16 +27,21 @@ Resource
 
 
 Service Layer
-    The service layer is where your business logic (also known as the *domain model*) and your {term}`service`s meet.
+    The service layer is where your business logic (also known as the *domain model*) meets your {term}`service`s.
 
     Since services can use other services, it's not a flat layer but more of a tree.
-    The entry point is called from your {term}`composition root` (e.g., your web framework's views).
-    If you pass in all the services it needs, it's {term}`Dependency Injection`.
+    The entry point is called from your {term}`composition root` (e.g., your web framework's views) and coordinates database transactions, other services and, the domain model.
 
-    An example would be a function that takes a database Unit of Work, an email notification queue, an organization ID and a user ID and adds the user to the organization, if the domain model allows that:
+    If you pass in all the services it needs, it's *{term}`dependency injection`*.
+    If you look up the services *within* the service layer, it's *{term}`service location`*.
+
+    An example would be a function for adding users to organizations that takes a database [Unit of Work](https://www.cosmicpython.com/book/chapter_06_uow.html), an email notification queue, an organization ID and a user ID as parameters and queries the domain model if it's OK:
 
     ```python
     def add_user_to_org(unit_of_work, mail_q, org_id, user_id):
+        """
+        Service Layer entry point.
+        """
         with unit_of_work:
             org = unit_of_work.organizations.get(org_id)
             user = unit_of_work.users.get(user_id)
@@ -42,7 +49,7 @@ Service Layer
             domain_model.check_if_can_add_user_to_org(org, user)
 
             unit_of_work.orgs.add_user(org_id, user_id)
-            mail_q.send_welcome_mail(user.email)
+            mail_q.send_welcome_mail(user.email, user.name, org.name)
 
             unit_of_work.commit()
     ```
@@ -55,9 +62,7 @@ Service Layer
 
     As you can see, ideally you call service layer functions from your views and pass them all the services it needs to do their job.
     That keeps the service layer clean from any framework-specific code and makes it easy to test.
-    You could also call that function from a CLI command, a work queue, or a test.
-
-    You can also let the service layer find it's services by using a {term}`service locator` like *svcs* **inside of the service layer** but that makes it a lot harder to test and reason about.
+    You could also call that function from a CLI entry point, a work queue, or a test.
 
     Admittedly, in simple cases it's possible that the whole logic is in the service layer and you don't need a separate domain model.
     Don't let that discourage you.
@@ -66,6 +71,9 @@ Service Layer
     The fourth chapter of the wonderful [*Architecture Patterns with Python*] book called [*Flask API and Service Layer*](https://www.cosmicpython.com/book/chapter_04_service_layer.html) (you can read it for free on the web).
     :::
 
+
+Service Location
+    See {term}`Service Locator`.
 
 Service Locator
     The [architectural pattern](https://en.wikipedia.org/wiki/Architectural_pattern) implemented by *svcs*.
@@ -84,7 +92,7 @@ Service Locator
     def view(request):
         if request.form.valid():
             # Form is valid; only NOW get a DB connection
-            # and pass it into your business logic.
+            # and pass it into your service layer.
             return handle_form_data(
                 request.services.get(Database),
                 form.data,
@@ -93,7 +101,28 @@ Service Locator
         raise InvalidFormError()
     ```
 
-    But you can use, e.g., your web framework's injection capabilities to inject the locator object into your views and benefit from *svcs*'s upsides without giving up some of DI's ones.
+    ::: {important}
+    I you use *svcs* as a {term}`service locator` as in the example above, you're actually doing {term}`dependency injection` – and that's a Good Thing™.
+
+    Obtaining the database using `request.services.get()` *is* service location, but passing it into your {term}`service layer` without using it yourself makes the view a {term}`composition root` and `handle_form_data()` the entry point into your service layer.
+
+    We strongly recommend using *svcs* like this.
+    :::
+
+    Classic service location in the service layer would look something like this:
+
+    ```python
+    from flask import request
+
+    def view():
+        if request.form.valid():
+            return handle_form_data(form.data)
+
+    def handle_form_data(data):
+        svcs.flask.get(Database).do_database_stuff(data)
+    ```
+
+    We do not recommend using *svcs* like this because it's harder to test and reason about.
 
     ::: {seealso}
     <https://en.wikipedia.org/wiki/Service_locator_pattern>.
@@ -125,6 +154,8 @@ Dependency Injection
     ```
 
     In this case `view` uses *svcs* to *locate* a `Database` and then *injects* it into `do_something()`.
+    `do_something()` doesn't know where `db` is coming from and how it was created.
+    It only knows it needs to do database stuff.
 
     ::: {seealso}
     - <https://en.wikipedia.org/wiki/Dependency_injection>
@@ -133,9 +164,11 @@ Dependency Injection
 
 
 Composition Root
-    The place that collects all the services your application needs and calls into the {term}`service layer`.
+    The place that acquires all the services your application needs and calls into the {term}`service layer`.
 
     Common types are web framework views, CLI command entry points, or test fixtures.
+
+    We recommend using *svcs* in your composition roots to get all the services you need and then pass them into your {term}`service layer`.
 
 
 Dependency Inversion Principle
@@ -181,7 +214,6 @@ Hexagonal Architecture
 
 IoC
     See {term}`Inversion of Control`.
-
 
 Inversion of Control
     ::: {seealso}
