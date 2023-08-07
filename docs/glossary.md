@@ -14,7 +14,7 @@ Service
     ::: {important}
     One key aspect of these services is that they provide **behavior**, but have **no state** that is relevant to the business logic.
     They are pure *doers*.
-    They query a database, make HTTP requests, store data in a cache, or delete files.
+    They query databases, make HTTP requests, store data in caches, or delete files.
 
     But they don't do anything business-relevant neither with the data they send out, nor with the data they get back.
 
@@ -102,7 +102,7 @@ Service Locator
     ```
 
     ::: {important}
-    I you use *svcs* as a {term}`service locator` as in the example above, you're actually doing {term}`dependency injection` – and that's a Good Thing™.
+    If you use *svcs* like in the example above, you're actually doing {term}`dependency injection` – and that's a Good Thing™.
 
     Obtaining the database using `request.services.get()` *is* service location, but passing it into your {term}`service layer` without using it yourself makes the view a {term}`composition root` and `handle_form_data()` the entry point into your service layer.
 
