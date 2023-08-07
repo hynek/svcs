@@ -147,6 +147,15 @@ jobs:
           name: Packages
           path: dist
       - run: tar xf dist/*.tar.gz --strip-components=1  # needed for config files
+      - uses: actions/setup-python@v4
+        with:
+          cache: pip
+          python-version-file: .python-version-default
+
+      - run: |
+          python -Im venv .venv
+          .venv/bin/python -Im pip install .[typing]
+          echo "$PWD/.venv/bin" >> $GITHUB_PATH
       - uses: jakebailey/pyright-action@v1
 
   docs:
