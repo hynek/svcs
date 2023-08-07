@@ -105,15 +105,22 @@ Dependency Injection
     It is a fundamental technique to achieve loose coupling between your business code and the services it depends on – and to achieve {term}`Inversion of Control`.
 
     Often when talking about dependency injection, people think of *dependency injection frameworks* that use decorators or other magic to inject services into their code.
-    But *dependency injection* just means that services are passed from the outside, with no
+    But *dependency injection* just means that services are passed from the outside, with no control over how that happens (hence {term}`Inversion of Control`).
 
-    Our preferred way to use *svcs* is to use it as a {term}`service locator`, but in your {term}`composition root`, which then injects the services into your {term}`service layer`:
+    Our preferred way to use *svcs* is to use it as a {term}`service locator`, but *only* in your {term}`composition root` to acquire necessary services.
+    Which then injects said services into your {term}`service layer`:
 
     ```python
     def view(request):
+        """
+        View and composition root.
+        """
         return do_something(request.svcs.get(Database))
 
     def do_something(db):
+        """
+        Service layer.
+        """
         db.do_database_stuff()
     ```
 
