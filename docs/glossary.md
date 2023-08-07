@@ -5,7 +5,7 @@
 Service
     Unfortunately, a "service" is a highly overloaded term in software engineering, but we've resisted to come up with a new term that's even more confusing.
 
-    In our context, it's a *local* runtime-{term}`resource` managed by *svcs*.
+    In our context, it's a *local* object managed by *svcs*.
     This can be anything you'd like to be loosely coupled to your application code.
     For example, a database connection, a web API client, or a cache.
 
