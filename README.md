@@ -54,7 +54,7 @@ Benefits:
 - simplifies **testing** through **loose coupling**,
 - and allows for easy **health checks** across *all* resources.
 
-The goal is to minimize the code for acquiring pluggable resources in your business code to:
+The goal is to minimize the code for acquiring pluggable resources to:
 
 ```python
 def view(request):

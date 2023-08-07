@@ -25,12 +25,42 @@ Resource
 
 
 Service Layer
-    The service layer is where your business logic (also known as domain model) and your {term}`service`s meet.
+    The service layer is where your business logic (also known as the *domain model*) and your {term}`service`s meet.
 
-    A service layer is sadly not the layer where  live – it's the layer where services *are used*.
+    Since services can use other services, it's not a flat layer but more of a tree.
+    The entry point is called from your {term}`composition root` (e.g., your web framework's views).
+    If you pass in all the services it needs, it's {term}`Dependency Injection`.
 
-    Ideally you call its functions from your views and pass it all the services it needs to do its job.
+    An example would be a function that takes a database Unit of Work, an email notification queue, an organization ID and a user ID and adds the user to the organization, if the domain model allows that:
+
+    ```python
+    def add_user_to_org(unit_of_work, mail_q, org_id, user_id):
+        with unit_of_work:
+            org = unit_of_work.organizations.get(org_id)
+            user = unit_of_work.users.get(user_id)
+
+            domain_model.check_if_can_add_user_to_org(org, user)
+
+            unit_of_work.orgs.add_user(org_id, user_id)
+            mail_q.send_welcome_mail(user.email)
+
+            unit_of_work.commit()
+    ```
+
+    In this case, the `unit_of_work` and `mail_q` parameters are services that are used by the service `add_user_to_org()` and are *injected* by the {term}`composition root`.
+
+    The business rules are enforced by `domain_model.check_if_can_add_user_to_org()` which is a pure function working on plain domain objects and doesn't use any services.
+
+    ---
+
+    As you can see, ideally you call service layer functions from your views and pass them all the services it needs to do their job.
     That keeps the service layer clean from any framework-specific code and makes it easy to test.
+    You could also call that function from a CLI command, a work queue, or a test.
+
+    You can also let the service layer find it's services by using a {term}`service locator` like *svcs* **inside of the service layer** but that makes it a lot harder to test and reason about.
+
+    Admittedly, in simple cases it's possible that the whole logic is in the service layer and you don't need a separate domain model.
+    Don't let that discourage you.
 
     ::: {seealso}
     The fourth chapter of the wonderful [*Architecture Patterns with Python*] book called [*Flask API and Service Layer*](https://www.cosmicpython.com/book/chapter_04_service_layer.html) (you can read it for free on the web).
@@ -71,13 +101,34 @@ Service Locator
 
 
 Dependency Injection
-    Similar to {term}`service locator`, but declarative.
-    The injected services are usually passed into the business code as function parameters.
+    Dependency Injection means that the {term}`service layer` is called with all services it needs to do its job.
+    It is a fundamental technique to achieve loose coupling between your business code and the services it depends on – and to achieve {term}`Inversion of Control`.
+
+    Often when talking about dependency injection, people think of *dependency injection frameworks* that use decorators or other magic to inject services into their code.
+    But *dependency injection* just means that services are passed from the outside, with no
+
+    Our preferred way to use *svcs* is to use it as a {term}`service locator`, but in your {term}`composition root`, which then injects the services into your {term}`service layer`:
+
+    ```python
+    def view(request):
+        return do_something(request.svcs.get(Database))
+
+    def do_something(db):
+        db.do_database_stuff()
+    ```
+
+    In this case `view` uses *svcs* to *locate* a `Database` and then *injects* it into `do_something()`.
 
     ::: {seealso}
     - <https://en.wikipedia.org/wiki/Dependency_injection>
     - [*incant*](https://github.com/Tinche/incant), a lovely package that implements dependency injection in Python.
     :::
+
+
+Composition Root
+    The place that collects all the services your application needs and calls into the {term}`service layer`.
+
+    Common types are web framework views, CLI command entry points, or test fixtures.
 
 
 Dependency Inversion Principle

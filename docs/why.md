@@ -109,12 +109,20 @@ However, it starts paying dividends *very fast* once you go past that.
 
 ## Is this Dependency Injection!?
 
-No.
+It can be!
+It only depends *where* you choose to call our `get()` method.
 
-Although the concepts are related and share the idea of having a central registry of services, the ways they provide those services are fundamentally different:
-{term}`Dependency injection` always passes your dependencies as arguments while you actively ask a service locator for them *when you need them*.
+When people think of dependency injection, they usually think of *dependency injection frameworks* that use decorators or other magic to inject services into their code.
+But that's **not** what dependency injection means.
+It means that the {term}`service layer` is called with all services it needs to do its job.
 
-If you're curious, check the [glossary](glossary) entry for {term}`Service Locator` for more details.
+So if you use *svcs* in your web view to look up a database connection, and then pass the database connection into your business logic, you're doing *dependency injection*.
+
+On the other hand, if you use *svcs* in your service layer – or even business logic – to look up a database connection and use it there, you're doing *service location*.
+
+We strongly recommend the former over the latter.
+
+If you're curious, check the [glossary](glossary) entry for {term}`Service Locator` and {term}`Dependency Injection` for more details.
 
 
 ## Why not?
