@@ -127,18 +127,25 @@ class TestRegistry:
 
         orc.assert_called_once_with()
 
-    @needs_working_async_mock
     @pytest.mark.asyncio()
     async def test_async_context_manager(self):
         """
         The registry is also an async context manager that acloses on exit.
+
+        Passing an awaitable to on_registry_close works.
         """
-        orc = AsyncMock()
+        closed = False
+
+        async def closer():
+            nonlocal closed
+            closed = True
 
         async with svcs.Registry() as registry:
-            registry.register_factory(Service, Service, on_registry_close=orc)
+            registry.register_factory(
+                Service, Service, on_registry_close=closer()
+            )
 
-        orc.assert_awaited_once_with()
+        assert closed
 
     def test_detects_async_factories(self, registry):
         """
