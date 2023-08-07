@@ -9,7 +9,15 @@ Service
     This can be anything you'd like to be loosely coupled to your application code.
     For example, a database connection, a web API client, or a cache.
 
-    It's usually also something you need to configure before using and can't just instantiate directly in your business code.
+    They're usually also something you need to configure before using and can't just instantiate directly in your business code.
+
+    ::: {important}
+    One key aspect of these services is that they provide **behavior**, but have **no state** that is relevant to the business logic.
+    They are pure *doers*.
+    They query a database, make HTTP requests, store data in a cache, or delete files.
+
+    But they don't do anything business-relevant neither with the data they send out, nor with the data they get back.
+    :::
 
 Resource
     Used interchangeably with {term}`service`, but also a heavily overloaded term.
