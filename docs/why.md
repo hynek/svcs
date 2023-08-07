@@ -110,19 +110,19 @@ However, it starts paying dividends *very fast* once you go past that.
 ## Is this Dependency Injection or Service Location!?
 
 It can be both!
-At its core, *svcs* is a {term}`service locator`, because it locates services for you when you call `get()` – based on your configuration.
+At its core, *svcs* is a {term}`service locator` because it locates services for you when you call `get()` – based on your configuration.
 
 But it depends *where* you choose to call `get()` whether you're doing *dependency injection* or *service location* in the classical sense.
 
 When people think of dependency injection, they usually think of *dependency injection frameworks* that use decorators or other magic to inject services into their code.
 But that's **not** what dependency injection means.
-It means that the {term}`service layer` is called with all services it needs to do its job.
+It means the {term}`service layer` is called with all services it needs to do its job.
 
 So, if you use *svcs* in your web view to look up a database connection and pass the database connection into your service layer, you're doing *dependency injection*.
 
 On the other hand, if you use *svcs* in your service layer – or even business logic – to look up a database connection and use it there, you're doing *service location*.
 
-We strongly recommend the former over the latter, because it's much easier to test and reason about.
+We strongly recommend the former over the latter because it's much easier to test and reason about.
 
 If you're curious, check the [glossary](glossary) entry for {term}`Service Locator` and {term}`Dependency Injection` for more details.
 
