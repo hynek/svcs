@@ -1,4 +1,4 @@
-# *svcs*: A Lightweight Service Locator
+# *svcs*: A Lightweight Dependency Container
 
 Release **{sub-ref}`release`**  ([What's new?](changelog))
 

@@ -107,20 +107,22 @@ However, it starts paying dividends *very fast* once you go past that.
 :end-before: "<!-- end typing -->"
 ```
 
-## Is this Dependency Injection!?
+## Is this Dependency Injection or Service Location!?
 
-It can be!
-It only depends *where* you choose to call our `get()` method.
+It can be both!
+At its core, *svcs* is a {term}`service locator`, because it locates services for you when you call `get()` – based on your configuration.
+
+But it depends *where* you choose to call `get()` whether you're doing *dependency injection* or *service location* in the classical sense.
 
 When people think of dependency injection, they usually think of *dependency injection frameworks* that use decorators or other magic to inject services into their code.
 But that's **not** what dependency injection means.
 It means that the {term}`service layer` is called with all services it needs to do its job.
 
-So if you use *svcs* in your web view to look up a database connection, and then pass the database connection into your business logic, you're doing *dependency injection*.
+So, if you use *svcs* in your web view to look up a database connection and pass the database connection into your service layer, you're doing *dependency injection*.
 
 On the other hand, if you use *svcs* in your service layer – or even business logic – to look up a database connection and use it there, you're doing *service location*.
 
-We strongly recommend the former over the latter.
+We strongly recommend the former over the latter, because it's much easier to test and reason about.
 
 If you're curious, check the [glossary](glossary) entry for {term}`Service Locator` and {term}`Dependency Injection` for more details.
 
@@ -129,9 +131,9 @@ If you're curious, check the [glossary](glossary) entry for {term}`Service Locat
 
 The main downside of service locators is that it's impossible to verify whether all required dependencies have been configured without running the code.
 
-This is a consequence of being imperative instead of declarative and the main trade-off to make when deciding between dependency injection and service locators.
+This is a consequence of being imperative instead of declarative and the main trade-off to make when deciding between a traditional dependency injection framework and a service locator like *svcs*.
 
-If you still prefer dependency injection, check out [*incant*](https://github.com/Tinche/incant) – a very nice package by a friend of the project.
+If you still prefer a dependency injection framework, check out [*incant*](https://github.com/Tinche/incant) – a very nice package by a friend of the project.
 
 
 ## What Next?
@@ -144,4 +146,4 @@ Once you've understood the life cycles of registries and containers, you can loo
 - [Pyramid](pyramid)
 - Or learn how to write [your own](custom)!
 
-If you get overwhelmed by the jargon, always feel free to check our [glossary](glossary)!
+If you get overwhelmed by the jargon, we have put a lot of effort into our [glossary](glossary)!
