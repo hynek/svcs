@@ -36,7 +36,7 @@
 >
 > This project is only public to [gather feedback](https://github.com/hynek/svcs/discussions), and everything can and will change until the project is proclaimed stable.
 >
-> While the code has 100% test and type coverage, and the shipped *Flask* and *Pyramid* integrations have been in production for years, the API details can still change.
+> The code has 100% test and type coverage, and the shipped *Flask* and *Pyramid* integrations have been in production for years, but the API details can still change.
 
 <!-- begin index -->
 
@@ -71,12 +71,12 @@ While *svcs* has first-class support for static typing, it is **strictly optiona
 *svcs* also doesn't check your types at runtime.
 
 It only forwards the type you have asked for to the type checker.
-If you don't use a type checker, that information is simply ignored without any runtime overhead.
+If you don't use a type checker, that information is ignored without any runtime overhead.
 <!-- end typing -->
 
 ---
 
-Please read the [*Why?*](https://svcs.hynek.me/en/latest/why.html) section of our documentation to learn more.
+Read on in [*Why?*](https://svcs.hynek.me/en/latest/why.html), if you find that intriguing!
 
 
 ## Project Links
@@ -93,7 +93,7 @@ Please read the [*Why?*](https://svcs.hynek.me/en/latest/why.html) section of ou
 
 *svcs* is written by [Hynek Schlawack](https://hynek.me/) and distributed under the terms of the [MIT](https://github.com/hynek/svcs/blob/main/LICENSE) license.
 
-The development is kindly supported by my employer [Variomedia AG](https://www.variomedia.de/) and all my amazing [GitHub Sponsors](https://github.com/sponsors/hynek).
+The development is kindly supported by my employer [Variomedia AG](https://www.variomedia.de/) and all my fabulous [GitHub Sponsors](https://github.com/sponsors/hynek).
 
 The [Bestagon](https://www.youtube.com/watch?v=thOifuHs6eY) locator logo is made by [Lynn Root](https://www.roguelynn.com), based on an [Font Awesome](https://fontawesome.com) Icon.
 *svcs* has started out as a wrapper around [*wired*](https://wired.readthedocs.io/) by [Michael Merickel](https://michael.merickel.org/) and has been heavily influenced by it.
