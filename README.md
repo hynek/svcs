@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <em>A Lightweight Service Locator for Python.</em>
+  <em>A Lightweight Dependency Container for Python.</em>
 </p>
 
 <!-- end logo -->
@@ -40,8 +40,10 @@
 
 <!-- begin index -->
 
-*svcs* (pronounced *services*) is a [**service locator**](https://en.wikipedia.org/wiki/Service_locator_pattern) for Python.
+*svcs* (pronounced *services*) is a **dependency container** for Python.
 It gives you a central place to register factories for types/interfaces and then imperatively request instances of those types with **automatic cleanup** and **health checks**.
+
+It's a flexible Inversion-of-Control container that can be used for **dependency injection** or **service location**, but doesn't require global state, decorators, or mangling of function signatures.
 
 <!-- begin benefits -->
 Benefits:
@@ -52,7 +54,7 @@ Benefits:
 - simplifies **testing** through **loose coupling**,
 - and allows for easy **health checks** across *all* resources.
 
-The goal is to minimize the code for acquiring pluggable resources in your business code to:
+The goal is to minimize the code for acquiring pluggable resources to:
 
 ```python
 def view(request):
@@ -95,5 +97,5 @@ Read on in [*Why?*](https://svcs.hynek.me/en/latest/why.html), if you find that 
 
 The development is kindly supported by my employer [Variomedia AG](https://www.variomedia.de/) and all my fabulous [GitHub Sponsors](https://github.com/sponsors/hynek).
 
-The [Bestagon](https://www.youtube.com/watch?v=thOifuHs6eY) locator logo is made by [Lynn Root](https://www.roguelynn.com), based on an [Font Awesome](https://fontawesome.com) Icon.
+The [Bestagon](https://www.youtube.com/watch?v=thOifuHs6eY) radar logo is made by [Lynn Root](https://www.roguelynn.com), based on an [Font Awesome](https://fontawesome.com) Icon.
 *svcs* has started out as a wrapper around [*wired*](https://wired.readthedocs.io/) by [Michael Merickel](https://michael.merickel.org/) and has been heavily influenced by it.
