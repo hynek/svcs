@@ -36,7 +36,7 @@
 >
 > This project is only public to [gather feedback](https://github.com/hynek/svcs/discussions), and everything can and will change until the project is proclaimed stable.
 >
-> While the code has 100% test and type coverage, and the [**Flask** integration](#flask) has been in production for years, the API details can still change.
+> While the code has 100% test and type coverage, and the shipped *Flask* and *Pyramid* integrations have been in production for years, the API details can still change.
 >
 > At this point, it's unclear whether this project will become a "proper Hynek project".
 > I will keep using it for my work projects, but whether this will grow beyond my personal needs depends on community interest.
@@ -55,31 +55,25 @@ Benefits:
 - simplifies **testing** through **loose coupling**,
 - and allows for easy **health checks** across *all* resources.
 
-The goal is to minimize your business code to:
+The goal is to minimize the code for acquiring pluggable resources in your business code to:
 
 ```python
 def view(request):
-    db = request.svcs.get(Database)
-    api = request.svcs.get(WebAPIClient)
+    db, api, cache = request.svcs.get(Database, WebAPIClient, Cache)
 ```
 
-To the type checker (e.g. [Mypy](https://mypy-lang.org)), `db` has the type `Database` and `api` has the type `WebAPIClient` and verifies your code as such.
+It's ensured that to a type checker like [Mypy](https://mypy-lang.org), `db` has the type `Database`, `api` has the type `WebAPIClient`, and `cache` has the type `Cache`.
 
 <!-- end index -->
 
-You can also ask for multiple services at once with the same typing benefits:
-
-```python
-def view(request):
-    db, api = request.svcs.get(Database, WebAPIClient)
-```
-
-Or, if you don't shy away from some global state and your web framework supports it, even:
+If you don't shy away from some global state and your web framework supports it, You can go even further and write:
 
 ```python
 def view():
-    db, api = svcs.flask.get(Database, WebAPIClient)
+    db, api, cache = svcs.flask.get(Database, WebAPIClient, Cache)
 ```
+
+*svcs* comes with seamless integration for the **Flask** and **Pyramid** web frameworks.
 
 <!-- end benefits -->
 <!-- begin typing -->

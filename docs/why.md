@@ -6,7 +6,7 @@ A {term}`service locator` like *svcs* allows you to configure and manage all you
 
 In practice that means that at runtime, you say "*Give me a database connection*!", and *svcs* will give you whatever you've configured it to return when asked for a database connection.
 This can be an actual database connection or it can be a mock object for testing.
-All of this happens *within* your application – service locators are **not** related to service discovery.
+All of this happens *within* your application – service locators are **not** related to {term}`service discovery`.
 
 If you follow the **{term}`Dependency Inversion Principle`**, you would register concrete factories for abstract interfaces; in Python usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [*abstract base class*](https://docs.python.org/3.11/library/abc.html).
 
