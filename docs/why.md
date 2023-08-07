@@ -18,6 +18,13 @@ If you follow the **{term}`Hexagonal Architecture`** (aka "*ports and adapters*"
 :end-before: "<!-- end benefits -->"
 ```
 
+If you don't shy away from some global state and your web framework supports it, you can go even further and write:
+
+```python
+def view():
+    db, api, cache = svcs.flask.get(Database, WebAPIClient, Cache)
+```
+
 You set it up like this:
 
 % skip: next

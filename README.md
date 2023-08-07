@@ -64,18 +64,8 @@ def view(request):
 
 It's ensured that to a type checker like [Mypy](https://mypy-lang.org), `db` has the type `Database`, `api` has the type `WebAPIClient`, and `cache` has the type `Cache`.
 
-<!-- end index -->
-
-If you don't shy away from some global state and your web framework supports it, You can go even further and write:
-
-```python
-def view():
-    db, api, cache = svcs.flask.get(Database, WebAPIClient, Cache)
-```
-
-*svcs* comes with seamless integration for the **Flask** and **Pyramid** web frameworks.
-
 <!-- end benefits -->
+<!-- end index -->
 <!-- begin typing -->
 While *svcs* has first-class support for static typing, it is **strictly optional** and will always remain so.
 *svcs* also doesn't check your types at runtime.
@@ -83,6 +73,8 @@ While *svcs* has first-class support for static typing, it is **strictly optiona
 It only forwards the type you have asked for to the type checker.
 If you don't use a type checker, that information is simply ignored without any runtime overhead.
 <!-- end typing -->
+
+*svcs* comes with seamless integration for the **Flask** and **Pyramid** web frameworks and has first-class **async** support.
 
 ---
 
@@ -106,4 +98,4 @@ Please read the [*Why?*](https://svcs.hynek.me/en/latest/why.html) section of ou
 The development is kindly supported by my employer [Variomedia AG](https://www.variomedia.de/) and all my amazing [GitHub Sponsors](https://github.com/sponsors/hynek).
 
 The [Bestagon](https://www.youtube.com/watch?v=thOifuHs6eY) locator logo is made by [Lynn Root](https://www.roguelynn.com), based on an [Font Awesome](https://fontawesome.com) Icon.
-*svcs* has started out as a wrapper around [*wired*](https://wired.readthedocs.io/) by [Michael Merickel](https://michael.merickel.org/) and has been heavily inspired by it.
+*svcs* has started out as a wrapper around [*wired*](https://wired.readthedocs.io/) by [Michael Merickel](https://michael.merickel.org/) and has been heavily influenced by it.
