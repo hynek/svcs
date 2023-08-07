@@ -160,7 +160,13 @@ ignore_errors = false
 
 
 [tool.pyright]
-ignore = ["src/svcs/pyramid.py", "tests/typing/pyramid.py"]
+ignore = [
+  "src/svcs/pyramid.py",
+  "tests/typing/pyramid.py",
+  "tests",
+  "docs",
+  "conftest.py",
+]
 
 
 [tool.black]
