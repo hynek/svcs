@@ -65,6 +65,9 @@ def view(request):
 It's ensured that to a type checker like [Mypy](https://mypy-lang.org), `db` has the type `Database`, `api` has the type `WebAPIClient`, and `cache` has the type `Cache`.
 
 <!-- end benefits -->
+
+*svcs* comes with seamless integration for the **Flask** and **Pyramid** web frameworks and has first-class **async** support.
+
 <!-- end index -->
 <!-- begin typing -->
 While *svcs* has first-class support for static typing, it is **strictly optional** and will always remain so.
@@ -73,8 +76,6 @@ While *svcs* has first-class support for static typing, it is **strictly optiona
 It only forwards the type you have asked for to the type checker.
 If you don't use a type checker, that information is simply ignored without any runtime overhead.
 <!-- end typing -->
-
-*svcs* comes with seamless integration for the **Flask** and **Pyramid** web frameworks and has first-class **async** support.
 
 ---
 

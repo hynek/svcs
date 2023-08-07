@@ -30,6 +30,27 @@ Service Locator
 
     **Unlike** dependency injection, it's *imperative* (and not declarative), as you ask for services explicitly at runtime instead of having them injected into your business code based on function parameter types, or similar.
 
+    That usually requires less opaque magic since nothing meddles with your function/method definitions.
+
+    The active acquisition of resources by calling `get()` when you *know* for sure you're going to need it avoids the conundrum of either having to pass a factory (e.g., a connection pool – which also puts the onus of cleanup on you) or eagerly creating resources that you never use:
+
+    % skip: next
+
+    ```python
+    def view(request):
+        if request.form.valid():
+            # Form is valid; only NOW get a DB connection
+            # and pass it into your business logic.
+            return handle_form_data(
+                request.services.get(Database),
+                form.data,
+            )
+
+        raise InvalidFormError()
+    ```
+
+    But you can use, e.g., your web framework's injection capabilities to inject the locator object into your views and benefit from *svcs*'s upsides without giving up some of DI's ones.
+
     ::: {seealso}
     <https://en.wikipedia.org/wiki/Service_locator_pattern>.
     :::
