@@ -187,6 +187,7 @@ jobs:
       - run: python -Im pip install -e .[dev]
       - run: python -Ic 'import svcs'
       - run: python -Ic 'import svcs.flask'
+      - run: python -Ic 'import svcs.pyramid'
 
   # Ensure everything required is passing for branch protection.
   required-checks-pass:
