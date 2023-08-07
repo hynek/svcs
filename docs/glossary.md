@@ -19,11 +19,15 @@ Service
     But they don't do anything business-relevant neither with the data they send out, nor with the data they get back.
     :::
 
+
 Resource
     Used interchangeably with {term}`service`, but also a heavily overloaded term.
 
+
 Service Layer
-    A service layer is sadly not the layer where {term}`service`s live – it's the layer where services *are used*.
+    The service layer is where your business logic (also known as domain model) and your {term}`service`s meet.
+
+    A service layer is sadly not the layer where  live – it's the layer where services *are used*.
 
     Ideally you call its functions from your views and pass it all the services it needs to do its job.
     That keeps the service layer clean from any framework-specific code and makes it easy to test.
@@ -31,6 +35,7 @@ Service Layer
     ::: {seealso}
     The fourth chapter of the wonderful [*Architecture Patterns with Python*] book called [*Flask API and Service Layer*](https://www.cosmicpython.com/book/chapter_04_service_layer.html) (you can read it for free on the web).
     :::
+
 
 Service Locator
     The [architectural pattern](https://en.wikipedia.org/wiki/Architectural_pattern) implemented by *svcs*.
@@ -64,6 +69,7 @@ Service Locator
     <https://en.wikipedia.org/wiki/Service_locator_pattern>.
     :::
 
+
 Dependency Injection
     Similar to {term}`service locator`, but declarative.
     The injected services are usually passed into the business code as function parameters.
@@ -72,6 +78,7 @@ Dependency Injection
     - <https://en.wikipedia.org/wiki/Dependency_injection>
     - [*incant*](https://github.com/Tinche/incant), a lovely package that implements dependency injection in Python.
     :::
+
 
 Dependency Inversion Principle
     Sometimes confused with {term}`Dependency Injection` due to the similarity of "Injection" and "Inversion", but only tangentially related.
@@ -89,6 +96,7 @@ Dependency Inversion Principle
 
     - The third chapter of the wonderful [*Architecture Patterns with Python*] book called [*On Coupling and Abstractions*](https://www.cosmicpython.com/book/chapter_03_abstractions.html) (you can read it for free on the web).
     :::
+
 
 Hexagonal Architecture
     Also known as "*ports and adapters*", "*onion architecture*", or "*clean architecture*".
@@ -111,6 +119,18 @@ Hexagonal Architecture
 
     - <https://alistair.cockburn.us/hexagonal-architecture/>
     :::
+
+
+IoC
+    See {term}`Inversion of Control`.
+
+
+Inversion of Control
+    ::: {seealso}
+    - [*What is Inversion of Control and Why Does it Matter?*](https://seddonym.me/2019/04/15/inversion-of-control/)
+    - [*Three Techniques for Inverting Control, in Python*](https://seddonym.me/2019/08/03/ioc-techniques/)
+    :::
+
 
 Service Discovery
     An completely unrelated concept for finding *remote* services (e.g., web services, database servers, ...).
