@@ -103,7 +103,7 @@ On the other hand, if you use *svcs* in your service layer – or even business 
 
 We strongly recommend the former over the latter because it's much easier to test and reason about.
 
-If you're curious, check the [glossary](glossary) entry for {term}`Service Locator` and {term}`Dependency Injection` for more details.
+If you're curious, check the [glossary](glossary) entries for {term}`Service Locator` and {term}`Dependency Injection` for more details.
 
 
 ## Why not?
