@@ -1,5 +1,10 @@
 # Glossary
 
+We are trying to make the purpose and best use of *svcs* as clear as possible, even if you're unfamiliar with all the concepts it's based on.
+As such, the glossary got slightly out of hand, but we hope it's to your advantage.
+
+If you want a more narrative introduction into the concepts, we strongly recommend reading the wonderful book [*Architecture Patterns with Python*] (you can read it for free [on the web](https://www.cosmicpython.com/book/preface.html)).
+
 :::{glossary}
 
 Service
