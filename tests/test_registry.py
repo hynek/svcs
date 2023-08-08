@@ -349,3 +349,10 @@ class TestTakesContainer:
                 ...
 
         assert svcs._core._takes_container(Factory())
+
+    def test_signature_fails(self):
+        """
+        If getting the signature fails, it means the factory doesn't get a
+        container.
+        """
+        assert not svcs._core._takes_container(int)

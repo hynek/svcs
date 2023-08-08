@@ -308,7 +308,11 @@ def _takes_container(factory: Callable) -> bool:
     """
     Return True if *factory* takes a svcs.Container as its first argument.
     """
-    sig = inspect.signature(factory)
+    try:
+        sig = inspect.signature(factory)
+    except Exception:  # noqa: BLE001
+        return False
+
     if not sig.parameters:
         return False
 
