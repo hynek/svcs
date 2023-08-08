@@ -154,8 +154,8 @@ Here's an example for a health check endpoint in Pyramid[^flask]:
 
 ## Summary
 
-The {class}`svcs.Registry` object should live on an application-scoped object like Flask's `app.config` object.
-On the other hand, the {class}`svcs.Container` object should live on a request-scoped object like Flask's `g` object or Pyramid's `request` object.
+The {class}`svcs.Registry` object should live on an application-scoped object like Flask's {attr}`flask.Flask.config` object or in Pyramid's {attr}`pyramid.config.Configurator.registry`.
+On the other hand, the {class}`svcs.Container` object should live on a request-scoped object like Flask's {data}`~flask.g` object or Pyramid's {class}`~pyramid.request.Request` object.
 
 
 ::: {important}
