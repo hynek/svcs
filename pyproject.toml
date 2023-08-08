@@ -158,6 +158,11 @@ ignore_errors = true
 module = "tests.typing.*"
 ignore_errors = false
 
+[[tool.mypy.overrides]]
+module = "health_check_pyramid"
+
+allow_untyped_decorators = true
+
 
 [tool.pyright]
 ignore = [
@@ -208,6 +213,8 @@ ignore = [
 "conftest.py" = [
   "PT005", # we always add underscores and explicit names
 ]
+
+"docs/examples/*" = ["PERF203", "BLE001"]
 
 [tool.ruff.isort]
 lines-between-types = 1

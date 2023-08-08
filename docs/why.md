@@ -63,28 +63,7 @@ This is how it could look in Pyramid[^flask]:
 
 [^flask]: See the [Flask integration](flask.md) chapter for a Flask equivalent.
 
-% skip: next
-
-```python
-@view_config(route_name="healthy")
-def healthy_view(request: Request) -> Response:
-    ok: list[str] = []
-    failing: list[dict[str, str]] = []
-    status = 200
-
-    for svc in request.svcs.get_pings():
-        try:
-            svc.ping()
-            ok.append(svc.name)
-        except Exception as e:
-            failing.append({svc.name: repr(e)})
-            status = 500
-
-    return Response(
-        content_type="application/json",
-        status=status,
-        body=json.dumps({"ok": ok, "failing": failing}).encode("ascii"),
-    )
+```{literalinclude} examples/health_check_pyramid.py
 ```
 
 Once written, you have to never touch this view endpoint again and define the service health checks *where you define the services*.

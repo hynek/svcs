@@ -99,7 +99,7 @@ def test_get_pings(registry, container, svc):
     registry.register_factory(AnotherService, AnotherService)
     registry.register_value(Service, svc, ping=nop)
 
-    assert [Service] == [ping._rs.svc_type for ping in container.get_pings()]
+    assert [Service] == [ping._svc_type for ping in container.get_pings()]
 
 
 def test_cleanup_called(registry, container):

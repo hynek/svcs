@@ -33,7 +33,7 @@ def init(
         tween_over: Passed unchanged to
             :meth:`pyramid.config.Configurator.add_tween()` as *over*.
 
-    .. Tween: https://docs.pylonsproject.org/projects/pyramid/en/main/glossary.html#term-tween
+    .. _Tween: https://docs.pylonsproject.org/projects/pyramid/en/main/glossary.html#term-tween
     """
     config.registry[_KEY_REGISTRY] = svcs.Registry()
 
@@ -116,7 +116,7 @@ def get_container(request: Request | None = None) -> svcs.Container:
         Please also note that the container is guaranteed to be
         ``request.svcs`` if *svcs* is set up correctly.
 
-    .. discourage: https://docs.pylonsproject.org/projects/pyramid/en/main/narr/threadlocals.html
+    .. _discourage: https://docs.pylonsproject.org/projects/pyramid/en/main/narr/threadlocals.html
     """
     if request:
         return request.svcs  # type: ignore[no-any-return]
@@ -141,7 +141,7 @@ def get_registry(rh: RegistryHaver | None = None) -> svcs.Registry:
         The Pyramid developers discourage_ the use of thread locals outside of
         tests.
 
-    .. discourage: https://docs.pylonsproject.org/projects/pyramid/en/main/narr/threadlocals.html
+    .. _discourage: https://docs.pylonsproject.org/projects/pyramid/en/main/narr/threadlocals.html
     """
     if rh:
         return rh.registry[_KEY_REGISTRY]  # type: ignore[no-any-return]

@@ -12,7 +12,7 @@ import warnings
 from collections.abc import Callable
 from contextlib import suppress
 from inspect import isasyncgenfunction, isawaitable, iscoroutinefunction
-from typing import Any, AsyncGenerator, Generator, TypeVar, overload
+from typing import Any, AsyncGenerator, Awaitable, Generator, TypeVar, overload
 
 import attrs
 
@@ -52,41 +52,89 @@ class RegisteredService:
 
 @attrs.frozen
 class ServicePing:
+    """
+    A service health check as returned by :meth:`svcs.Container.get_pings`.
+
+    Attributes:
+        name: A fully-qualified name of the service type.
+
+        is_async: Whether the service needs to be pinged using :meth:`aping`.
+
+    See also:
+        :ref:`health`
+    """
+
+    name: str
+    is_async: bool
+    _svc_type: type
+    _ping: Callable
     _container: Container
-    _rs: RegisteredService
 
     def ping(self) -> None:
-        svc: Any = self._container.get(self._rs.svc_type)
-        self._rs.ping(svc)  # type: ignore[misc]
+        """
+        Instantiate the service, schedule its cleanup, and call its ping
+        method.
+        """
+        svc: Any = self._container.get(self._svc_type)
+        self._ping(svc)
 
     async def aping(self) -> None:
-        svc: Any = await self._container.aget(self._rs.svc_type)
-        if iscoroutinefunction(self._rs.ping):
-            await self._rs.ping(svc)
+        """
+        Same as :meth:`ping` but instantiate and/or ping asynchronously, if
+        necessary.
+
+        Also works with synchronous services, so in an async application, just
+        use this.
+        """
+        svc: Any = await self._container.aget(self._svc_type)
+        if iscoroutinefunction(self._ping):
+            await self._ping(svc)
         else:
-            self._rs.ping(svc)  # type: ignore[misc]
-
-    @property
-    def name(self) -> str:
-        return self._rs.name
-
-    @property
-    def is_async(self) -> bool:
-        """
-        Return True if you have to use `aping` instead of `ping`.
-        """
-        return self._rs.is_async or iscoroutinefunction(self._rs.ping)
+            self._ping(svc)
 
 
 @attrs.define
 class Registry:
+    """
+    A central registry of recipes for creating services.
+
+    An instance of this should live as long as your application does.
+
+    Also works as a context manager that runs ``on_registry_close`` hooks on
+    exit:
+
+    .. doctest::
+
+        >>> import svcs
+        >>> with svcs.Registry() as reg:
+        ...     reg.register_value(
+        ...         int, 42,
+        ...         on_registry_close=lambda: print("closed!")
+        ...     )
+        closed!
+
+    ``async with`` is also supported.
+    """
+
     _services: dict[type, RegisteredService] = attrs.Factory(dict)
-    _on_close: list[tuple[str, Callable]] = attrs.Factory(list)
+    _on_close: list[tuple[str, Callable | Awaitable]] = attrs.Factory(list)
 
     def __repr__(self) -> str:
         return f"<svcs.Registry(num_services={len(self._services)})>"
 
     def __contains__(self, svc_type: type) -> bool:
+        """
+        Check whether this registry knows how to create *svc_type*:
+
+        .. doctest::
+
+            >>> reg = svcs.Registry()
+            >>> reg.register_value(int, 42)
+            >>> int in reg
+            True
+            >>> str in reg
+            False
+        """
         return svc_type in self._services
 
     def __enter__(self) -> Registry:
@@ -109,27 +157,35 @@ class Registry:
         factory: Callable,
         *,
         ping: Callable | None = None,
-        on_registry_close: Callable | None = None,
+        on_registry_close: Callable | Awaitable | None = None,
     ) -> None:
         """
-        Register *factory* for *svc_type*.
+        Register *factory* to be used when asked for a *svc_type*.
+
+        Repeated registrations overwrite previous ones, but the
+        *on_registry_close* hooks are run all together when the registry is
+        closed.
 
         Args:
             svc_type: The type of the service to register.
 
             factory: A callable that is used to instantiated *svc_type* if
                 asked. If it's a generator, a cleanup is registered after
-                instantiation. Can be also async or an async generator.
+                instantiation.
+
+                Can also be an async callable or an async generator.
 
             ping: A callable that marks the service as having a health check.
-                The service iss returned when :meth:`Container.get_pings` is
-                called and *ping* is called as part of :meth:`ServicePing.ping`
-                or :meth:`ServicePing.aping`.
+
+                .. seealso::
+                    :meth:`Container.get_pings` and :class:`ServicePing`.
 
             on_registry_close: A callable that is called when the
-                :meth:`Registry.close()` method is called. Can be an async
-                callable or an :class:`collections.abc.Awaitable`, then
-                :meth:`Registry.aclose()` must be called.
+                :meth:`svcs.Registry.close()` method is called.
+
+                Can also be an async callable or an
+                :class:`collections.abc.Awaitable`, then
+                :meth:`svcs.Registry.aclose()` must be called.
         """
         rs = RegisteredService(
             svc_type,
@@ -152,8 +208,14 @@ class Registry:
         on_registry_close: Callable | None = None,
     ) -> None:
         """
-        Syntactic sugar for ``register_factory(svc_type, lambda: value,
-        ping=ping, on_registry_close=on_registry_close)``.
+        Syntactic sugar for::
+
+           register_factory(
+               svc_type,
+               lambda: value,
+               ping=ping,
+               on_registry_close=on_registry_close
+           )
         """
         self.register_factory(
             svc_type,
@@ -170,10 +232,14 @@ class Registry:
 
     def close(self) -> None:
         """
-        Clear registrations & run synchronous ``on_registry_close`` callbacks.
+        Clear registrations and run synchronous *on_registry_close* hooks.
+
+        Async hooks are *not* awaited and a warning is raised
+
+        Errors are logged at warning level, but otherwise ignored.
         """
         for name, oc in reversed(self._on_close):
-            if iscoroutinefunction(oc):
+            if iscoroutinefunction(oc) or isawaitable(oc):
                 warnings.warn(
                     f"Skipped async cleanup for {name!r}. "
                     "Use aclose() instead.",
@@ -185,7 +251,7 @@ class Registry:
 
             try:
                 log.debug("closing %r", name)
-                oc()
+                oc()  # type: ignore[operator]
                 log.debug("closed %r", name)
             except Exception:  # noqa: BLE001
                 log.warning(
@@ -200,7 +266,12 @@ class Registry:
 
     async def aclose(self) -> None:
         """
-        Clear registrations & run all ``on_registry_close`` callbacks.
+        Clear registrations and run all *on_registry_close* hooks.
+
+        Errors are logged at warning level, but otherwise ignored.
+
+        Also works with synchronous services, so in an async application, just
+        use this.
         """
         for name, oc in reversed(self._on_close):
             try:
@@ -213,7 +284,7 @@ class Registry:
                     log.debug("async closed %r", name)
                 else:
                     log.debug("closing %r", name)
-                    oc()
+                    oc()  # type: ignore[operator]
                     log.debug("closed %r", name)
             except Exception:  # noqa: BLE001, PERF203
                 log.warning(
@@ -264,7 +335,28 @@ T10 = TypeVar("T10")
 @attrs.define
 class Container:
     """
-    A per-context container for instantiated services & cleanups.
+    A per-context container for instantiated services and cleanups.
+
+    The instance of this should live as long as a request or a task.
+
+    Also works as a context manager that runs clean ups on exit:
+
+    .. doctest::
+
+        >>> reg = svcs.Registry()
+        >>> def factory() -> str:
+        ...     yield "Hello World"
+        ...     print("Cleaned up!")
+        >>> reg.register_factory(str, factory)
+
+        >>> with svcs.Container(reg) as con:
+        ...     _ = con.get(str)
+        Cleaned up!
+
+    Attributes:
+
+        registry: The :class:`Registry` instance that this container uses for
+           service type lookup.
     """
 
     registry: Registry
@@ -280,6 +372,9 @@ class Container:
         )
 
     def __contains__(self, svc_type: type) -> bool:
+        """
+        Check whether this container has a cached instance of *svc_type*.
+        """
         return svc_type in self._instantiated
 
     def __enter__(self) -> Container:
@@ -298,7 +393,7 @@ class Container:
 
     def forget_about(self, svc_type: type) -> None:
         """
-        Remove all traces of *svc_type* from ourselves.
+        Forget cached instances of *svc_type* if there are any.
         """
         with suppress(KeyError):
             del self._instantiated[svc_type]
@@ -307,7 +402,9 @@ class Container:
         """
         Run all registered *synchronous* cleanups.
 
-        Async closes are *not* awaited.
+        Async closes are *not* awaited and a warning is raised.
+
+        Errors are logged at warning level, but otherwise ignored.
         """
         for name, gen in reversed(self._on_close):
             try:
@@ -342,6 +439,11 @@ class Container:
     async def aclose(self) -> None:
         """
         Run *all* registered cleanups -- synchronous **and** asynchronous.
+
+        Errors are logged at warning level, but otherwise ignored.
+
+        Also works with synchronous services, so in an async application, just
+        use this.
         """
         for name, gen in reversed(self._on_close):
             try:
@@ -370,19 +472,29 @@ class Container:
 
     def get_pings(self) -> list[ServicePing]:
         """
-        Get all pingable services and bind them to ourselves for cleanups.
+        Return all services that have defined a *ping* and bind them to this
+        container.
+
+        Returns:
+            A sequence of services that have registered a ping callable.
         """
         return [
-            ServicePing(self, rs)
+            ServicePing(
+                rs.name,
+                rs.is_async or iscoroutinefunction(rs.ping),
+                rs.svc_type,
+                rs.ping,
+                self,
+            )
             for rs in self.registry._services.values()
             if rs.ping is not None
         ]
 
     def get_abstract(self, *svc_types: type) -> Any:
         """
-        Like :meth:`get` but is annotated to return `Any` which allows it to be
-        used with abstract types like :class:`typing.Protocol` or :mod:`abc`
-        classes.
+        Like :meth:`get` but is annotated to return :data:`typing.Any` which
+        allows it to be used with abstract types like :class:`typing.Protocol`
+        or :mod:`abc` classes.
 
         Note:
              See https://github.com/python/mypy/issues/4717 why this is
@@ -392,8 +504,11 @@ class Container:
 
     async def aget_abstract(self, *svc_types: type) -> Any:
         """
-        Like :meth:`aget` but has returns `Any` which allows it to be used with
-        abstract types like :class:`typing.Protocol` or :mod:`abc` classes.
+        Same as :meth:`get_abstract` but instantiates asynchronously, if
+        necessary.
+
+        Also works with synchronous services, so in an async application, just
+        use this.
         """
         return await self.aget(*svc_types)
 
@@ -513,13 +628,14 @@ class Container:
 
     def get(self, *svc_types: type) -> object:
         """
-        Get an instance of *svc_type*s.
+        Get services of *svc_types*.
 
         Instantiate them if necessary and register their cleanup.
 
         Returns:
-             If one service is requested, it's returned directly. If multiple
-             are requested, a sequence of services is returned.
+             ``svc_types[0]`` | ``tuple[*svc_types]``: If one service is
+             requested, it's returned directly. If multiple are requested, a
+             tuple of services is returned.
         """
         rv = []
         for svc_type in svc_types:
@@ -659,17 +775,10 @@ class Container:
 
     async def aget(self, *svc_types: type) -> object:
         """
-        Get an instance of *svc_type*.
+        Same as :meth:`get` but instantiates asynchronously, if necessary.
 
-        Instantiate it asynchronously if necessary and register its cleanup.
-
-        Returns:
-             If one service is requested, it's returned directly. If multiple
-             are requested, a sequence of services is returned.
-
-        Note:
-             See https://github.com/python/mypy/issues/4717 why this is
-             necessary.
+        Also works with synchronous services, so in an async application, just
+        use this.
         """
         rv = []
         for svc_type in svc_types:

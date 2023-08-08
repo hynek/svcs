@@ -7,8 +7,6 @@ from unittest.mock import Mock
 
 import pytest
 
-import svcs
-
 from .ifaces import AnotherService, Service
 
 
@@ -108,13 +106,6 @@ class TestContainer:
 
 
 class TestServicePing:
-    def test_name(self, rs):
-        """
-        The name property proxies the correct class name.
-        """
-
-        assert "tests.ifaces.Service" == svcs.ServicePing(None, rs).name
-
     def test_ping(self, registry, container):
         """
         Calling ping instantiates the service using its factory, appends it to

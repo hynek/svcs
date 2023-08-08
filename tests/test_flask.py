@@ -132,7 +132,7 @@ class TestFlask:
         svcs.flask.replace_factory(AnotherService, AnotherService, ping=nop)
 
         assert [AnotherService] == [
-            ping._rs.svc_type for ping in svcs.flask.get_pings()
+            ping._svc_type for ping in svcs.flask.get_pings()
         ]
 
     def test_cleanup_purge_tolerant(self, container):
