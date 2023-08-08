@@ -169,15 +169,12 @@ It gets more interesting when using framework-specific integrations where the li
 ```{eval-rst}
 .. module:: svcs
 
-.. invisible-code-block: python
-    import svcs
-
-.. autoclass:: svcs.Registry()
+.. autoclass:: Registry()
    :members: register_factory, register_value, close, aclose, __contains__
 
-.. autoclass:: svcs.Container()
+.. autoclass:: Container()
    :members: get, aget, get_abstract, aget_abstract, close, aclose, forget_about, get_pings, __contains__
 
-.. autoclass:: svcs.ServicePing()
+.. autoclass:: ServicePing()
    :members: name, ping, aping, is_async
 ```

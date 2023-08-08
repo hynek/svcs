@@ -175,6 +175,12 @@ class Registry:
 
                 Can also be an async callable or an async generator.
 
+                If *factory* takes a first argument called ``svcs_container``
+                or the first argument (of any name) is annotated as being
+                :class:`svcs.Container`, the container instance that is
+                instantiating the service is passed into the factory as the
+                first positional argument.
+
             ping: A callable that marks the service as having a health check.
 
                 .. seealso::
