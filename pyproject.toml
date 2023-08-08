@@ -33,6 +33,7 @@ docs = [
   "myst-parser",
   "sphinx-notfound-page",
   "flask",
+  "pyramid",
   "sybil",
   "pytest",
 ]

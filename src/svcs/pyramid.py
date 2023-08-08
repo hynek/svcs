@@ -21,8 +21,10 @@ def init(
     """
     Configure *config* to work with *svcs*.
 
-    *svcs* uses a Tween_ to manage the life cycle of the container. You can
-    affect its position by passing *tween_under* and *tween_over*.
+    *svcs* uses a :term:`Tween` to manage the life cycle of the container. You
+    can affect its position by passing *tween_under* and *tween_over*.
+
+    .. _Tween: https://docs.pylonsproject.org/projects/pyramid/en/main/glossary.html#term-tween
 
     Args:
         config: Pyramid configurator object.
@@ -32,8 +34,6 @@ def init(
 
         tween_over: Passed unchanged to
             :meth:`pyramid.config.Configurator.add_tween()` as *over*.
-
-    .. _Tween: https://docs.pylonsproject.org/projects/pyramid/en/main/glossary.html#term-tween
     """
     config.registry[_KEY_REGISTRY] = svcs.Registry()
 
@@ -97,7 +97,7 @@ def register_value(
 
 def close_registry(config: Configurator) -> None:
     """
-    Close the registry on *app* if present.
+    Close the registry on *app*, if present.
 
     Ideal for :func:`atexit.register()` handlers.
     """
@@ -109,14 +109,9 @@ def get_container(request: Request | None = None) -> svcs.Container:
     """
     Get the current container either from *request* or from thread locals.
 
-    .. note::
-        The Pyramid developers discourage_ the use of thread locals outside of
-        tests.
+    Arguments:
 
-        Please also note that the container is guaranteed to be
-        ``request.svcs`` if *svcs* is set up correctly.
-
-    .. _discourage: https://docs.pylonsproject.org/projects/pyramid/en/main/narr/threadlocals.html
+        request: If None, thread locals are used.
     """
     if request:
         return request.svcs  # type: ignore[no-any-return]
@@ -126,8 +121,9 @@ def get_container(request: Request | None = None) -> svcs.Container:
 
 class RegistryHaver(Protocol):
     """
-    This is both true for apps (:class:`pyramid.interfaces.IRouter`) and
-    :class:`pyramid.config.Configurator`.
+    An object with a :class:`pyramid.registry.Registry` as a ``registry``
+    attribute. For example a :class:`~pyramid.config.Configurator` or an
+    application.
     """
 
     registry: dict[str, Any]
@@ -137,11 +133,8 @@ def get_registry(rh: RegistryHaver | None = None) -> svcs.Registry:
     """
     Get the registry from *rh* or thread locals.
 
-    .. note::
-        The Pyramid developers discourage_ the use of thread locals outside of
-        tests.
-
-    .. _discourage: https://docs.pylonsproject.org/projects/pyramid/en/main/narr/threadlocals.html
+    Arguments:
+        rh: If None, thread locals are used.
     """
     if rh:
         return rh.registry[_KEY_REGISTRY]  # type: ignore[no-any-return]
@@ -151,12 +144,8 @@ def get_registry(rh: RegistryHaver | None = None) -> svcs.Registry:
 
 def get_abstract(*svc_types: type) -> Any:
     """
-    Like :func:`get` but is annotated to return `Any` which allows it to be
-    used with abstract types like :class:`typing.Protocol` or :mod:`abc`
-    classes.
-
-    Note:
-        See https://github.com/python/mypy/issues/4717 why this is necessary.
+    Same as :meth:`svcs.Container.get_abstract()`, but uses container on
+    thread locals.
     """
     return get(*svc_types)
 
@@ -292,10 +281,5 @@ def get(*svc_types: type) -> object:
     """
     Same as :meth:`svcs.Container.get()`, but uses thread locals to find the
     current request.
-
-    .. note::
-        The Pyramid developers discourage_ this kind of usage outside of tests.
-
-    .. discourage: https://docs.pylonsproject.org/projects/pyramid/en/main/narr/threadlocals.html
     """
     return get_container().get(*svc_types)

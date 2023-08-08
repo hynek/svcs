@@ -46,7 +46,9 @@ You can use `svcs.pyramid.close_registry(config)` to close the registry that is 
 These functions only work from within an **active** Pyramid request.
 :::
 
-Despite being [discouraged](https://docs.pylonsproject.org/projects/pyramid/en/main/narr/threadlocals.html), you can use Pyramid's thread locals to access the active container, or even services:
+Despite being [discouraged], you can use Pyramid's thread locals to access the active container, or even services
+
+So this:
 
 ```python
 def view(request):
@@ -55,4 +57,56 @@ def view(request):
     service2 = svcs.pyramid.get_abstract(AbstractService)
 ```
 
+is equivalent to this:
+
+```python
+def view(request):
+    container = request.svcs
+    service1 = request.svcs.get(Service)
+    service2 = request.svcs.get_abstract(AbstractService)
+```
+
 [Tween]: https://docs.pylonsproject.org/projects/pyramid/en/main/glossary.html#term-tween
+
+
+## API Reference
+
+### Application Life Cycle
+
+```{eval-rst}
+.. module:: svcs.pyramid
+
+.. autofunction:: init
+.. autofunction:: close_registry
+
+.. autofunction:: get_container
+.. autofunction:: get_registry
+
+.. autoclass:: RegistryHaver()
+```
+
+
+### Registering Services
+
+```{eval-rst}
+.. autofunction:: register_factory
+.. autofunction:: register_value
+```
+
+
+### Service Acquisition
+
+Generally, you should use the `request.svcs` to access services.
+But Pyramid _does_ also support to find the request and the registry using thread locals, so here's helper methods for that.
+It's [discouraged] by the Pyramid developers, though.
+
+```{eval-rst}
+.. function:: get(svc_types)
+
+   Same as :meth:`svcs.Container.get()`, but uses thread locals to find the
+   current request.
+
+.. autofunction:: get_abstract
+```
+
+[discouraged]: https://docs.pylonsproject.org/projects/pyramid/en/main/narr/threadlocals.html
