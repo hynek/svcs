@@ -652,6 +652,10 @@ class Container:
                 continue
 
             rs = self.registry.get_registered_service_for(svc_type)
+            if rs.is_async:
+                msg = "Please use `aget()` for async factories."
+                raise TypeError(msg)
+
             svc = rs.factory(self) if rs.takes_container else rs.factory()
 
             if isinstance(svc, Generator):

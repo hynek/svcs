@@ -20,6 +20,9 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 - Factory results of None are now treated like every other result and cached.
   [#22](https://github.com/hynek/svcs/pull/22)
 
+- Calling `Container.get()` on a service that has an async factory now raises a `TypeError`.
+  [#21](https://github.com/hynek/svcs/pull/21)
+
 
 ### Added
 

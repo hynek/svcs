@@ -3,12 +3,13 @@
 # SPDX-License-Identifier: MIT
 
 import asyncio
+import re
 
 import pytest
 
 import svcs
 
-from .fake_factories import nop
+from .fake_factories import async_int_factory, async_str_cleanup_factory, nop
 from .ifaces import AnotherService, Interface, Service, YetAnotherService
 
 
@@ -198,6 +199,22 @@ def test_none_is_a_valid_factory_result(registry, container):
     assert None is container.get(Service)
     assert None is container.get(Service)
     assert 1 == i
+
+
+@pytest.mark.parametrize(
+    "factory", [async_int_factory, async_str_cleanup_factory]
+)
+def test_get_on_async_factory_raises_type_error(registry, container, factory):
+    """
+    get() on an async factory raises a TypeError.
+    """
+
+    registry.register_factory(Service, factory)
+
+    with pytest.raises(
+        TypeError, match=re.escape("Please use `aget()` for async factories.")
+    ):
+        container.get(Service)
 
 
 @pytest.mark.asyncio()
