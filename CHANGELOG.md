@@ -28,6 +28,9 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 - API reference docs!
 
+- A **huge** [glossary](https://svcs.hynek.me/en/stable/glossary.html) that should have been a book.
+  [#20](https://github.com/hynek/svcs/pull/20)
+
 
 ## [23.10.0](https://github.com/hynek/svcs/compare/23.9.0...23.10.0) - 2023-08-07
 
