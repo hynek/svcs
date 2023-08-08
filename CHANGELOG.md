@@ -110,7 +110,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ### Changed
 
-- Switched the cleanup mechanism from passing a function to allowing the factory to be a generator that yields the resource and can clean up after the `yield`.
+- Switched the cleanup mechanism from passing a function to allowing the factory to be a generator that yields the service and can clean up after the `yield`.
   Just like Pytest fixtures.
   [#3](https://github.com/hynek/svcs/pull/3)
 

@@ -49,12 +49,12 @@ It's a flexible Inversion-of-Control container that can be used for **dependency
 Benefits:
 
 - Eliminates tons of repetitive **boilerplate** code,
-- unifies **acquisition** and **cleanups** of resources,
+- unifies **acquisition** and **cleanups** of services,
 - provides full *static* **type safety** for them,
 - simplifies **testing** through **loose coupling**,
-- and allows for easy **health checks** across *all* resources.
+- and allows for easy **health checks** across *all* services.
 
-The goal is to minimize the code for acquiring pluggable resources to:
+The goal is to minimize the code for acquiring pluggable services to:
 
 ```python
 def view(request):

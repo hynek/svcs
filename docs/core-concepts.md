@@ -47,7 +47,7 @@ registry.register_factory(
 
 If this callback fails, it's logged at warning level but otherwise ignored.
 For instance, you could free a database connection pool in an {mod}`atexit` handler or *pytest* fixture.
-This frees you from keeping track of registered resources yourself.
+This frees you from keeping track of registered services yourself.
 You can also use `Registry` as an (async) context manager that (a)closes automatically on exit.
 
 
@@ -114,7 +114,7 @@ You can also use `Registry` as an (async) context manager that (a)closes automat
 
 Failing cleanups are logged at `warning` level but otherwise ignored.
 
-**The key idea is that your business code doesn't have to care about cleaning up resources it has requested.**
+**The key idea is that your business code doesn't have to care about cleaning up services it has requested.**
 
 That makes it even easier to test it because the business codes makes fewer assumptions about the object it's getting.
 
@@ -124,8 +124,8 @@ That makes it even easier to test it because the business codes makes fewer assu
 Each registered service may have a `ping` callable that you can use for health checks.
 You can request all pingable registered services with `container.get_pings()`.
 This returns a list of `ServicePing` objects that currently have a name property to identify the ping and a `ping` method that instantiates the service, adds it to the cleanup list, and runs the ping.
-If you have async resources (either factory or ping callable), you can use `aping()` instead.
-`aping()` works with sync resources too, so you can use it universally in async code.
+If you have async services (either factory or ping callable), you can use `aping()` instead.
+`aping()` works with sync services too, so you can use it universally in async code.
 You can look at the `is_async` property to check whether you *need* to use `aget()`, though.
 
 

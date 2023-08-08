@@ -84,7 +84,7 @@ Service Locator
 
     That usually requires less opaque magic since nothing meddles with your function/method definitions.
 
-    The active acquisition of resources by calling `get()` when you *know* for sure you're going to need it avoids the conundrum of either having to pass a factory (e.g., a connection pool – which also puts the onus of cleanup on you) or eagerly creating resources that you never use:
+    The active acquisition of services by calling `get()` when you *know* for sure you're going to need it avoids the conundrum of either having to pass a factory (e.g., a connection pool – which also puts the onus of cleanup on you) or eagerly creating services that you never use:
 
     % skip: next
 

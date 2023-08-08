@@ -90,7 +90,7 @@ def healthy_view(request: Request) -> Response:
 Once written, you have to never touch this view endpoint again and define the service health checks *where you define the services*.
 
 ::: {important}
-All of this may look over-engineered if you have only one or two resources.
+All of this may look over-engineered if you have only one or two services.
 However, it starts paying dividends *very fast* once you go past that.
 :::
 
