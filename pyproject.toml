@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 [project]
 dynamic = ["version", "readme"]
 name = "svcs"
-description = "A Lightweight Dependency Container"
+description = "A Flexible Service Locator"
 requires-python = ">=3.8"
 license = "MIT"
 authors = [{ name = "Hynek Schlawack", email = "hs@ox.cx" }]

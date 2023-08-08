@@ -80,7 +80,7 @@ html_static_path = ["_static"]
 
 htmlhelp_basename = "svcsdoc"
 
-_descr = "A Lightweight Dependency Container for Python."
+_descr = f"{metadata.metadata('svcs')['summary']} for Python."
 _title = "svcs"
 rst_epilog = f"""\
 .. meta::
