@@ -11,7 +11,8 @@ It:
 - transparently retrieves them from there for you,
 - and installs a [`teardown_appcontext()`](http://flask.pocoo.org/docs/latest/api#flask.Flask.teardown_appcontext) handler that calls `close()` on the container when a request is done.
 
----
+
+## Initialization
 
 You can add support for *svcs* by calling `svcs.flask.init_app(app)` in your [*application factory*](https://flask.palletsprojects.com/en/latest/patterns/appfactories/).
 For instance, to create a factory that uses a SQLAlchemy engine to produce connections, you could do this:
@@ -83,6 +84,9 @@ def create_app(config_filename):
     return app
 ```
 
+
+## Service Acquisition
+
 Now you can request the `Connection` object in your views:
 
 ```python
@@ -91,32 +95,17 @@ def index() -> flask.ResponseValue:
     conn = svcs.flask.get(Connection)
 ```
 
+(flask-health)=
 
 ## Health Checks
 
-If you have a [health endpoint](https://kubernetes.io/docs/reference/using-api/health-checks/), it could look like this:
+The {func}`svcs.flask.get_pings` helper will transparently pick the container from `g`.
+So, if you would like a [health endpoint](https://kubernetes.io/docs/reference/using-api/health-checks/), it could look like this:
 
-```python
-@app.get("healthy")
-def healthy() -> flask.ResponseValue:
-    """
-    Ping all external services.
-    """
-    ok: list[str] = []
-    failing: list[dict[str, str]] = []
-    code = 200
-
-    for svc in svcs.flask.get_pings():
-        try:
-            svc.ping()
-            ok.append(svc.name)
-        except Exception as e:
-            failing.append({svc.name: repr(e)})
-            code = 500
-
-    return {"ok": ok, "failing": failing}, code
+```{literalinclude} examples/health_check_flask.py
 ```
 
+(flask-testing)=
 
 ## Testing
 
@@ -205,3 +194,37 @@ def index():
 ```
 
 🧑‍🍳💋
+
+
+## API Reference
+
+### Application Life Cycle
+
+```{eval-rst}
+.. module:: svcs.flask
+
+.. autofunction:: init_app
+.. autofunction:: close_registry
+```
+
+
+### Registering and Overwriting Services
+
+```{eval-rst}
+.. autofunction:: register_factory
+.. autofunction:: register_value
+.. autofunction:: replace_factory
+.. autofunction:: replace_value
+```
+
+
+### Service Acquisition
+
+```{eval-rst}
+.. function:: get(svc_types)
+
+   Same as :meth:`svcs.Container.get()`, but uses container on :obj:`flask.g`.
+
+.. autofunction:: get_abstract
+.. autofunction:: get_pings
+```

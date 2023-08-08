@@ -46,12 +46,8 @@ def init_app(app: FlaskAppT, registry: Registry | None = None) -> FlaskAppT:
 
 def get_abstract(*svc_types: type) -> Any:
     """
-    Like :func:`get` but is annotated to return `Any` which allows it to be
-    used with abstract types like :class:`typing.Protocol` or :mod:`abc`
-    classes.
-
-    Note:
-        See https://github.com/python/mypy/issues/4717 why this is necessary.
+    Same as :meth:`svcs.Container.get_abstract()`, but uses container on
+    :obj:`flask.g`.
     """
     return get(*svc_types)
 
@@ -66,7 +62,7 @@ def register_factory(
 ) -> None:
     """
     Same as :meth:`svcs.Registry.register_factory()`, but uses registry on
-    *app*.
+    *app* that has been put there by :func:`init_app()`.
     """
     app.config["svcs_registry"].register_factory(
         svc_type, factory, ping=ping, on_registry_close=on_registry_close
@@ -82,7 +78,8 @@ def register_value(
     on_registry_close: Callable | None = None,
 ) -> None:
     """
-    Same as :meth:`svcs.Registry.register_value()`, but uses registry on *app*.
+    Same as :meth:`svcs.Registry.register_value()`, but uses registry on *app*
+    that has been put there by :func:`init_app()`.
     """
     app.config["svcs_registry"].register_value(
         svc_type, value, ping=ping, on_registry_close=on_registry_close
@@ -97,7 +94,11 @@ def replace_factory(
     on_registry_close: Callable | None = None,
 ) -> None:
     """
-    Register *factory* for *svc_type* and clear any cached values for it.
+    Register *factory* for *svc_type* and clear any cached values for it in the
+    current container on :obj:`flask.g`.
+
+    .. seealso::
+        :ref:`flask-testing`
     """
     registry, container = _ensure_req_data()
 
@@ -116,6 +117,9 @@ def replace_value(
 ) -> None:
     """
     Register *instance* for *svc_type* and clear any cached values for it.
+
+    .. seealso::
+        :ref:`flask-testing`
     """
     registry, container = _ensure_req_data()
 
@@ -128,6 +132,9 @@ def replace_value(
 def get_pings() -> list[ServicePing]:
     """
     See :meth:`svcs.Container.get_pings()`.
+
+    .. seealso::
+        :ref:`flask-health`
     """
     _, container = _ensure_req_data()
 
@@ -136,8 +143,8 @@ def get_pings() -> list[ServicePing]:
 
 def teardown(exc: BaseException | None) -> None:
     """
-    To be used with :meth:`Flask.teardown_appcontext` that requires to take an
-    exception.
+    To be used with :meth:`flask.Flask.teardown_appcontext` that requires to
+    take an exception.
 
     The app context is torn down after the response is sent.
     """
@@ -147,7 +154,7 @@ def teardown(exc: BaseException | None) -> None:
 
 def close_registry(app: Flask) -> None:
     """
-    Close the registry on *app* if present.
+    Close the registry on *app*, if present.
     """
     if reg := app.config.pop("svcs_registry", None):
         reg.close()

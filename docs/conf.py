@@ -53,7 +53,19 @@ if "dev" in release:
 
 exclude_patterns = ["_build"]
 
-nitpick_ignore = []
+nitpick_ignore = [
+    ("py:class", "T1"),
+    ("py:class", "T2"),
+    ("py:class", "T3"),
+    ("py:class", "T4"),
+    ("py:class", "T5"),
+    ("py:class", "T6"),
+    ("py:class", "T7"),
+    ("py:class", "T8"),
+    ("py:class", "T9"),
+    ("py:class", "T10"),
+    ("py:class", "svcs._core.T1"),
+]
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
