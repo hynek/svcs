@@ -15,6 +15,16 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/23.10.0...HEAD)
 
+### Changed
+
+- Factory results of None are now treated like every other result and cached.
+  [#22](https://github.com/hynek/svcs/pull/22)
+
+
+### Added
+
+- API reference docs!
+
 
 ## [23.10.0](https://github.com/hynek/svcs/compare/23.9.0...23.10.0) - 2023-08-07
 

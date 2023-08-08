@@ -181,6 +181,25 @@ def test_warns_if_generator_does_not_stop_after_cleanup(registry, container):
     )
 
 
+def test_none_is_a_valid_factory_result(registry, container):
+    """
+    None is a valid factory result and is cached as such.
+    """
+
+    i = 0
+
+    def factory():
+        nonlocal i
+        i += 1
+        yield None
+
+    registry.register_factory(Service, factory)
+
+    assert None is container.get(Service)
+    assert None is container.get(Service)
+    assert 1 == i
+
+
 @pytest.mark.asyncio()
 class TestAsync:
     async def test_async_factory(self, registry, container):
@@ -353,3 +372,21 @@ class TestAsync:
 
         assert pinged
         assert apinged
+
+    async def test_none_is_a_valid_factory_result(self, registry, container):
+        """
+        None is a valid factory result and is cached as such.
+        """
+
+        i = 0
+
+        async def factory():
+            nonlocal i
+            i += 1
+            yield None
+
+        registry.register_factory(Service, factory)
+
+        assert None is await container.aget(Service)
+        assert None is await container.aget(Service)
+        assert 1 == i

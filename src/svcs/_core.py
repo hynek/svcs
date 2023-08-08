@@ -645,7 +645,9 @@ class Container:
         """
         rv = []
         for svc_type in svc_types:
-            if (svc := self._instantiated.get(svc_type)) is not None:
+            if (
+                svc := self._instantiated.get(svc_type, attrs.NOTHING)
+            ) is not attrs.NOTHING:
                 rv.append(svc)
                 continue
 
@@ -788,7 +790,9 @@ class Container:
         """
         rv = []
         for svc_type in svc_types:
-            if (svc := self._instantiated.get(svc_type)) is not None:
+            if (
+                svc := self._instantiated.get(svc_type, attrs.NOTHING)
+            ) is not attrs.NOTHING:
                 rv.append(svc)
                 continue
 
