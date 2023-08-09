@@ -70,7 +70,10 @@ def tl_view(request):
     svc = svcs.pyramid.get(Service)
 
     assert (
-        svc == request.svcs.get(Service) == svcs.pyramid.get_abstract(Service)
+        svc
+        is request.svcs.get(Service)
+        is svcs.pyramid.services(request).get(Service)
+        is svcs.pyramid.get_abstract(Service)
     )
     assert (
         request.registry["svcs_registry"]
