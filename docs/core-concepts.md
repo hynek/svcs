@@ -142,7 +142,7 @@ This returns a list of {class}`svcs.ServicePing` objects that currently have a n
 
 If you have async services (factory or ping callable), you can use {meth}`~svcs.ServicePing.aping()` instead.
 `aping()` works with sync services, too, so you can use it universally in async code.
-You can look at the {attr}`~svcs.ServicePing.is_async` property to check whether you *need* to use `aget()`, though.
+You can look at the {attr}`~svcs.ServicePing.is_async` property to check whether you *need* to use `aping()`, though.
 
 Here's how a health check endpoint could look in Flask or Pyramid:
 
