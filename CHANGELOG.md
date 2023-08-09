@@ -26,7 +26,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 - Ooof.
   It's obvious in hindsight, but accessing anything directly on a request object like in the `request.svcs.get()` examples erases type information and everything becomes a big soup of `Any`.
 
-  Therefore, we've added a new "best practice" for integrations to have a `services()` function that extracts containers from request objects (or from thread locals in the case of Flask).
+  Therefore, we've added a new "best practice" for integrations to have a `svcs_from()` function that extracts containers from request objects (or from thread locals in the case of Flask).
 
 
 ## [23.11.0](https://github.com/hynek/svcs/compare/23.10.0...23.11.0) - 2023-08-08

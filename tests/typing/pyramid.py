@@ -46,7 +46,7 @@ a, b, c, d, e, f, g, h, i, j = svcs.pyramid.get(
 reg: svcs.Registry = svcs.pyramid.get_registry(config)
 reg = svcs.pyramid.get_registry()
 
-con: svcs.Container = svcs.pyramid.services()
-con = svcs.pyramid.services(pyramid.request.Request())
+con: svcs.Container = svcs.pyramid.svcs_from()
+con = svcs.pyramid.svcs_from(pyramid.request.Request())
 
 svcs.pyramid.close_registry(config)

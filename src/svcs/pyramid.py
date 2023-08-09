@@ -15,7 +15,7 @@ from pyramid.threadlocal import get_current_registry, get_current_request
 import svcs
 
 
-def services(request: Request | None = None) -> svcs.Container:
+def svcs_from(request: Request | None = None) -> svcs.Container:
     """
     Get the current container either from *request* or from thread locals.
 
@@ -291,4 +291,4 @@ def get(*svc_types: type) -> object:
     Same as :meth:`svcs.Container.get()`, but uses thread locals to find the
     current request.
     """
-    return services().get(*svc_types)
+    return svcs_from().get(*svc_types)

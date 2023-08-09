@@ -18,7 +18,7 @@ All you need to do is:
 - Give the user an API to access the container instance in views, so they can {meth}`~svcs.Container.get()` their services.
 
   ::: {tip}
-  If you need to call a function to extract the container from a request object or similar, consider calling it `services` like we do in our integrations.
+  If you need to call a function to extract the container from a request object or similar, consider calling it `svcs_from` like we do in our integrations.
   :::
 
 That's it!

@@ -4,7 +4,7 @@
 
 from typing import Generator
 
-from flask import Flask
+import flask
 
 import svcs
 
@@ -15,7 +15,7 @@ def factory_with_cleanup() -> Generator[int, None, None]:
 
 reg = svcs.Registry()
 
-app = Flask("tests")
+app = flask.Flask("tests")
 app = svcs.flask.init_app(app, reg)
 app = svcs.flask.init_app(app)
 
@@ -51,8 +51,11 @@ a, b, c, d, e, f, g, h, i, j = svcs.flask.get(
 
 svcs.flask.close_registry(app)
 
+con: svcs.Container = svcs.flask.svcs_from()
+con = svcs.flask.svcs_from(flask.g)
 
-class CustomApp(Flask):
+
+class CustomApp(flask.Flask):
     pass
 
 

@@ -61,10 +61,10 @@ The goal is to minimize the code for acquiring pluggable services to:
 -->
 
 ```python
-from svcs.your_framework import services
+from svcs.your_framework import svcs_from
 
 def view(request):
-    db, api, cache = services(request).get(Database, WebAPIClient, Cache)
+    db, api, cache = svcs_from(request).get(Database, WebAPIClient, Cache)
 ```
 
 It's ensured that to a type checker like [Mypy](https://mypy-lang.org), `db` has the type `Database`, `api` has the type `WebAPIClient`, and `cache` has the type `Cache`.

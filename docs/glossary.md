@@ -149,7 +149,7 @@ Dependency Injection
         """
         View and composition root.
         """
-        return do_something(services(request).get(Database))
+        return do_something(svcs_from(request).get(Database))
 
     def do_something(db):
         """

@@ -72,7 +72,7 @@ def tl_view(request):
     assert (
         svc
         is request.svcs.get(Service)
-        is svcs.pyramid.services(request).get(Service)
+        is svcs.pyramid.svcs_from(request).get(Service)
         is svcs.pyramid.get_abstract(Service)
     )
     assert (
@@ -82,8 +82,8 @@ def tl_view(request):
     )
     assert (
         request.svcs
-        is svcs.pyramid.services()
-        is svcs.pyramid.services(request)
+        is svcs.pyramid.svcs_from()
+        is svcs.pyramid.svcs_from(request)
     )
 
     return {"svc": svc}

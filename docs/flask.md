@@ -221,6 +221,7 @@ def index():
 ### Service Acquisition
 
 ```{eval-rst}
+.. autofunction:: svcs_from
 .. function:: get(svc_types)
 
    Same as :meth:`svcs.Container.get()`, but uses container on :obj:`flask.g`.

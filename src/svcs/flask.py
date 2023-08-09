@@ -8,6 +8,7 @@ from collections.abc import Callable
 from typing import Any, TypeVar, overload
 
 from flask import Flask, current_app, g, has_app_context
+from flask.ctx import _AppCtxGlobals
 
 from ._core import (
     T1,
@@ -26,7 +27,7 @@ from ._core import (
 )
 
 
-def services() -> Container:
+def svcs_from(g: _AppCtxGlobals = g) -> Container:
     """
     Get the current container from `g`.
     """
@@ -110,7 +111,7 @@ def replace_factory(
     .. seealso::
         :ref:`flask-testing`
     """
-    container = services()
+    container = svcs_from(g)
     registry = container.registry
 
     container.forget_about(svc_type)
@@ -132,7 +133,7 @@ def replace_value(
     .. seealso::
         :ref:`flask-testing`
     """
-    container = services()
+    container = svcs_from(g)
     registry = container.registry
 
     container.forget_about(svc_type)
@@ -148,7 +149,7 @@ def get_pings() -> list[ServicePing]:
     .. seealso::
         :ref:`flask-health`
     """
-    return services().get_pings()
+    return svcs_from(g).get_pings()
 
 
 def teardown(exc: BaseException | None) -> None:
@@ -289,4 +290,4 @@ def get(*svc_types: type) -> object:
     """
     Same as :meth:`svcs.Container.get()`, but uses container on :obj:`flask.g`.
     """
-    return services().get(*svc_types)
+    return svcs_from(g).get(*svc_types)

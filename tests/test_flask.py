@@ -34,7 +34,7 @@ def _clean_app_ctx(registry, app):
 
 @pytest.fixture(name="container")
 def _container(clean_app_ctx):
-    return svcs.flask.services()
+    return svcs.flask.svcs_from()
 
 
 @pytest.mark.usefixtures("clean_app_ctx")
@@ -199,15 +199,15 @@ class TestFlask:
         assert isinstance(svc, Interface)
         assert svc is svcs.flask.get_abstract(Interface)
 
-    def test_services(self, container):
+    def test_svcs_from(self, container):
         """
-        services() returns the container the same container as that is on g.
+        svcs_from() returns the container the same container as that is on g.
         """
         assert (
             container
-            is svcs.flask.services()
+            is svcs.flask.svcs_from()
             is flask.g.svcs_container
-            is svcs.flask.services()
+            is svcs.flask.svcs_from()
         )
 
 

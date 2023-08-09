@@ -28,14 +28,14 @@ def make_app():
 ## Service Acquisition
 
 Every {class}`~pyramid.request.Request` object that is passed into views will have an `svcs` attribute that is a {class}`svcs.Container` that is scoped to the request.
-You can use {func}`svcs.pyramid.services()` to access it in a type-safe way:
+You can use {func}`svcs.pyramid.svcs_from()` to access it in a type-safe way:
 
 
 ```python
-from svcs.pyramid import services
+from svcs.pyramid import svcs_from
 
 def view(request):
-    db = services(request).get(Database)
+    db = svcs_from(request).get(Database)
 ```
 
 If you don't care about type checking, you can use `request.svcs` directly.
@@ -52,13 +52,13 @@ You can use {func}`svcs.pyramid.close_registry()` to close the registry that is 
 These functions only work from within an **active** Pyramid request.
 :::
 
-Despite being [discouraged](<inv:#narr/threadlocals>), you can use Pyramid's thread locals to access the active container, or even services
+Despite being [discouraged](<inv:#narr/threadlocals>), you can use Pyramid's thread locals to access the active container, or even services.
 
 So this:
 
 ```python
 def view(request):
-    container = svcs.pyramid.services()
+    container = svcs.pyramid.svcs_from()
     service1 = svcs.pyramid.get(Service)
     service2 = svcs.pyramid.get_abstract(AbstractService)
 ```
@@ -67,7 +67,7 @@ is equivalent to this:
 
 ```python
 def view(request):
-    container = services(request)
+    container = svcs.pyramid.svcs_from(request)
     service1 = container.get(Service)
     service2 = container.get_abstract(AbstractService)
 ```
@@ -83,7 +83,7 @@ def view(request):
 .. autofunction:: init
 .. autofunction:: close_registry
 
-.. autofunction:: services
+.. autofunction:: svcs_from
 .. autofunction:: get_registry
 
 .. autoclass:: PyramidRegistryHaver()
@@ -100,7 +100,7 @@ def view(request):
 
 ### Service Acquisition
 
-You should use `services(request).get()` to access services.
+You should use `svcs_from(request).get()` to access services.
 But Pyramid _does_ also support to find the request and the registry using thread locals, so here's helper methods for that.
 It's [discouraged](<inv:#narr/threadlocals>) by the Pyramid developers, though.
 
