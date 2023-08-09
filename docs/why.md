@@ -4,13 +4,14 @@ A {term}`service locator` like *svcs* allows you to configure and manage all you
 
 ---
 
-In practice that means that at runtime, you say "*Give me a database connection*!", and *svcs* will give you whatever you've configured it to return when asked for a database connection.
-This can be an actual database connection or it can be a mock object for testing.
-All of this happens *within* your application – service locators are **not** related to {term}`service discovery`.
+In practice, that means that you say "*Give me a database connection*!" at runtime, and *svcs* will give you whatever you've configured to return when asked for a database connection.
+That can be an actual database connection, or it can be a mock object for testing.
+All this happens *within* your application – service locators are **not** related to {term}`service discovery`.
 
-If you follow the **{term}`Dependency Inversion Principle`**, you would register concrete factories for abstract interfaces; in Python usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [*abstract base class*](https://docs.python.org/3.11/library/abc.html).
+If you follow the **{term}`Dependency Inversion Principle`**, you would register concrete factories for abstract interfaces.
+In Python, usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [*abstract base class*](https://docs.python.org/3.11/library/abc.html).
 
-If you follow the **{term}`Hexagonal Architecture`** (aka "*ports and adapters*"), the registered types are *ports* and the factories produce the *adapters*.
+If you follow the **{term}`Hexagonal Architecture`** (aka "*ports and adapters*"), the registered types are *ports*, and the factories produce the *adapters*.
 *svcs* gives you a well-defined way to make your application *pluggable*.
 
 ```{include} ../README.md
@@ -56,9 +57,9 @@ def cleanup():
 ```
 
 The generator-based setup and cleanup may remind you of [*pytest* fixtures](https://docs.pytest.org/en/stable/explanation/fixtures.html).
-The callbacks that are defined as `on_registry_close` are called when you call `Registry.close()` – e.g. when your application is shutting down.
+The callbacks defined as `on_registry_close` are called when you call `Registry.close()` – for example, when your application is shutting down.
 
-Next, if you've registered health checks (called *pings*) for your services, you can write a simple health check endpoint.
+Next, you can write a simple health check endpoint if you've registered health checks (called *pings*) for your services.
 This is how it could look in Flask or Pyramid:
 
 ::: {tab} Flask
@@ -70,7 +71,7 @@ This is how it could look in Flask or Pyramid:
 ```
 :::
 
-Once written, you have to never touch this view endpoint again and define the service health checks *where you define the services*.
+Once written, you never touch this view endpoint again and define the service health checks *where you define the services*.
 
 ::: {important}
 All of this may look over-engineered if you have only one or two services.
@@ -114,7 +115,7 @@ If you're curious, check the [glossary](glossary) entries for {term}`Service Loc
 
 The main downside of service locators is that it's impossible to verify whether all required dependencies have been configured without running the code.
 
-This is a consequence of being imperative instead of declarative and the main trade-off to make when deciding between a traditional dependency injection framework and a service locator like *svcs*.
+That's a consequence of being imperative instead of declarative and the main trade-off when deciding between a traditional dependency injection framework and a service locator like *svcs*.
 
 If you still prefer a dependency injection framework, check out [*incant*](https://github.com/Tinche/incant) – a very nice package by a friend of the project.
 
@@ -127,6 +128,6 @@ Once you've understood the life cycles of registries and containers, you can loo
 
 - [Flask](flask.md)
 - [Pyramid](pyramid.md)
-- Or learn how to write [your own](custom.md)!
+- Or learn to write [your own](custom.md)!
 
-If you get overwhelmed by the jargon, we have put a lot of effort into our [glossary](glossary)!
+If you get overwhelmed by the jargon, we have put much effort into our [glossary](glossary)!
