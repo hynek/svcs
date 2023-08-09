@@ -34,7 +34,7 @@ def _clean_app_ctx(registry, app):
 
 @pytest.fixture(name="container")
 def _container(clean_app_ctx):
-    return svcs.flask._ensure_req_data()[1]
+    return svcs.flask.services()
 
 
 @pytest.mark.usefixtures("clean_app_ctx")

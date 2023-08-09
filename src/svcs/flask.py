@@ -30,7 +30,10 @@ def services() -> Container:
     """
     Get the current container from `g`.
     """
-    return _ensure_req_data()[1]
+    if "svcs_container" not in g:
+        g.svcs_container = Container(current_app.config["svcs_registry"])
+
+    return g.svcs_container  # type: ignore[no-any-return]
 
 
 FlaskAppT = TypeVar("FlaskAppT", bound=Flask)
@@ -107,7 +110,8 @@ def replace_factory(
     .. seealso::
         :ref:`flask-testing`
     """
-    registry, container = _ensure_req_data()
+    container = services()
+    registry = container.registry
 
     container.forget_about(svc_type)
     registry.register_factory(
@@ -128,7 +132,8 @@ def replace_value(
     .. seealso::
         :ref:`flask-testing`
     """
-    registry, container = _ensure_req_data()
+    container = services()
+    registry = container.registry
 
     container.forget_about(svc_type)
     registry.register_value(
@@ -143,9 +148,7 @@ def get_pings() -> list[ServicePing]:
     .. seealso::
         :ref:`flask-health`
     """
-    _, container = _ensure_req_data()
-
-    return container.get_pings()
+    return services().get_pings()
 
 
 def teardown(exc: BaseException | None) -> None:
@@ -165,14 +168,6 @@ def close_registry(app: Flask) -> None:
     """
     if reg := app.config.pop("svcs_registry", None):
         reg.close()
-
-
-def _ensure_req_data() -> tuple[Registry, Container]:
-    registry: Registry = current_app.config["svcs_registry"]
-    if "svcs_container" not in g:
-        g.svcs_container = Container(registry)
-
-    return registry, g.svcs_container
 
 
 @overload
@@ -294,6 +289,4 @@ def get(*svc_types: type) -> object:
     """
     Same as :meth:`svcs.Container.get()`, but uses container on :obj:`flask.g`.
     """
-    _, container = _ensure_req_data()
-
-    return container.get(*svc_types)
+    return services().get(*svc_types)
