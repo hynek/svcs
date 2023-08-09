@@ -187,7 +187,7 @@ Inversion of Control
     This makes the code hard to test, since we don't want our unit tests to send people emails.
 
     ```python
-    def add_user(email: str) -> None:
+    def add_user(email):
         smtp = SmtpSender()
         db = get_database_connection()
 
@@ -201,7 +201,7 @@ Inversion of Control
     To fix that, we need to take _control_ of the dependencies out of the function, and provide them somehow, usually through {term}`dependency injection`:
 
     ```python
-    def add_user(email: str, smtp: SmtpSender, db: DbConnection) -> None:
+    def add_user(email, smtp, db):
         try:
             user = db.create_user(email)
             smtp.send_welcome_email(user)
