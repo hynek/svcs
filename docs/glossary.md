@@ -180,6 +180,14 @@ IoC
     See {term}`Inversion of Control`.
 
 Inversion of Control
+    Inversion of Control is too complicated and essential to explain in a few sentences.
+    So if you feel like you haven't fully grokked it, we *strongly* recommend consulting the links at the end of this entry.
+
+    It's about accepting that separating a big ball of mud into small modules is still a lot of dirt, just spread out – which is worse.
+    Instead, it's necessary to break the coupling between classes and modules – and achieve loose coupling.
+
+    The most widespread method to achieve that is {term}`Dependency Injection`.
+
     ::: {seealso}
 
     - [*What is Inversion of Control and Why Does it Matter?*](https://seddonym.me/2019/04/15/inversion-of-control/)
