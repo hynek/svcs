@@ -29,9 +29,10 @@ tests = ["pytest", "pytest-asyncio", "sybil"]
 typing = ["mypy>=1.4", "flask", "pyramid"]
 docs = [
   "sphinx",
-  "furo",
-  "myst-parser",
   "sphinx-notfound-page",
+  "sphinx-inline-tabs",
+  "myst-parser",
+  "furo",
   "flask",
   "pyramid",
   "sybil",

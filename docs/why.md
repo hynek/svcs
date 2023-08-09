@@ -59,12 +59,16 @@ The generator-based setup and cleanup may remind you of [*pytest* fixtures](http
 The hooks that are defined as `on_registry_close` are called when you call `Registry.close()` – e.g. when your application is shutting down.
 
 Next, if you've registered health checks (called *pings*) for your services, you can write a simple health check endpoint.
-This is how it could look in Pyramid[^flask]:
+This is how it could look in Flask or Pyramid:
 
-[^flask]: See the [Flask integration](flask.md) chapter for a Flask equivalent.
-
+::: {tab} Flask
+```{literalinclude} examples/health_check_flask.py
+```
+:::
+::: {tab} Pyramid
 ```{literalinclude} examples/health_check_pyramid.py
 ```
+:::
 
 Once written, you have to never touch this view endpoint again and define the service health checks *where you define the services*.
 
