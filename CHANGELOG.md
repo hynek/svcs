@@ -15,6 +15,12 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/23.11.0...HEAD)
 
+### Added
+
+- *svcs* now logs registrations at debug level.
+  So if you ever get confused where your factories are coming from, set the log level to debug and trace your registrations!
+
+
 ### Changed
 
 - Ooof.

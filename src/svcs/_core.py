@@ -20,12 +20,19 @@ import attrs
 from .exceptions import ServiceNotFoundError
 
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("svcs")
 
 if sys.version_info < (3, 10):
 
     def anext(gen: AsyncGenerator) -> Any:
         return gen.__anext__()
+
+
+def _full_name(obj: object) -> str:
+    try:
+        return f"{obj.__module__}.{obj.__qualname__}"  # type: ignore[attr-defined]
+    except AttributeError:
+        return repr(obj)
 
 
 @attrs.frozen
@@ -38,7 +45,7 @@ class RegisteredService:
 
     @property
     def name(self) -> str:
-        return f"{ self.svc_type.__module__ }.{self.svc_type.__qualname__}"
+        return _full_name(self.svc_type)
 
     def __repr__(self) -> str:
         return (
@@ -202,17 +209,19 @@ class Registry:
                 :class:`collections.abc.Awaitable`, then
                 :meth:`svcs.Registry.aclose()` must be called.
         """
-        rs = RegisteredService(
-            svc_type,
-            factory,
-            _takes_container(factory),
-            iscoroutinefunction(factory) or isasyncgenfunction(factory),
-            ping,
+        rs = self._register_factory(
+            svc_type, factory, ping=ping, on_registry_close=on_registry_close
         )
-        self._services[svc_type] = rs
 
-        if on_registry_close is not None:
-            self._on_close.append((rs.name, on_registry_close))
+        log.debug(
+            "registered factory %r for service type %s",
+            factory,
+            rs.name,
+            extra={
+                "svcs_service_name": rs.name,
+                "svcs_factory_name": _full_name(factory),
+            },
+        )
 
     def register_value(
         self,
@@ -220,7 +229,7 @@ class Registry:
         value: object,
         *,
         ping: Callable | None = None,
-        on_registry_close: Callable | None = None,
+        on_registry_close: Callable | Awaitable | None = None,
     ) -> None:
         """
         Syntactic sugar for::
@@ -232,12 +241,38 @@ class Registry:
                on_registry_close=on_registry_close
            )
         """
-        self.register_factory(
+        rs = self._register_factory(
             svc_type,
             lambda: value,
             ping=ping,
             on_registry_close=on_registry_close,
         )
+
+        log.debug(
+            "registered value %r for service type %s",
+            value,
+            rs.name,
+            extra={"svcs_service_name": rs.name, "svcs_value": value},
+        )
+
+    def _register_factory(
+        self,
+        svc_type: type,
+        factory: Callable,
+        ping: Callable | None,
+        on_registry_close: Callable | Awaitable | None = None,
+    ) -> RegisteredService:
+        rs = RegisteredService(
+            svc_type,
+            factory,
+            _takes_container(factory),
+            iscoroutinefunction(factory) or isasyncgenfunction(factory),
+            ping,
+        )
+        self._services[svc_type] = rs
+        if on_registry_close is not None:
+            self._on_close.append((rs.name, on_registry_close))
+        return rs
 
     def get_registered_service_for(self, svc_type: type) -> RegisteredService:
         try:

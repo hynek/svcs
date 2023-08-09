@@ -4,6 +4,7 @@
 
 import contextlib
 import inspect
+import logging
 
 from unittest.mock import AsyncMock, Mock
 
@@ -17,7 +18,7 @@ from .fake_factories import (
     int_factory,
     str_cleanup_factory,
 )
-from .ifaces import AnotherService, Service
+from .ifaces import AnotherService, Interface, Service
 
 
 needs_working_async_mock = pytest.mark.skipif(
@@ -103,6 +104,35 @@ class TestRegistry:
         ):
             registry.close()
 
+    def test_register_factory_logs(self, registry, caplog):
+        """
+        register_factory logs the registration to debug.
+        """
+        caplog.set_level(logging.DEBUG)
+
+        registry.register_factory(Interface, Service)
+
+        assert [
+            "registered factory <class 'tests.ifaces.Service'> for "
+            "service type tests.ifaces.Interface"
+        ] == caplog.messages
+        assert "tests.ifaces.Interface" == caplog.records[0].svcs_service_name
+        assert "tests.ifaces.Service" == caplog.records[0].svcs_factory_name
+
+    def test_register_value_logs(self, registry, caplog):
+        """
+        register_value logs the registration to debug.
+        """
+        caplog.set_level(logging.DEBUG)
+
+        registry.register_value(Service, 42)
+
+        assert [
+            "registered value 42 for service type tests.ifaces.Service"
+        ] == caplog.messages
+        assert "tests.ifaces.Service" == caplog.records[0].svcs_service_name
+        assert 42 == caplog.records[0].svcs_value
+
     def test_close_logs_failures(self, registry, caplog):
         """
         Closing failures are logged but ignored.
@@ -114,6 +144,9 @@ class TestRegistry:
         with registry:
             ...
 
+        assert [
+            "Registry's on_registry_close hook failed for 'tests.ifaces.Service'."
+        ] == caplog.messages
         assert "tests.ifaces.Service" == caplog.records[0].svcs_service_name
 
     def test_context_manager(self):
@@ -356,3 +389,14 @@ class TestTakesContainer:
         container.
         """
         assert not svcs._core._takes_container(int)
+
+
+class TestFullName:
+    def test_object(self):
+        """
+        Object has neither ``__module__`` nor ``__qualname__``, so it gets
+        repr'ed.
+        """
+        assert svcs._core._full_name(object()).startswith(
+            "<object object at 0x"
+        )
