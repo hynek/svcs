@@ -189,19 +189,19 @@ Inversion of Control
     def add_user_to_org(email: str):
         smtp = SmtpSender()
         db = get_database_connection()
-        
+
         try:
             user = db.create_user(email)
             smtp.send_welcome_email(user)
         except DuplicateUserError:
             log.warning("Duplicate user", email=email)
     ```
-    
+
     To fix that, we need to take _control_ of the dependencies out of the function, and provide them somehow, usually through dependency injection.
-    
+
     Why do we say IoC and not just dependency injection? Inversion of Control is a broader term that applies to any situation where we "invert" the
     flow of control, so that lower-level code (frameworks, data access layers etc.) invoke our higher-level code (the business logic we care about).
-    
+
     ::: {seealso}
 
     - [*What is Inversion of Control and Why Does it Matter?*](https://seddonym.me/2019/04/15/inversion-of-control/)
