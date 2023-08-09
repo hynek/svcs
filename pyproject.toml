@@ -194,6 +194,7 @@ ignore = [
   "INP001",  # sometimes we want Python files outside of packages
   "PLR0913", # yes, many arguments, but most have defaults
   "PLR2004", # numbers are sometimes fine
+  "PYI034",  # We're not adding typing_extensions just for Self.
   "RUF001",  # leave my smart characters alone
   "SLF001",  # private members are accessed by friendly functions
   "TCH",     # TYPE_CHECKING blocks break autodocs

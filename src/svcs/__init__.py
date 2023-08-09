@@ -22,14 +22,14 @@ __all__ = [
 ]
 
 try:
-    from . import flask  # noqa: F401
+    from . import flask
 except ImportError:
-    __all__.append("flask")
+    __all__ += ["flask"]
 
 try:
-    from . import pyramid  # noqa: F401
+    from . import pyramid
 except ImportError:
-    __all__.append("pyramid")
+    __all__ += ["pyramid"]
 
 
 # Make nicer public names.

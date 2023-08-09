@@ -12,6 +12,7 @@ import warnings
 from collections.abc import Callable
 from contextlib import suppress
 from inspect import isasyncgenfunction, isawaitable, iscoroutinefunction
+from types import TracebackType
 from typing import Any, AsyncGenerator, Awaitable, Generator, TypeVar, overload
 
 import attrs
@@ -140,14 +141,22 @@ class Registry:
     def __enter__(self) -> Registry:
         return self
 
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
         self.close()
 
     async def __aenter__(self) -> Registry:
         return self
 
     async def __aexit__(
-        self, exc_type: Any, exc_val: Any, exc_tb: Any
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         await self.aclose()
 
@@ -390,14 +399,22 @@ class Container:
     def __enter__(self) -> Container:
         return self
 
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
         self.close()
 
     async def __aenter__(self) -> Container:
         return self
 
     async def __aexit__(
-        self, exc_type: Any, exc_val: Any, exc_tb: Any
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         await self.aclose()
 
