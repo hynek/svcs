@@ -6,6 +6,8 @@ from pyramid.request import Request
 from pyramid.response import Response
 from pyramid.view import view_config
 
+from svcs.pyramid import services
+
 
 @view_config(route_name="healthy")
 def healthy_view(request: Request) -> Response:
@@ -13,7 +15,7 @@ def healthy_view(request: Request) -> Response:
     failing: list[dict[str, str]] = []
     status = 200
 
-    for svc in request.svcs.get_pings():
+    for svc in services(request).get_pings():
         try:
             svc.ping()
             ok.append(svc.name)

@@ -1,23 +1,13 @@
 # Pyramid
 
-*svcs*'s Pyramid integration uses Pyramid's {class}`pyramid.registry.Registry` to store its own `svcs.Registry` (yes, unfortunate name clash) and a [Tween] that attaches a fresh `svcs.Container` to every request.
+*svcs*'s Pyramid integration uses Pyramid's {class}`pyramid.registry.Registry` to store its own {class}`svcs.Registry` (yes, unfortunate name clash) and a {term}`tween` that attaches a fresh {class}`svcs.Container` to every request and closes it afterwards.
 
----
 
-The most important integration API for Pyramid is `svcs.pyramid.init()` that takes an {class}`pyramid.config.Configurator` and optionally the positions where to put its [Tween] using the *tween_under* and *tween_over* arguments.
+## Initialization
 
-Now every {class}`pyramid.request.Request` object that is passed into views will have an `svcs` attribute that is a `svcs.Container` that is scoped to the request:
+The most important integration API for Pyramid is {func}`svcs.pyramid.init()` that takes an {class}`pyramid.config.Configurator` and optionally the positions where to put its {term}`tween` using the *tween_under* and *tween_over* arguments.
 
-% skip: start
-
-```python
-def view(request):
-    db = request.svcs.get(Database)
-```
-
-## Registration
-
-You can use `svcs.pyramid.register_(factory|value)(config, ...)` that work like their `svcs.Registry` counterparts but take a {class}`pyramid.config.Configurator` as the first option (or any other object that has a `registry: dict` field, really).
+You can use {func}`svcs.pyramid.register_factory()` and {func}`svcs.pyramid.register_value()` that work like their {class}`svcs.Registry` counterparts but take a {class}`pyramid.config.Configurator` as the first option (or any other object that has a `registry: dict` field, really).
 
 So you application factory is going to look something like this:
 
@@ -32,12 +22,28 @@ def make_app():
         ...
 
         return config.make_wsgi_app()
-
 ```
+
+
+## Service Acquisition
+
+Every {class}`~pyramid.request.Request` object that is passed into views will have an `svcs` attribute that is a {class}`svcs.Container` that is scoped to the request.
+You can uses {func}`svcs.pyramid.services()` to access it in a type-safe way:
+
+
+```python
+from svcs.pyramid import services
+
+def view(request):
+    db = services(request).get(Database)
+```
+
+If you don't care about type checking, you can use `request.svcs` directly.
+
 
 ## Cleanup
 
-You can use `svcs.pyramid.close_registry(config)` to close the registry that is attached to the {class}`pyramid.registry.Registry` of *config*.
+You can use {func}`svcs.pyramid.close_registry()` to close the registry that is attached to the {class}`pyramid.registry.Registry` of the config or app object that you pass as the only parameter.
 
 
 ## Thread Locals
@@ -46,13 +52,13 @@ You can use `svcs.pyramid.close_registry(config)` to close the registry that is 
 These functions only work from within an **active** Pyramid request.
 :::
 
-Despite being [discouraged], you can use Pyramid's thread locals to access the active container, or even services
+Despite being [discouraged](<inv:#narr/threadlocals>), you can use Pyramid's thread locals to access the active container, or even services
 
 So this:
 
 ```python
 def view(request):
-    container = svcs.pyramid.get_container()
+    container = svcs.pyramid.services()
     service1 = svcs.pyramid.get(Service)
     service2 = svcs.pyramid.get_abstract(AbstractService)
 ```
@@ -61,12 +67,10 @@ is equivalent to this:
 
 ```python
 def view(request):
-    container = request.svcs
-    service1 = request.svcs.get(Service)
-    service2 = request.svcs.get_abstract(AbstractService)
+    container = services(request)
+    service1 = container.get(Service)
+    service2 = container.get_abstract(AbstractService)
 ```
-
-[Tween]: https://docs.pylonsproject.org/projects/pyramid/en/main/glossary.html#term-tween
 
 
 ## API Reference
@@ -79,10 +83,10 @@ def view(request):
 .. autofunction:: init
 .. autofunction:: close_registry
 
-.. autofunction:: get_container
+.. autofunction:: services
 .. autofunction:: get_registry
 
-.. autoclass:: RegistryHaver()
+.. autoclass:: PyramidRegistryHaver()
 ```
 
 
@@ -96,9 +100,9 @@ def view(request):
 
 ### Service Acquisition
 
-Generally, you should use the `request.svcs` to access services.
+You should use `services(request).get()` to access services.
 But Pyramid _does_ also support to find the request and the registry using thread locals, so here's helper methods for that.
-It's [discouraged] by the Pyramid developers, though.
+It's [discouraged](<inv:#narr/threadlocals>) by the Pyramid developers, though.
 
 ```{eval-rst}
 .. function:: get(svc_types)
@@ -108,5 +112,3 @@ It's [discouraged] by the Pyramid developers, though.
 
 .. autofunction:: get_abstract
 ```
-
-[discouraged]: https://docs.pylonsproject.org/projects/pyramid/en/main/narr/threadlocals.html

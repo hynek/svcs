@@ -79,8 +79,8 @@ def tl_view(request):
     )
     assert (
         request.svcs
-        is svcs.pyramid.get_container()
-        is svcs.pyramid.get_container(request)
+        is svcs.pyramid.services()
+        is svcs.pyramid.services(request)
     )
 
     return {"svc": svc}

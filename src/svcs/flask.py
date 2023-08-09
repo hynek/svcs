@@ -26,6 +26,13 @@ from ._core import (
 )
 
 
+def services() -> Container:
+    """
+    Get the current container from `g`.
+    """
+    return _ensure_req_data()[1]
+
+
 FlaskAppT = TypeVar("FlaskAppT", bound=Flask)
 
 

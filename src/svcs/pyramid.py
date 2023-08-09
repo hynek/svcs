@@ -15,13 +15,31 @@ from pyramid.threadlocal import get_current_registry, get_current_request
 import svcs
 
 
+def services(request: Request | None = None) -> svcs.Container:
+    """
+    Get the current container either from *request* or from thread locals.
+
+    Arguments:
+
+        request: If None, thread locals are used.
+    """
+    if request:
+        return request.svcs  # type: ignore[no-any-return]
+
+    return get_current_request().svcs  # type: ignore[no-any-return]
+
+
 def init(
-    config: Configurator, *, tween_under: Any = None, tween_over: Any = None
+    config: Configurator,
+    registry: svcs.Registry | None = None,
+    *,
+    tween_under: Any = None,
+    tween_over: Any = None,
 ) -> None:
     """
     Configure *config* to work with *svcs*.
 
-    *svcs* uses a :term:`Tween` to manage the life cycle of the container. You
+    *svcs* uses a :term:`tween` to manage the life cycle of the container. You
     can affect its position by passing *tween_under* and *tween_over*.
 
     .. _Tween: https://docs.pylonsproject.org/projects/pyramid/en/main/glossary.html#term-tween
@@ -29,13 +47,15 @@ def init(
     Args:
         config: Pyramid configurator object.
 
+        registry: A custom *svcs* registry to use. If None, a new one is created.
+
         tween_under: Passed unchanged to
             :meth:`pyramid.config.Configurator.add_tween()` as *under*.
 
         tween_over: Passed unchanged to
             :meth:`pyramid.config.Configurator.add_tween()` as *over*.
     """
-    config.registry[_KEY_REGISTRY] = svcs.Registry()
+    config.registry[_KEY_REGISTRY] = registry or svcs.Registry()
 
     config.add_tween(
         "svcs.pyramid.ServicesTween", over=tween_over, under=tween_under
@@ -62,7 +82,7 @@ class ServicesTween:
 
 
 def register_factory(
-    config: Configurator,
+    config: PyramidRegistryHaver,
     svc_type: type,
     factory: Callable,
     *,
@@ -79,7 +99,7 @@ def register_factory(
 
 
 def register_value(
-    config: Configurator,
+    config: PyramidRegistryHaver,
     svc_type: type,
     value: object,
     *,
@@ -95,31 +115,20 @@ def register_value(
     )
 
 
-def close_registry(config: Configurator) -> None:
+def close_registry(rh: PyramidRegistryHaver) -> None:
     """
-    Close the registry on *app*, if present.
+    Close the registry on *rh*, if present.
 
     Ideal for :func:`atexit.register()` handlers.
+
+    Parameters:
+        rh: An object that carries a :class:`pyramid.registry.Registry`.
     """
-    if reg := config.registry.pop(_KEY_REGISTRY, None):
+    if reg := rh.registry.pop(_KEY_REGISTRY, None):
         reg.close()
 
 
-def get_container(request: Request | None = None) -> svcs.Container:
-    """
-    Get the current container either from *request* or from thread locals.
-
-    Arguments:
-
-        request: If None, thread locals are used.
-    """
-    if request:
-        return request.svcs  # type: ignore[no-any-return]
-
-    return get_current_request().svcs  # type: ignore[no-any-return]
-
-
-class RegistryHaver(Protocol):
+class PyramidRegistryHaver(Protocol):
     """
     An object with a :class:`pyramid.registry.Registry` as a ``registry``
     attribute. For example a :class:`~pyramid.config.Configurator` or an
@@ -129,7 +138,7 @@ class RegistryHaver(Protocol):
     registry: dict[str, Any]
 
 
-def get_registry(rh: RegistryHaver | None = None) -> svcs.Registry:
+def get_registry(rh: PyramidRegistryHaver | None = None) -> svcs.Registry:
     """
     Get the registry from *rh* or thread locals.
 
@@ -282,4 +291,4 @@ def get(*svc_types: type) -> object:
     Same as :meth:`svcs.Container.get()`, but uses thread locals to find the
     current request.
     """
-    return get_container().get(*svc_types)
+    return services().get(*svc_types)

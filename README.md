@@ -56,9 +56,15 @@ Benefits:
 
 The goal is to minimize the code for acquiring pluggable services to:
 
+<!--
+; skip: next
+-->
+
 ```python
+from svcs.your_framework import services
+
 def view(request):
-    db, api, cache = request.svcs.get(Database, WebAPIClient, Cache)
+    db, api, cache = services(request).get(Database, WebAPIClient, Cache)
 ```
 
 It's ensured that to a type checker like [Mypy](https://mypy-lang.org), `db` has the type `Database`, `api` has the type `WebAPIClient`, and `cache` has the type `Cache`.

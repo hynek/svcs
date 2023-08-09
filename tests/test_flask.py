@@ -199,6 +199,17 @@ class TestFlask:
         assert isinstance(svc, Interface)
         assert svc is svcs.flask.get_abstract(Interface)
 
+    def test_services(self, container):
+        """
+        services() returns the container the same container as that is on g.
+        """
+        assert (
+            container
+            is svcs.flask.services()
+            is flask.g.svcs_container
+            is svcs.flask.services()
+        )
+
 
 class TestNonContextHelpers:
     def test_register_factory_helper(self, registry, app):
