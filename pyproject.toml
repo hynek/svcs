@@ -45,6 +45,8 @@ Changelog = "https://github.com/hynek/svcs/blob/main/CHANGELOG.md"
 Documentation = "https://svcs.hynek.me/"
 Source = "https://github.com/hynek/svcs"
 Funding = "https://github.com/sponsors/hynek"
+Mastodon = "https://mastodon.social/@hynek"
+Twitter = "https://x.com/hynek"
 
 
 [tool.hatch.version]
