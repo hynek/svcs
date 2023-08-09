@@ -1,20 +1,20 @@
 # Flask
 
-*svcs* has grown from my frustration with the repetitiveness of using the `get_x` that creates an `x` and then stores it on the `g` object [pattern](https://flask.palletsprojects.com/en/latest/appcontext/#storing-data).
+*svcs* has grown from my frustration with the repetitiveness of using the `get_x` that creates an `x` and then stores it on the {obj}`~flask.g` object [pattern](https://flask.palletsprojects.com/en/latest/appcontext/#storing-data).
 
-Therefore it comes with Flask support out of the box in the form of the `svcs.flask` module.
+Therefore it comes with Flask support out of the box in the form of the {mod}`svcs.flask` module.
 
 It:
 
 - puts the registry into `app.config["svcs_registry"]`,
 - unifies the caching of services on the `g` object by putting a container into `g.svcs_container`,
 - transparently retrieves them from there for you,
-- and installs a [`teardown_appcontext()`](http://flask.pocoo.org/docs/latest/api#flask.Flask.teardown_appcontext) handler that calls `close()` on the container when a request is done.
+- and installs a [`teardown_appcontext()`](http://flask.pocoo.org/docs/latest/api#flask.Flask.teardown_appcontext) handler that calls {meth}`svcs.Container.close()` when a request is done.
 
 
 ## Initialization
 
-You can add support for *svcs* by calling `svcs.flask.init_app(app)` in your [*application factory*](https://flask.palletsprojects.com/en/latest/patterns/appfactories/).
+You add support for *svcs* by calling {meth}`svcs.flask.init_app` in your [*application factory*](https://flask.palletsprojects.com/en/latest/patterns/appfactories/).
 For instance, to create a factory that uses a SQLAlchemy engine to produce connections, you could do this:
 
 

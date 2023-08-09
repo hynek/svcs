@@ -209,11 +209,15 @@ Hexagonal Architecture
     The *svcs* logo is a hexagon to remind you of this architecture.
 
     ::: {seealso}
+
     - <https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)>
 
-    - [*Functional Core, Imperative Shell*](https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell)
-
     - <https://alistair.cockburn.us/hexagonal-architecture/>
+
+    - [*Functional Core, Imperative Shell*](https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell) – a screencast by Gary Bernhardt.
+
+    - [*The Clean Architecture in Python*](https://www.youtube.com/watch?v=DJtef410XaM) – a 2014 talk by Brandon Rhodes.
+
     :::
 
 
@@ -222,8 +226,13 @@ IoC
 
 Inversion of Control
     ::: {seealso}
+
     - [*What is Inversion of Control and Why Does it Matter?*](https://seddonym.me/2019/04/15/inversion-of-control/)
+
     - [*Three Techniques for Inverting Control, in Python*](https://seddonym.me/2019/08/03/ioc-techniques/)
+
+    - [*Hoist Your I/O*](https://www.youtube.com/watch?v=PBQN62oUnN8) – a 2015 talk by Brandon Rhodes.
+
     :::
 
 
