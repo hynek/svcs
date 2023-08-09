@@ -176,6 +176,21 @@ Composition Root
     We recommend using *svcs* in your composition roots to get all the services you need and then pass them into your {term}`service layer`.
 
 
+IoC
+    See {term}`Inversion of Control`.
+
+Inversion of Control
+    ::: {seealso}
+
+    - [*What is Inversion of Control and Why Does it Matter?*](https://seddonym.me/2019/04/15/inversion-of-control/)
+
+    - [*Three Techniques for Inverting Control, in Python*](https://seddonym.me/2019/08/03/ioc-techniques/)
+
+    - [*Hoist Your I/O*](https://www.youtube.com/watch?v=PBQN62oUnN8) – a 2015 talk by Brandon Rhodes.
+
+    :::
+
+
 Dependency Inversion Principle
     Sometimes confused with {term}`Dependency Injection` due to the similarity of "Injection" and "Inversion", but only tangentially related.
     It's the D in [SOLID](https://en.wikipedia.org/wiki/SOLID) and also known as "*program against interfaces, not implementations*".
@@ -217,21 +232,6 @@ Hexagonal Architecture
     - [*Functional Core, Imperative Shell*](https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell) – a screencast by Gary Bernhardt.
 
     - [*The Clean Architecture in Python*](https://www.youtube.com/watch?v=DJtef410XaM) – a 2014 talk by Brandon Rhodes.
-
-    :::
-
-
-IoC
-    See {term}`Inversion of Control`.
-
-Inversion of Control
-    ::: {seealso}
-
-    - [*What is Inversion of Control and Why Does it Matter?*](https://seddonym.me/2019/04/15/inversion-of-control/)
-
-    - [*Three Techniques for Inverting Control, in Python*](https://seddonym.me/2019/08/03/ioc-techniques/)
-
-    - [*Hoist Your I/O*](https://www.youtube.com/watch?v=PBQN62oUnN8) – a 2015 talk by Brandon Rhodes.
 
     :::
 
