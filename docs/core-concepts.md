@@ -7,8 +7,8 @@ You will probably use some framework integration and not the low-level API direc
 
 ## Registries
 
-A **{class}`svcs.Registry`** allows to register factories for types.
-It's expected to live as long as your application lives.
+A **{class}`svcs.Registry`** allows registering factories for types.
+A registry should live as long as your application lives.
 Its only job is to store and retrieve factories along with some metadata.
 
 It is possible to register either factory callables or values:
@@ -105,7 +105,7 @@ How to achieve this in other frameworks elegantly is TBD.
 
 ### Cleanup
 
-If a factory is a [generator](https://docs.python.org/3/tutorial/classes.html#generators) and *yields* the instance instead of returning it, the generator will be remembered by the container.
+If a factory is a [generator](https://docs.python.org/3/tutorial/classes.html#generators) and *yields* the instance instead of returning it, the container will remember the generator.
 At the end, you run {meth}`svcs.Container.close()` and all generators will be finished (i.e. called `next(factory)` again).
 You can use this to close files, return database connections to a pool, et cetera.
 
@@ -124,13 +124,13 @@ You can also use containers as (async) context managers that (a)close automatica
 Cleaned up!
 ```
 
-Failing cleanups are logged at `warning` level but otherwise ignored.
+Failing cleanups are logged at warning level but otherwise ignored.
 
 ::: {important}
 The key idea is that your business code doesn't have to care about cleaning up services it has requested.
 :::
 
-That makes it even easier to test because the business codes makes fewer assumptions about the object it's getting.
+That makes testing even easier because the business code makes fewer assumptions about the object it's getting.
 
 (health)=
 
@@ -140,17 +140,20 @@ Each registered service may have a `ping` callable that you can use for health c
 You can request all pingable registered services with {meth}`svcs.Container.get_pings()`.
 This returns a list of {class}`svcs.ServicePing` objects that currently have a name property to identify the ping and a `ping` method that instantiates the service, adds it to the cleanup list, and runs the ping.
 
-If you have async services (either factory or ping callable), you can use `aping()` instead.
-`aping()` works with sync services too, so you can use it universally in async code.
+If you have async services (factory or ping callable), you can use `aping()` instead.
+`aping()` works with sync services, too, so you can use it universally in async code.
 You can look at the `is_async` property to check whether you *need* to use `aget()`, though.
 
-Here's an example for a health check endpoint in Pyramid[^flask]:
+Here's how a health check endpoint could look in Flask or Pyramid:
 
-[^flask]: See the [Flask integration](flask.md) chapter for a Flask equivalent.
-
+::: {tab} Flask
+```{literalinclude} examples/health_check_flask.py
+```
+:::
+::: {tab} Pyramid
 ```{literalinclude} examples/health_check_pyramid.py
 ```
-
+:::
 
 ## Life Cycle Summary
 
@@ -159,21 +162,21 @@ On the other hand, the {class}`svcs.Container` object should live on a request-s
 
 
 ::: {important}
-The core APIs only use vanilla objects without any global state but also without any comfort.
+The core APIs only use vanilla objects without any global state – but also without any comfort.
 It gets more interesting when using framework-specific integrations where the life cycle of the container and, thus, services is handled automatically.
 :::
 
 
 ## Debugging Registrations
 
-If you end up being confused where a particular factory for a type has been defined, *svcs* logs every registration at debug level along with a stack trace.
+If you are confused about where a particular factory for a type has been defined, *svcs* logs every registration at debug level along with a stack trace.
 
 Set the *svcs* logger to `DEBUG` to see them:
 
 ```{literalinclude} examples/debugging_with_logging.py
 ```
 
-Gives you an output like this:
+It gives you an output like this:
 
 ```text
 svcs: registered factory <built-in method now of type object at 0x103468980> for service type datetime.datetime
@@ -190,7 +193,7 @@ Stack (most recent call last):
     log.debug(
 ```
 
-You can see that the datetime factory and the str value have been both registered in `debugging_with_logging.py`, down to the line number.
+You can see that the datetime factory and the str value have both been registered in `debugging_with_logging.py`, down to the line number.
 
 
 ## API Reference

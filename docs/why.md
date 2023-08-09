@@ -56,7 +56,7 @@ def cleanup():
 ```
 
 The generator-based setup and cleanup may remind you of [*pytest* fixtures](https://docs.pytest.org/en/stable/explanation/fixtures.html).
-The hooks that are defined as `on_registry_close` are called when you call `Registry.close()` – e.g. when your application is shutting down.
+The callbacks that are defined as `on_registry_close` are called when you call `Registry.close()` – e.g. when your application is shutting down.
 
 Next, if you've registered health checks (called *pings*) for your services, you can write a simple health check endpoint.
 This is how it could look in Flask or Pyramid:

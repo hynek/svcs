@@ -108,8 +108,8 @@ class Registry:
 
     An instance of this should live as long as your application does.
 
-    Also works as a context manager that runs ``on_registry_close`` hooks on
-    exit:
+    Also works as a context manager that runs ``on_registry_close`` callbacks
+    on exit:
 
     .. doctest::
 
@@ -179,7 +179,7 @@ class Registry:
         Register *factory* to be used when asked for a *svc_type*.
 
         Repeated registrations overwrite previous ones, but the
-        *on_registry_close* hooks are run all together when the registry is
+        *on_registry_close* callbacks are run all together when the registry is
         closed.
 
         Args:
@@ -284,9 +284,9 @@ class Registry:
 
     def close(self) -> None:
         """
-        Clear registrations and run synchronous *on_registry_close* hooks.
+        Clear registrations and run synchronous *on_registry_close* callbacks.
 
-        Async hooks are *not* awaited and a warning is raised
+        Async callbacks are *not* awaited and a warning is raised
 
         Errors are logged at warning level, but otherwise ignored.
         """
@@ -307,7 +307,7 @@ class Registry:
                 log.debug("closed %r", name)
             except Exception:  # noqa: BLE001
                 log.warning(
-                    "Registry's on_registry_close hook failed for %r.",
+                    "Registry's on_registry_close callback failed for %r.",
                     name,
                     exc_info=True,
                     extra={"svcs_service_name": name},
@@ -318,7 +318,7 @@ class Registry:
 
     async def aclose(self) -> None:
         """
-        Clear registrations and run all *on_registry_close* hooks.
+        Clear registrations and run all *on_registry_close* callbacks.
 
         Errors are logged at warning level, but otherwise ignored.
 
@@ -340,7 +340,7 @@ class Registry:
                     log.debug("closed %r", name)
             except Exception:  # noqa: BLE001, PERF203
                 log.warning(
-                    "Registry's on_registry_close hook failed for %r.",
+                    "Registry's on_registry_close callback failed for %r.",
                     name,
                     exc_info=True,
                     extra={"svcs_service_name": name},

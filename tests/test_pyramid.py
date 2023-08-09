@@ -48,8 +48,8 @@ def test_close_nop():
 
 def test_close(config):
     """
-    Closing a config with svcs_registry calls on_registry_close hooks on the
-    registered svcs.pyramid.
+    Closing a config with svcs_registry calls on_registry_close callbacks on
+    the registered svcs.pyramid.
     """
     orc = Mock()
 

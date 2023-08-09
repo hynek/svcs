@@ -93,10 +93,10 @@ class TestRegistry:
         Calling close raises a warning if there are async cleanups.
         """
 
-        async def hook():
+        async def callback():
             ...
 
-        registry.register_factory(Service, Service, on_registry_close=hook)
+        registry.register_factory(Service, Service, on_registry_close=callback)
 
         with pytest.warns(
             UserWarning,
@@ -145,7 +145,7 @@ class TestRegistry:
             ...
 
         assert [
-            "Registry's on_registry_close hook failed for 'tests.ifaces.Service'."
+            "Registry's on_registry_close callback failed for 'tests.ifaces.Service'."
         ] == caplog.messages
         assert "tests.ifaces.Service" == caplog.records[0].svcs_service_name
 
