@@ -182,8 +182,8 @@ Dependency Inversion Principle
 
     The goal is to achieve loose coupling by making code depend on interfaces instead of concrete implementations.
 
-    Given that Python is dynamic and you're free to ignore type hints in your tests, the usefulness isn't quite as high as in more static languages.
-    Nobody is going to stop you to pass a Mock where a Django `QuerySet` is expected.
+    Since Python is dynamic and you're free to ignore type hints in your tests, the usefulness isn't quite as high as in more static languages.
+    Nobody will stop you from passing a Mock where a Django `QuerySet` is expected.
 
     ::: {seealso}
     - {doc}`typing-caveats` regarding abstract classes and *svcs*.

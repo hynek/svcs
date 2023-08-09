@@ -28,7 +28,7 @@ def make_app():
 ## Service Acquisition
 
 Every {class}`~pyramid.request.Request` object that is passed into views will have an `svcs` attribute that is a {class}`svcs.Container` that is scoped to the request.
-You can uses {func}`svcs.pyramid.services()` to access it in a type-safe way:
+You can use {func}`svcs.pyramid.services()` to access it in a type-safe way:
 
 
 ```python
