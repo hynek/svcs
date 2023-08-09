@@ -175,7 +175,7 @@ Set the *svcs* logger to `DEBUG` to see them:
 
 Gives you an output like this:
 
-```
+```plaintext
 svcs: registered factory <built-in method now of type object at 0x103468980> for service type datetime.datetime
 Stack (most recent call last):
   File "/Users/hynek/FOSS/svcs/docs/examples/debugging_with_logging.py", line 41, in <module>
