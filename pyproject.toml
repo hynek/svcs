@@ -46,7 +46,7 @@ Documentation = "https://svcs.hynek.me/"
 Source = "https://github.com/hynek/svcs"
 Funding = "https://github.com/sponsors/hynek"
 Mastodon = "https://mastodon.social/@hynek"
-Twitter = "https://x.com/hynek"
+Twitter = "https://twitter.com/hynek"
 
 
 [tool.hatch.version]
