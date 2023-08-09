@@ -524,8 +524,7 @@ class Container:
         or :mod:`abc` classes.
 
         Note:
-             See https://github.com/python/mypy/issues/4717 why this is
-             necessary.
+             See :doc:`typing-caveats` why this is necessary.
         """
         return self.get(*svc_types)
 
