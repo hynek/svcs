@@ -4,7 +4,7 @@
 
 If you try to `get()` an abstract class like an `Protocol` or an *abstract base classes* you'll get a Mypy error like this:
 
-```
+```text
 error: Only concrete class can be given where "type[P]" is expected  [type-abstract]
 ```
 

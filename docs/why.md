@@ -2,7 +2,8 @@
 
 A {term}`service locator` like *svcs* allows you to configure and manage all your {term}`service`s in *one central place*, access them in a *consistent* way without worrying about *cleaning them up* and achieve *loose coupling*.
 
----
+
+## Modus Operandi
 
 In practice, that means that you say "*Give me a database connection*!" at runtime, and *svcs* will give you whatever you've configured to return when asked for a database connection.
 That can be an actual database connection, or it can be a mock object for testing.
