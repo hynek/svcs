@@ -67,7 +67,7 @@ def view(request):
     db, api, cache = svcs_from(request).get(Database, WebAPIClient, Cache)
 ```
 
-It's ensured that to a type checker like [Mypy](https://mypy-lang.org), `db` has the type `Database`, `api` has the type `WebAPIClient`, and `cache` has the type `Cache`.
+To a type checker like [Mypy](https://mypy-lang.org), `db` has the type `Database`, `api` has the type `WebAPIClient`, and `cache` has the type `Cache`.
 
 <!-- end benefits -->
 
