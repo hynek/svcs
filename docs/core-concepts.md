@@ -138,11 +138,11 @@ That makes testing even easier because the business code makes fewer assumptions
 
 Each registered service may have a `ping` callable that you can use for health checks.
 You can request all pingable registered services with {meth}`svcs.Container.get_pings()`.
-This returns a list of {class}`svcs.ServicePing` objects that currently have a name property to identify the ping and a `ping` method that instantiates the service, adds it to the cleanup list, and runs the ping.
+This returns a list of {class}`svcs.ServicePing` objects that currently have a name property to identify the ping and a {meth}`~svcs.ServicePing.ping()` method that instantiates the service, adds it to the cleanup list, and runs the ping.
 
-If you have async services (factory or ping callable), you can use `aping()` instead.
+If you have async services (factory or ping callable), you can use {meth}`~svcs.ServicePing.aping()` instead.
 `aping()` works with sync services, too, so you can use it universally in async code.
-You can look at the `is_async` property to check whether you *need* to use `aget()`, though.
+You can look at the {attr}`~svcs.ServicePing.is_async` property to check whether you *need* to use `aget()`, though.
 
 Here's how a health check endpoint could look in Flask or Pyramid:
 
