@@ -180,14 +180,25 @@ IoC
     See {term}`Inversion of Control`.
 
 Inversion of Control
-    Inversion of Control is too complicated and essential to explain in a few sentences.
-    So if you feel like you haven't fully grokked it, we *strongly* recommend consulting the links at the end of this entry.
+    Inversion of Control is a complicated name for a simple idea.
 
-    It's about accepting that separating a big ball of mud into small modules is still a lot of dirt, just spread out – which is worse.
-    Instead, it's necessary to break the coupling between classes and modules – and achieve loose coupling.
+    In the following code, we have a function that adds a user to a database then sends them an email. To do that, it needs an `SmtpSender` and a `DbConnection`
+    which it constructs. This makes the code hard to test, since we don't want our unit tests to send people emails.
 
-    The most widespread method to achieve that is {term}`Dependency Injection`.
-
+    ```python
+    def add_user_to_org(email: str):
+        smtp = SmtpSender()
+        db = get_database_connection()
+        
+        try:
+            user = db.create_user(email)
+            smtp.send_welcome_email(user)
+        except DuplicateUserError:
+            log.warning("Duplicate user", email=email)
+    ```
+    
+    To fix that, we need to take _control_ of the dependencies out of the function, and provide them somehow, usually through dependency injection.
+    
     ::: {seealso}
 
     - [*What is Inversion of Control and Why Does it Matter?*](https://seddonym.me/2019/04/15/inversion-of-control/)
