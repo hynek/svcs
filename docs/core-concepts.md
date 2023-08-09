@@ -152,7 +152,7 @@ Here's an example for a health check endpoint in Pyramid[^flask]:
 ```
 
 
-## Summary
+## Life Cycle Summary
 
 The {class}`svcs.Registry` object should live on an application-scoped object like Flask's {attr}`flask.Flask.config` object or in Pyramid's {attr}`pyramid.config.Configurator.registry`.
 On the other hand, the {class}`svcs.Container` object should live on a request-scoped object like Flask's {data}`~flask.g` object or Pyramid's {class}`~pyramid.request.Request` object.
@@ -162,6 +162,35 @@ On the other hand, the {class}`svcs.Container` object should live on a request-s
 The core APIs only use vanilla objects without any global state but also without any comfort.
 It gets more interesting when using framework-specific integrations where the life cycle of the container and, thus, services is handled automatically.
 :::
+
+
+## Debugging Registrations
+
+If you end up being confused where a particular factory for a type has been defined, *svcs* logs every registration at debug level along with a stack trace.
+
+Set the *svcs* logger to `DEBUG` to see them:
+
+```{literalinclude} examples/debugging_with_logging.py
+```
+
+Gives you an output like this:
+
+```
+svcs: registered factory <built-in method now of type object at 0x103468980> for service type datetime.datetime
+Stack (most recent call last):
+  File "/Users/hynek/FOSS/svcs/docs/examples/debugging_with_logging.py", line 41, in <module>
+    reg.register_factory(datetime, datetime.now)
+  File "/Users/hynek/FOSS/svcs/src/svcs/_core.py", line 216, in register_factory
+    log.debug(
+svcs: registered value 'Hello World' for service type builtins.str
+Stack (most recent call last):
+  File "/Users/hynek/FOSS/svcs/docs/examples/debugging_with_logging.py", line 42, in <module>
+    reg.register_value(str, "Hello World")
+  File "/Users/hynek/FOSS/svcs/src/svcs/_core.py", line 252, in register_value
+    log.debug(
+```
+
+You can see that the datetime factory and the str value have been both registered in `debugging_with_logging.py`, down to the line number.
 
 
 ## API Reference

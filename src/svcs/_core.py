@@ -221,6 +221,7 @@ class Registry:
                 "svcs_service_name": rs.name,
                 "svcs_factory_name": _full_name(factory),
             },
+            stack_info=True,
         )
 
     def register_value(
@@ -253,6 +254,7 @@ class Registry:
             value,
             rs.name,
             extra={"svcs_service_name": rs.name, "svcs_value": value},
+            stack_info=True,
         )
 
     def _register_factory(
