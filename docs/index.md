@@ -43,8 +43,8 @@ Security Policy <https://github.com/hynek/svcs/blob/main/.github/SECURITY.md>
 ```
 
 
-## Project Links
+## Credits
 
 ```{include} ../README.md
-:start-after: "## Project Links"
+:start-after: "## Credits"
 ```
