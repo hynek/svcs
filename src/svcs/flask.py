@@ -40,16 +40,13 @@ def svcs_from(g: _AppCtxGlobals = g) -> Container:
 FlaskAppT = TypeVar("FlaskAppT", bound=Flask)
 
 
-def init_app(app: FlaskAppT, registry: Registry | None = None) -> FlaskAppT:
+def init_app(app: FlaskAppT, *, registry: Registry | None = None) -> FlaskAppT:
     """
     Initialize *app* for *svcs*.
 
     Creates a registry for you if you don't provide one.
     """
-    if registry is None:
-        registry = Registry()
-
-    app.config["svcs_registry"] = registry
+    app.config["svcs_registry"] = registry or Registry()
     app.teardown_appcontext(teardown)
 
     return app

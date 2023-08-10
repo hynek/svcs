@@ -22,6 +22,11 @@ __all__ = [
 ]
 
 try:
+    from . import aiohttp
+except ImportError:
+    __all__ += ["aiohttp"]
+
+try:
     from . import flask
 except ImportError:
     __all__ += ["flask"]

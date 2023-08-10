@@ -54,19 +54,14 @@ if "dev" in release:
 
 exclude_patterns = ["_build"]
 
-nitpick_ignore = [
-    ("py:class", "T1"),
-    ("py:class", "T2"),
-    ("py:class", "T3"),
-    ("py:class", "T4"),
-    ("py:class", "T5"),
-    ("py:class", "T6"),
-    ("py:class", "T7"),
-    ("py:class", "T8"),
-    ("py:class", "T9"),
-    ("py:class", "T10"),
-    ("py:class", "svcs._core.T1"),
-]
+nitpick_ignore = (
+    [
+        ("py:class", "aiohttp.web_request.Request"),
+        ("py:class", "svcs._core.T1"),
+    ]
+    + [("py:class", f"T{i}") for i in range(1, 11)]
+    + [("py:class", f"svcs.aiohttp.T{i}") for i in range(1, 11)]
+)
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
@@ -113,6 +108,7 @@ linkcheck_ignore = [
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
+    "aiohttp": ("https://docs.aiohttp.org/en/stable/", None),
     "flask": ("https://flask.palletsprojects.com/en/latest/", None),
     "pyramid": (
         "https://docs.pylonsproject.org/projects/pyramid/en/main/",

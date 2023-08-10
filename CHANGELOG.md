@@ -15,6 +15,10 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/23.12.0...HEAD)
 
+### Added
+
+- AIOHTTP integration.
+
 
 ## [23.12.0](https://github.com/hynek/svcs/compare/23.11.0...23.12.0) - 2023-08-09
 

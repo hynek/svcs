@@ -31,8 +31,8 @@ def svcs_from(request: Request | None = None) -> svcs.Container:
 
 def init(
     config: Configurator,
-    registry: svcs.Registry | None = None,
     *,
+    registry: svcs.Registry | None = None,
     tween_under: Any = None,
     tween_over: Any = None,
 ) -> None:

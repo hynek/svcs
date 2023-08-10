@@ -16,7 +16,7 @@ def factory_with_cleanup() -> Generator[int, None, None]:
 reg = svcs.Registry()
 
 app = flask.Flask("tests")
-app = svcs.flask.init_app(app, reg)
+app = svcs.flask.init_app(app, registry=reg)
 app = svcs.flask.init_app(app)
 
 svcs.flask.replace_value(int, 1)

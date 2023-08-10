@@ -26,19 +26,20 @@ dependencies = [
 
 [project.optional-dependencies]
 tests = ["pytest", "pytest-asyncio", "sybil"]
-typing = ["mypy>=1.4", "flask", "pyramid"]
+typing = ["mypy>=1.4", "aiohttp", "flask", "pyramid"]
 docs = [
   "sphinx",
   "sphinx-notfound-page",
   "sphinx-inline-tabs",
   "myst-parser",
   "furo",
+  "aiohttp",
   "flask",
   "pyramid",
   "sybil",
   "pytest",
 ]
-dev = ["svcs[tests,typing]", "tox>4", "flask", "webtest", "pyramid"]
+dev = ["svcs[tests,typing]", "tox>4"]
 
 [project.urls]
 Changelog = "https://github.com/hynek/svcs/blob/main/CHANGELOG.md"

@@ -27,7 +27,7 @@ def _app():
 
 @pytest.fixture(name="clean_app_ctx")
 def _clean_app_ctx(registry, app):
-    svcs.flask.init_app(app, registry)
+    svcs.flask.init_app(app, registry=registry)
     with app.app_context() as ctx:
         yield ctx
 
@@ -216,7 +216,7 @@ class TestNonContextHelpers:
         """
         register_factory() registers a factory to the app that is passed.
         """
-        svcs.flask.init_app(app, registry)
+        svcs.flask.init_app(app, registry=registry)
 
         svcs.flask.register_factory(app, Interface, Service)
 
@@ -226,7 +226,7 @@ class TestNonContextHelpers:
         """
         register_value() registers a value to the app that is passed.
         """
-        svcs.flask.init_app(app, registry)
+        svcs.flask.init_app(app, registry=registry)
 
         svcs.flask.register_value(app, Interface, 42)
 
@@ -249,7 +249,7 @@ class TestInitApp:
         """
         registry = svcs.Registry()
         app = flask.Flask("tests")
-        svcs.flask.init_app(app, registry)
+        svcs.flask.init_app(app, registry=registry)
 
         assert registry is app.config["svcs_registry"]
 

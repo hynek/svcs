@@ -71,7 +71,7 @@ To a type checker like [Mypy](https://mypy-lang.org), `db` has the type `Databas
 
 <!-- end benefits -->
 
-*svcs* comes with seamless integration for the **Flask** and **Pyramid** web frameworks and has first-class **async** support.
+*svcs* comes with seamless integration for the **AIOHTTP**, **Flask** and **Pyramid** web frameworks and has first-class **async** support.
 
 <!-- end index -->
 <!-- begin typing -->

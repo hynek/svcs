@@ -2,7 +2,7 @@
 
 *svcs* has grown from my frustration with the repetitiveness of using the `get_x` that creates an `x` and then stores it on the {obj}`~flask.g` object [pattern](https://flask.palletsprojects.com/en/latest/appcontext/#storing-data).
 
-Therefore it comes with Flask support out of the box in the form of the {mod}`svcs.flask` module.
+Therefore it comes with [Flask](https://flask.palletsprojects.com/en/2.3.x/) support out of the box in the form of the {mod}`svcs.flask` module.
 
 It:
 

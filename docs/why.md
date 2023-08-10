@@ -61,8 +61,12 @@ The generator-based setup and cleanup may remind you of [*pytest* fixtures](http
 The callbacks defined as `on_registry_close` are called when you call `Registry.close()` -- for example, when your application is shutting down.
 
 Next, you can write a simple health check endpoint if you've registered health checks (called *pings*) for your services.
-This is how it could look in Flask or Pyramid:
+This is how it could look with the shipped integrations:
 
+::: {tab} AIOHTTP
+```{literalinclude} examples/health_check_aiohttp.py
+```
+:::
 ::: {tab} Flask
 ```{literalinclude} examples/health_check_flask.py
 ```
