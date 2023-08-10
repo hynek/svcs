@@ -8,8 +8,8 @@ import pytest
 
 import svcs
 
-from .fake_factories import nop
-from .ifaces import AnotherService, Interface, Service
+from tests.fake_factories import nop
+from tests.ifaces import AnotherService, Interface, Service
 
 
 try:

@@ -1,6 +1,6 @@
-# Custom Integrations
+# Write Your Own!
 
-Once you've understood how registries and containers interact (see {doc}`core-concepts` if not), you already know how to write your own integrations!
+Once you've understood how registries and containers interact (see {doc}`../core-concepts` if not), you already know how to write your own integrations!
 
 All you need to do is:
 

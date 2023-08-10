@@ -25,9 +25,7 @@ Read on in *{doc}`why`*, if you find that intriguing!
 
 why
 core-concepts
-flask
-pyramid
-custom
+integrations/index
 typing-caveats
 glossary
 security
