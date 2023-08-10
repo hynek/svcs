@@ -81,15 +81,15 @@ Service Location
     See {term}`Service Locator`.
 
 Service Locator
-    The [architectural pattern](https://en.wikipedia.org/wiki/Architectural_pattern) implemented by *svcs*.
+    The [architectural pattern](https://en.wikipedia.org/wiki/Architectural_pattern) implemented by *svcs* and a way to achieve {term}`Inversion of Control` and loose coupling.
 
-    **Like** {term}`dependency injection`, it's a way to achieve loose coupling between your business code and the services it depends on by having a central registry of factories for those services.
+    **Like** {term}`dependency injection`, it depends on having a central registry of factories for services that aren't instantiated directly in your business code.
 
-    **Unlike** dependency injection, it's *imperative* (and not declarative), as you ask for services explicitly at runtime instead of having them injected into your business code based on function parameter types, or similar.
+    **Unlike** dependency injection, it's *imperative*:
+    You ask for services explicitly at runtime instead of having them injected into your business code.
+    The injection also usually requires opaque magic and meddling with your function/method definitions when using dependency injection frameworks.
 
-    That usually requires less opaque magic since nothing meddles with your function/method definitions.
-
-    The active acquisition of services by calling `get()` when you *know* for sure you're going to need it avoids the conundrum of either having to pass a factory (e.g., a connection pool -- which also puts the onus of cleanup on you) or eagerly creating services that you never use:
+    The active acquisition of services by calling `get()` when you *know* for sure you're going to need them avoids the conundrum of either having to pass a factory (like a connection pool -- which also puts the onus of cleanup on you) or eagerly creating services that you never use:
 
     % skip: next
 
@@ -107,9 +107,11 @@ Service Locator
     ```
 
     ::: {important}
-    If you use *svcs* like in the example above, you're actually doing {term}`dependency injection` -- and that's a Good Thing™.
+    If you use *svcs* like in the example above, you're doing {term}`dependency injection` -- and that's a Good Thing™.
 
     Obtaining the database using {meth}`svcs.Container.get()` *is* service location, but passing it into your {term}`service layer` -- without using it yourself -- makes the view a {term}`composition root` and `handle_form_data()` the entry point into your service layer.
+
+    You could say that you're moving your composition root into the view where it acquires services on demand as it needs them.
 
     We strongly recommend using *svcs* like this.
     :::
@@ -164,7 +166,7 @@ Dependency Injection
 
     ::: {seealso}
     - <https://en.wikipedia.org/wiki/Dependency_injection>
-    - [*incant*](https://github.com/Tinche/incant), a lovely package that implements dependency injection in Python.
+    - [*incant*](https://github.com/Tinche/incant), a lovely dependency injection framework for Python.
     :::
 
 
