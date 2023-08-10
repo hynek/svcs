@@ -26,7 +26,7 @@ dependencies = [
 
 [project.optional-dependencies]
 tests = ["pytest", "pytest-asyncio", "sybil"]
-typing = ["mypy>=1.4", "aiohttp", "flask", "pyramid"]
+typing = ["mypy>=1.4", "aiohttp; python_version<'3.12'", "flask", "pyramid; python_version<'3.12'"]
 docs = [
   "sphinx",
   "sphinx-notfound-page",
