@@ -125,10 +125,6 @@ If you still prefer a dependency injection framework, check out [*incant*](https
 
 If you're still interested, learn about our [core concepts](core-concepts) first – it's just two of them!
 
-Once you've understood the life cycles of registries and containers, you can look our framework integrations that get you started in no time:
-
-- [Flask](integrations/flask.md)
-- [Pyramid](integrations/pyramid.md)
-- Or learn to write [your own](integrations/custom.md)!
+Once you've understood the life cycles of registries and containers, you can look our [framework integrations](integrations/index.md) which should get you started right away.
 
 If you get overwhelmed by the jargon, we have put much effort into our [glossary](glossary)!

@@ -1,6 +1,10 @@
+---
+hide-toc: true
+---
+
 # *svcs*: A Flexible Service Locator
 
-Release **{sub-ref}`release`**  ([What's new?](changelog))
+Release **{sub-ref}`release`**  ([What's new?](https://github.com/hynek/svcs/blob/main/CHANGELOG.md))
 
 ::: {admonition} ☠️ Not ready yet! ☠️
 :class: danger
@@ -17,18 +21,25 @@ The code has 100% test and type coverage, and the shipped *Flask* and *Pyramid* 
 
 Read on in *{doc}`why`*, if you find that intriguing!
 
-
-## User's Guide
-
 ```{toctree}
-:maxdepth: 2
+:hidden:
 
 why
 core-concepts
 integrations/index
 typing-caveats
 glossary
-security
+```
+
+```{toctree}
+:hidden:
+:caption: Meta
+
+PyPI <https://pypi.org/project/svcs/>
+GitHub <https://github.com/hynek/svcs/>
+Changelog <https://github.com/hynek/svcs/blob/main/CHANGELOG.md>
+Contributing <https://github.com/hynek/svcs/blob/main/.github/CONTRIBUTING.md>
+Security Policy <https://github.com/hynek/svcs/blob/main/.github/SECURITY.md>
 ```
 
 
@@ -36,11 +47,4 @@ security
 
 ```{include} ../README.md
 :start-after: "## Project Links"
-```
-
-
-```{toctree}
-:hidden: true
-
-changelog
 ```
