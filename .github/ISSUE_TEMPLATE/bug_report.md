@@ -1,6 +1,6 @@
 ---
 name: Bug report
-labels: bug
+labels: [bug]
 ---
 
 <!--
