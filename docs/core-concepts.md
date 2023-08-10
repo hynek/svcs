@@ -73,7 +73,7 @@ True
 'Hello World'
 ```
 
-A container lives as long as you want the instances to live – for example, as long as a request lives.
+A container lives as long as you want the instances to live -- for example, as long as a request lives.
 
 If a factory takes a first argument called `svcs_container` or the first argument (of any name) is annotated as being {class}`svcs.Container`, the current container instance is passed into the factory as the first *positional* argument allowing for recursive service acquisition:
 
@@ -93,7 +93,7 @@ If a factory takes a first argument called `svcs_container` or the first argumen
 ```
 
 ::: {note}
-It is possible to overwrite registered service factories later – e.g., for testing – **without monkey-patching**.
+It is possible to overwrite registered service factories later -- e.g., for testing -- **without monkey-patching**.
 This is especially interesting if you want to replace a low-level service with a mock without re-jiggering all services that depend on it.
 
 You have to remove possibly cached instances from the container though ({meth}`svcs.Container.forget_about()`).
@@ -162,7 +162,7 @@ Here's how a health check endpoint could look in Flask or Pyramid:
 
 
 ::: {important}
-The core APIs only use vanilla objects without any global state – but also without any comfort.
+The core APIs only use vanilla objects without any global state -- but also without any comfort.
 It gets more interesting when using framework-specific integrations where the life cycle of the container and, thus, services is handled automatically.
 :::
 

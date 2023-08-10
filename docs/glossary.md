@@ -59,7 +59,7 @@ Service Layer
             unit_of_work.commit()
     ```
 
-    In this case, the `unit_of_work` and `mail_q` parameters are services that are used by the service `add_user_to_org()` and are passed – or: *injected* – by the {term}`composition root`.
+    In this case, the `unit_of_work` and `mail_q` parameters are services that are used by the service `add_user_to_org()` and are passed -- or: *injected* -- by the {term}`composition root`.
 
     The business rules are enforced by `domain_model.check_if_can_add_user_to_org()` which is a pure function working on plain domain objects and doesn't use any services.
 
@@ -89,7 +89,7 @@ Service Locator
 
     That usually requires less opaque magic since nothing meddles with your function/method definitions.
 
-    The active acquisition of services by calling `get()` when you *know* for sure you're going to need it avoids the conundrum of either having to pass a factory (e.g., a connection pool – which also puts the onus of cleanup on you) or eagerly creating services that you never use:
+    The active acquisition of services by calling `get()` when you *know* for sure you're going to need it avoids the conundrum of either having to pass a factory (e.g., a connection pool -- which also puts the onus of cleanup on you) or eagerly creating services that you never use:
 
     % skip: next
 
@@ -99,7 +99,7 @@ Service Locator
             # Form is valid; only NOW get a DB connection
             # and pass it into your service layer.
             return handle_form_data(
-                request.services.get(Database),
+                svcs_from(request).get(Database),
                 form.data,
             )
 
@@ -107,9 +107,9 @@ Service Locator
     ```
 
     ::: {important}
-    If you use *svcs* like in the example above, you're actually doing {term}`dependency injection` – and that's a Good Thing™.
+    If you use *svcs* like in the example above, you're actually doing {term}`dependency injection` -- and that's a Good Thing™.
 
-    Obtaining the database using `request.services.get()` *is* service location, but passing it into your {term}`service layer` without using it yourself makes the view a {term}`composition root` and `handle_form_data()` the entry point into your service layer.
+    Obtaining the database using {meth}`svcs.Container.get()` *is* service location, but passing it into your {term}`service layer` -- without using it yourself -- makes the view a {term}`composition root` and `handle_form_data()` the entry point into your service layer.
 
     We strongly recommend using *svcs* like this.
     :::
@@ -136,7 +136,7 @@ Service Locator
 
 Dependency Injection
     Dependency Injection means that the {term}`service layer` is called with all services it needs to do its job.
-    It is a fundamental technique to achieve loose coupling between your business code and the services it depends on – and to achieve {term}`Inversion of Control`.
+    It is a fundamental technique to achieve loose coupling between your business code and the services it depends on -- and to achieve {term}`Inversion of Control`.
 
     Often when talking about dependency injection, people think of *dependency injection frameworks* that use decorators or other magic to inject services into their code.
     But *dependency injection* just means that services are passed from the outside, with no control over how that happens (hence {term}`Inversion of Control`).
@@ -218,7 +218,7 @@ Inversion of Control
 
     - [*Three Techniques for Inverting Control, in Python*](https://seddonym.me/2019/08/03/ioc-techniques/)
 
-    - [*Hoist Your I/O*](https://www.youtube.com/watch?v=PBQN62oUnN8) – a 2015 talk by Brandon Rhodes.
+    - [*Hoist Your I/O*](https://www.youtube.com/watch?v=PBQN62oUnN8) -- a 2015 talk by Brandon Rhodes.
 
     :::
 
@@ -261,9 +261,9 @@ Hexagonal Architecture
 
     - <https://alistair.cockburn.us/hexagonal-architecture/>
 
-    - [*Functional Core, Imperative Shell*](https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell) – a screencast by Gary Bernhardt.
+    - [*Functional Core, Imperative Shell*](https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell) -- a screencast by Gary Bernhardt.
 
-    - [*The Clean Architecture in Python*](https://www.youtube.com/watch?v=DJtef410XaM) – a 2014 talk by Brandon Rhodes.
+    - [*The Clean Architecture in Python*](https://www.youtube.com/watch?v=DJtef410XaM) -- a 2014 talk by Brandon Rhodes.
 
     :::
 
