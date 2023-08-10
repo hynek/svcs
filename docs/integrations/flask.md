@@ -102,7 +102,7 @@ def index() -> flask.ResponseValue:
 The {func}`svcs.flask.get_pings` helper will transparently pick the container from `g`.
 So, if you would like a [health endpoint](https://kubernetes.io/docs/reference/using-api/health-checks/), it could look like this:
 
-```{literalinclude} examples/health_check_flask.py
+```{literalinclude} ../examples/health_check_flask.py
 ```
 
 (flask-testing)=

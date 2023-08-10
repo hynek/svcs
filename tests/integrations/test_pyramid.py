@@ -4,8 +4,8 @@ import pytest
 
 import svcs
 
-from .fake_factories import int_factory
-from .ifaces import AnotherService, Service
+from tests.fake_factories import int_factory
+from tests.ifaces import AnotherService, Service
 
 
 try:
