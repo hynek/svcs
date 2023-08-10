@@ -12,6 +12,7 @@ import pytest
 import svcs
 
 from tests.fake_factories import async_int_factory
+from tests.ifaces import Service
 
 
 try:
@@ -85,7 +86,25 @@ def _app(registry):
 
 @pytest.mark.asyncio()
 class TestAIOHTTP:
-    async def test_aclose_robust(self):
+    async def test_aclose_registry_ok(self, app):
+        """
+        aclose_registry closes the registry.
+        """
+        closed = False
+
+        async def closer():
+            nonlocal closed
+            closed = True
+
+        svcs.aiohttp.register_factory(
+            app, Service, Service, on_registry_close=closer
+        )
+
+        await svcs.aiohttp.aclose_registry(app)
+
+        assert closed
+
+    async def test_aclose_registry_robust(self):
         """
         aclose_registry handles lack of of registry gracefully.
         """
