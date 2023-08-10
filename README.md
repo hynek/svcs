@@ -90,7 +90,7 @@ Read on in [*Why?*](https://svcs.hynek.me/en/latest/why.html), if you find that 
 ## Project Links
 
 - [**PyPI**](https://pypi.org/project/svcs/)
-- [**Source Code**](https://github.com/hynek/svcs)
+- [**GitHub**](https://github.com/hynek/svcs)
 - [**Documentation**](https://svcs.hynek.me)
 - [**Changelog**](https://github.com/hynek/svcs/blob/main/CHANGELOG.md)
 

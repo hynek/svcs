@@ -43,7 +43,7 @@ dev = ["svcs[tests,typing]", "tox>4", "flask", "webtest", "pyramid"]
 [project.urls]
 Changelog = "https://github.com/hynek/svcs/blob/main/CHANGELOG.md"
 Documentation = "https://svcs.hynek.me/"
-Source = "https://github.com/hynek/svcs"
+GitHub = "https://github.com/hynek/svcs"
 Funding = "https://github.com/sponsors/hynek"
 Mastodon = "https://mastodon.social/@hynek"
 Twitter = "https://twitter.com/hynek"
