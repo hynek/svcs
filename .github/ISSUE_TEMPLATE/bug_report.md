@@ -1,5 +1,6 @@
 ---
 name: Bug report
+about: Bug reports only please! 💛
 labels: [bug]
 ---
 
