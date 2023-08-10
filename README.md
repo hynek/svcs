@@ -93,6 +93,7 @@ Read on in [*Why?*](https://svcs.hynek.me/en/latest/why.html), if you find that 
 - [**GitHub**](https://github.com/hynek/svcs)
 - [**Documentation**](https://svcs.hynek.me)
 - [**Changelog**](https://github.com/hynek/svcs/blob/main/CHANGELOG.md)
+- [**Funding**](https://hynek.me/say-thanks/)
 
 <!-- end pypi -->
 
