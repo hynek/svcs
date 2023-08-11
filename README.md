@@ -75,7 +75,7 @@ To a type checker like [Mypy](https://mypy-lang.org), `db` has the type `Databas
 
 <!-- end index -->
 <!-- begin typing -->
-While *svcs* has first-class support for static typing, it is **strictly optional** and will always remain so.
+While *svcs* also has first-class support for static typing, it is **strictly optional** and will always remain so.
 *svcs* also doesn't check your types at runtime.
 
 It only forwards the type you have asked for to the type checker.
