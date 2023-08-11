@@ -1,20 +1,14 @@
 # Flask
 
-*svcs* has grown from my frustration with the repetitiveness of using the `get_x` that creates an `x` and then stores it on the {obj}`~flask.g` object [pattern](https://flask.palletsprojects.com/en/latest/appcontext/#storing-data).
+*svcs*'s [Flask](https://flask.palletsprojects.com/en/2.3.x/) integration uses the {attr}`flask.Flask.config` object to store the {class}`svcs.Registry` and the {obj}`~flask.g` object to store the {class}`svcs.Container`.
+It also installs a {meth}`flask.Flask.teardown_appcontext` handler to close the container when the request is done.
 
-Therefore it comes with [Flask](https://flask.palletsprojects.com/en/2.3.x/) support out of the box in the form of the {mod}`svcs.flask` module.
-
-It:
-
-- puts the registry into `app.config["svcs_registry"]`,
-- unifies the caching of services on the `g` object by putting a container into `g.svcs_container`,
-- transparently retrieves them from there for you,
-- and installs a [`teardown_appcontext()`](http://flask.pocoo.org/docs/latest/api#flask.Flask.teardown_appcontext) handler that calls {meth}`svcs.Container.close()` when a request is done.
+The origin story of *svcs* is the frustration over the repetitiveness of the "write a `get_x` that creates an `x` and then stores it on `g` and register clean up -- for every single `x`" [pattern](https://flask.palletsprojects.com/en/latest/appcontext/#storing-data).
 
 
 ## Initialization
 
-You add support for *svcs* by calling {meth}`svcs.flask.init_app` in your [*application factory*](https://flask.palletsprojects.com/en/latest/patterns/appfactories/).
+You add support for *svcs* to your Flask app by calling {meth}`svcs.flask.init_app` in your [*application factory*](inv:flask#patterns/appfactories).
 For instance, to create a factory that uses a SQLAlchemy engine to produce connections, you could do this:
 
 
@@ -109,7 +103,7 @@ So, if you would like a [health endpoint](https://kubernetes.io/docs/reference/u
 
 ## Testing
 
-Having a central place for all your services, makes it obvious where to mock them for testing.
+Having a central place for all your services makes it obvious where to mock them for testing.
 So, if you want the connection service to return a mock `Connection`, you can do this:
 
 ```python
