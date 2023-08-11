@@ -2,6 +2,24 @@
 
 *svcs*'s [AIOHTTP](https://docs.aiohttp.org/) integration stores the {class}`svcs.Registry` on the {class}`aiohttp.web.Application` object and the {class}`svcs.Container` on the {class}`aiohttp.web.Request` object.
 
+## Initialization
+
+You add support for *svcs* to your AIOHTTP app by calling {meth}`svcs.aiohttp.init_app` wherever you create your {class}`aiohttp.web.Application` object.
+
+
+## Service Acquisition
+
+You can get either the container using {func}`svcs.aiohttp.svcs_from` or pluck them directly from the request object using {func}`svcs.aiohttp.aget` that takes a {class}`aiohttp.web.Request` object as its first argument.
+
+
+## Cleanup
+
+Acquired services and pings get cleaned up automatically at the end of a request.
+
+If you register *on_registry_close* callbacks, you can use {func}`svcs.aiohttp.aclose_registry` to run them.
+{meth}`~svcs.aiohttp.init_app` will automatically add them to the app's {attr}`aiohttp.web.Application.on_cleanup` callbacks.
+Therefore, if you shut down your AIOHTTP applications cleanly, you don't have to think about registry cleanup either.
+
 
 ## API Reference
 
@@ -28,7 +46,7 @@
 
 ```{eval-rst}
 .. autofunction:: svcs_from
-.. function:: aget
+.. function:: aget(request: aiohttp.web.Request, svc_type1: type, ...)
 
    Same as :meth:`svcs.Container.aget`, but uses the container from *request*.
 .. autofunction:: get_pings

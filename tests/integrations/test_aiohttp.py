@@ -100,7 +100,11 @@ class TestAIOHTTP:
             app, Service, Service, on_registry_close=closer
         )
 
-        await svcs.aiohttp.aclose_registry(app)
+        server = await AppServer.start(app)
+
+        assert not closed
+
+        await server.aclose()
 
         assert closed
 
