@@ -545,7 +545,7 @@ class Container:
         container.
 
         Returns:
-            A sequence of services that have registered a ping callable.
+            A list of services that have registered a ping callable.
         """
         return [
             ServicePing(

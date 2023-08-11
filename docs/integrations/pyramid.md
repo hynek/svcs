@@ -27,9 +27,7 @@ def make_app():
 
 ## Service Acquisition
 
-Every {class}`~pyramid.request.Request` object that is passed into views will have an `svcs` attribute that is a {class}`svcs.Container` that is scoped to the request.
-You can use {func}`svcs.pyramid.svcs_from()` to access it in a type-safe way:
-
+You can use {func}`svcs.pyramid.svcs_from()` to access a request-scoped {class}`svcs.Container` from a request object:
 
 ```python
 from svcs.pyramid import svcs_from
@@ -39,16 +37,7 @@ def view(request):
 ```
 
 
-## Cleanup
-
-You can use {func}`svcs.pyramid.close_registry()` to close the registry that is attached to the {class}`pyramid.registry.Registry` of the config or app object that you pass as the only parameter.
-
-
-## Thread Locals
-
-::: {danger}
-These functions only work from within an **active** Pyramid request.
-:::
+### Thread Locals
 
 Despite being [discouraged](<inv:#narr/threadlocals>), you can use Pyramid's thread locals to access the active container, or even services.
 
@@ -69,6 +58,27 @@ def view(request):
     service1 = container.get(Service)
     service2 = container.get_abstract(AbstractService)
 ```
+
+::: {caution}
+These functions only work from within an **active** Pyramid request.
+:::
+
+
+(pyramid-health)=
+
+## Health Checks
+
+As with services, you have the option to either {func}`svcs.pyramid.svcs_from` on the request or go straight for {func}`svcs.pyramid.get_pings`.
+
+A health endpoint could look like this:
+
+```{literalinclude} ../examples/health_check_pyramid.py
+```
+
+
+## Cleanup
+
+You can use {func}`svcs.pyramid.close_registry()` to close the registry that is attached to the {class}`pyramid.registry.Registry` of the config or app object that you pass as the only parameter.
 
 
 ## API Reference
@@ -109,4 +119,5 @@ It's [discouraged](<inv:#narr/threadlocals>) by the Pyramid developers, though.
    current request.
 
 .. autofunction:: get_abstract
+.. autofunction:: get_pings
 ```

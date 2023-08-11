@@ -23,4 +23,4 @@ All you need to do is:
 
 That's it!
 
-If you need inspiration, look at our integrations, like the [one for Flask](https://github.com/hynek/svcs/blob/main/src/svcs/flask.py) that is based on thread locals or the [one for Pyramid](https://github.com/hynek/svcs/blob/main/src/svcs/pyramid.py) that extracts the container from a request object!
+If you need inspiration, look at our integrations, like the [one for Flask](https://github.com/hynek/svcs/blob/main/src/svcs/flask.py) that is based on thread locals, the [one for Pyramid](https://github.com/hynek/svcs/blob/main/src/svcs/pyramid.py) that extracts the container from a request object, or the [one for AIOHTTP](https://github.com/hynek/svcs/blob/main/src/svcs/aiohttp.py) that is async.

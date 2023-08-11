@@ -157,6 +157,22 @@ def get_registry(rh: PyramidRegistryHaver | None = None) -> svcs.Registry:
     return get_current_registry()[_KEY_REGISTRY]  # type: ignore[no-any-return]
 
 
+def get_pings(request: Request | None = None) -> list[svcs.ServicePing]:
+    """
+    Like :meth:`svcs.Container.get_pings()`, but uses container on *request* or
+    from thread local.
+
+    Arguments:
+        request: If none, thread locals are used.
+
+    .. seealso:: :ref:`pyramid-health`
+    """
+    if not request:
+        request = get_current_request()
+
+    return getattr(request, _KEY_CONTAINER).get_pings()  # type: ignore[no-any-return]
+
+
 def get_abstract(*svc_types: type) -> Any:
     """
     Same as :meth:`svcs.Container.get_abstract()`, but uses container on

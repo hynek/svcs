@@ -18,6 +18,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 ### Added
 
 - aiohttp: missing `aget_abstract()` function.
+- pyramid: missing `get_pings()` function.
 
 
 ## [23.13.0](https://github.com/hynek/svcs/compare/23.12.0...23.13.0) - 2023-08-11
