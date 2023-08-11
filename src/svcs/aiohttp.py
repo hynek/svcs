@@ -107,6 +107,11 @@ def get_registry(app: web.Application) -> svcs.Registry:
 async def aclose_registry(app: web.Application) -> None:
     """
     Close the registry on *app*, if present.
+
+    You probably don't have to call this yourself, because it's registered for
+    the application as an {attr}`aiohttp.web.Application.on_cleanup` callback.
+
+    .. seealso:: :ref:`aiohttp-cleanup`
     """
     if reg := app.get(_KEY_REGISTRY):
         await reg.aclose()
@@ -116,6 +121,8 @@ def get_pings(request: web.Request) -> list[svcs.ServicePing]:
     """
     Same as :meth:`svcs.Container.get_pings`, but uses the container from
     *request*.
+
+    .. seealso:: :ref:`aiohttp-health`
     """
     return request[_KEY_CONTAINER].get_pings()  # type: ignore[no-any-return]
 
