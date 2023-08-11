@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Protocol, TypeVar, overload
+from typing import Any, Protocol, overload
 
 import attrs
 
@@ -17,7 +17,20 @@ from pyramid.threadlocal import get_current_registry, get_current_request
 
 import svcs
 
-from ._core import _KEY_CONTAINER, _KEY_REGISTRY
+from ._core import (
+    _KEY_CONTAINER,
+    _KEY_REGISTRY,
+    T1,
+    T2,
+    T3,
+    T4,
+    T5,
+    T6,
+    T7,
+    T8,
+    T9,
+    T10,
+)
 
 
 def svcs_from(request: Request | None = None) -> svcs.Container:
@@ -179,18 +192,6 @@ def get_abstract(*svc_types: type) -> Any:
     thread locals.
     """
     return get(*svc_types)
-
-
-T1 = TypeVar("T1")
-T2 = TypeVar("T2")
-T3 = TypeVar("T3")
-T4 = TypeVar("T4")
-T5 = TypeVar("T5")
-T6 = TypeVar("T6")
-T7 = TypeVar("T7")
-T8 = TypeVar("T8")
-T9 = TypeVar("T9")
-T10 = TypeVar("T10")
 
 
 @overload
