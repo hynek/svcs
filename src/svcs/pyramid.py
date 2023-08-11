@@ -5,7 +5,6 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from contextlib import closing
 from typing import Any, Protocol, TypeVar, overload
 
 import attrs
@@ -78,10 +77,14 @@ class ServicesTween:
     registry: Registry
 
     def __call__(self, request: Request) -> Response:
-        with closing(svcs.Container(self.registry[_KEY_REGISTRY])) as con:
-            request.set_property(lambda _: con, _KEY_CONTAINER, reify=True)
+        def make_container(request: Request) -> svcs.Container:
+            con = svcs.Container(self.registry[_KEY_REGISTRY])
+            request.add_finished_callback(lambda _: con.close())
 
-            return self.handler(request)
+            return con
+
+        request.set_property(make_container, _KEY_CONTAINER, reify=True)
+        return self.handler(request)
 
 
 def register_factory(

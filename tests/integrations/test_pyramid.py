@@ -72,6 +72,7 @@ def tl_view(request):
     Thread locals return the same objects as the direct way.
     """
     svc = svcs.pyramid.get(Service)
+    svcs.pyramid.get(float)
 
     assert (
         svc
@@ -98,7 +99,17 @@ def test_thread_locals():
     """
     tapp = make_test_app("tl_view")
 
+    closed = False
+
+    def closing_factory():
+        yield 1.0
+
+        nonlocal closed
+        closed = True
+
     svcs.pyramid.get_registry(tapp.app).register_value(Service, 42)
     svcs.pyramid.register_value(tapp.app, AnotherService, 23)
+    svcs.pyramid.register_factory(tapp.app, float, closing_factory)
 
     assert {"svc": 42} == tapp.get("/").json
+    assert closed
