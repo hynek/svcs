@@ -11,6 +11,9 @@ import svcs
 
 @view_config(route_name="healthy")
 def healthy_view(request: Request) -> Response:
+    """
+    Ping all external services.
+    """
     ok: list[str] = []
     failing: list[dict[str, str]] = []
     status = 200
