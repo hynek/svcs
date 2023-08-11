@@ -2,9 +2,7 @@
 
 ## Supported Versions
 
-We only support the latest version.
-
-We are following [*CalVer*](https://calver.org) with generous backwards-compatibility guarantees.
+We're following [*CalVer*](https://calver.org) with generous backwards-compatibility guarantees.
 Therefore we only support the latest version.
 
 Once the project is pronounced stable, the next two paragraphs will go into effect:
