@@ -95,6 +95,10 @@ This is how it could look with the shipped integrations:
 ```{literalinclude} examples/aiohttp/health_check.py
 ```
 :::
+::: {tab} FastAPI
+```{literalinclude} examples/fastapi/health_check.py
+```
+:::
 ::: {tab} Flask
 ```{literalinclude} examples/flask/health_check.py
 ```

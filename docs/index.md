@@ -33,6 +33,19 @@ async def view(request):
     ...
 ```
 :::
+::: {tab} FastAPI
+```python
+import svcs
+
+@app.get("/")
+async def view(
+    services: Annotated[svcs.Container, Depends(svcs.fastapi.container)],
+):
+    db, api, cache = await services.aget(Database, WebAPI, Cache)
+
+    ...
+```
+:::
 ::: {tab} Flask
 ```python
 import svcs
