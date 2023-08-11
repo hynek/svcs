@@ -11,6 +11,8 @@ from flask import Flask, current_app, g, has_app_context
 from flask.ctx import _AppCtxGlobals
 
 from ._core import (
+    _KEY_CONTAINER,
+    _KEY_REGISTRY,
     T1,
     T2,
     T3,
@@ -29,12 +31,13 @@ from ._core import (
 
 def svcs_from(g: _AppCtxGlobals = g) -> Container:
     """
-    Get the current container from `g`.
+    Get the current container from *g*.
     """
-    if "svcs_container" not in g:
-        g.svcs_container = Container(current_app.config["svcs_registry"])
+    if (con := g.get(_KEY_CONTAINER, None)) is None:
+        con = Container(current_app.config[_KEY_REGISTRY])
+        setattr(g, _KEY_CONTAINER, con)
 
-    return g.svcs_container  # type: ignore[no-any-return]
+    return con  # type: ignore[no-any-return]
 
 
 FlaskAppT = TypeVar("FlaskAppT", bound=Flask)
@@ -46,7 +49,7 @@ def init_app(app: FlaskAppT, *, registry: Registry | None = None) -> FlaskAppT:
 
     Creates a registry for you if you don't provide one.
     """
-    app.config["svcs_registry"] = registry or Registry()
+    app.config[_KEY_REGISTRY] = registry or Registry()
     app.teardown_appcontext(teardown)
 
     return app
@@ -72,7 +75,7 @@ def register_factory(
     Same as :meth:`svcs.Registry.register_factory()`, but uses registry on
     *app* that has been put there by :func:`init_app()`.
     """
-    app.config["svcs_registry"].register_factory(
+    app.config[_KEY_REGISTRY].register_factory(
         svc_type, factory, ping=ping, on_registry_close=on_registry_close
     )
 
@@ -89,7 +92,7 @@ def register_value(
     Same as :meth:`svcs.Registry.register_value()`, but uses registry on *app*
     that has been put there by :func:`init_app()`.
     """
-    app.config["svcs_registry"].register_value(
+    app.config[_KEY_REGISTRY].register_value(
         svc_type, value, ping=ping, on_registry_close=on_registry_close
     )
 
@@ -156,7 +159,7 @@ def teardown(exc: BaseException | None) -> None:
 
     The app context is torn down after the response is sent.
     """
-    if has_app_context() and (container := g.pop("svcs_container", None)):
+    if has_app_context() and (container := g.pop(_KEY_CONTAINER, None)):
         container.close()
 
 
@@ -164,7 +167,7 @@ def close_registry(app: Flask) -> None:
     """
     Close the registry on *app*, if present.
     """
-    if reg := app.config.pop("svcs_registry", None):
+    if reg := app.config.pop(_KEY_REGISTRY, None):
         reg.close()
 
 

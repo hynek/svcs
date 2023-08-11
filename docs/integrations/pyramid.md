@@ -38,8 +38,6 @@ def view(request):
     db = svcs_from(request).get(Database)
 ```
 
-If you don't care about type checking, you can use `request.svcs` directly.
-
 
 ## Cleanup
 

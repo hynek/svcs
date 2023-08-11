@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2023 Hynek Schlawack <hs@ox.cx>
+#
+# SPDX-License-Identifier: MIT
+
 from unittest.mock import Mock
 
 import pytest
@@ -71,7 +75,6 @@ def tl_view(request):
 
     assert (
         svc
-        is request.svcs.get(Service)
         is svcs.pyramid.svcs_from(request).get(Service)
         is svcs.pyramid.get_abstract(Service)
     )
@@ -81,7 +84,7 @@ def tl_view(request):
         is svcs.pyramid.get_registry(request)
     )
     assert (
-        request.svcs
+        request.svcs_container
         is svcs.pyramid.svcs_from()
         is svcs.pyramid.svcs_from(request)
     )

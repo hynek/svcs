@@ -54,14 +54,9 @@ if "dev" in release:
 
 exclude_patterns = ["_build"]
 
-nitpick_ignore = (
-    [
-        ("py:class", "aiohttp.web_request.Request"),
-        ("py:class", "svcs._core.T1"),
-    ]
-    + [("py:class", f"T{i}") for i in range(1, 11)]
-    + [("py:class", f"svcs.aiohttp.T{i}") for i in range(1, 11)]
-)
+nitpick_ignore = [
+    ("py:class", "aiohttp.web_request.Request"),
+]
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True

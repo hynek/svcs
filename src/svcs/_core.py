@@ -35,6 +35,11 @@ def _full_name(obj: object) -> str:
         return repr(obj)
 
 
+# Default names where to put the container and registry in integrations.
+_KEY_REGISTRY = "svcs_registry"
+_KEY_CONTAINER = "svcs_container"
+
+
 @attrs.frozen
 class RegisteredService:
     svc_type: type

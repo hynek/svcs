@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2023 Hynek Schlawack <hs@ox.cx>
+#
+# SPDX-License-Identifier: MIT
+
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -14,6 +18,8 @@ from pyramid.threadlocal import get_current_registry, get_current_request
 
 import svcs
 
+from ._core import _KEY_CONTAINER, _KEY_REGISTRY
+
 
 def svcs_from(request: Request | None = None) -> svcs.Container:
     """
@@ -23,10 +29,10 @@ def svcs_from(request: Request | None = None) -> svcs.Container:
 
         request: If None, thread locals are used.
     """
-    if request:
-        return request.svcs  # type: ignore[no-any-return]
+    if request is None:
+        request = get_current_request()
 
-    return get_current_request().svcs  # type: ignore[no-any-return]
+    return getattr(request, _KEY_CONTAINER)  # type: ignore[no-any-return]
 
 
 def init(
@@ -62,9 +68,6 @@ def init(
     )
 
 
-_KEY_REGISTRY = "svcs_registry"
-
-
 @attrs.define
 class ServicesTween:
     """
@@ -76,7 +79,7 @@ class ServicesTween:
 
     def __call__(self, request: Request) -> Response:
         with closing(svcs.Container(self.registry[_KEY_REGISTRY])) as con:
-            request.svcs = con
+            request.set_property(lambda _: con, _KEY_CONTAINER, reify=True)
 
             return self.handler(request)
 
