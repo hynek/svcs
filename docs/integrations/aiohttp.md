@@ -60,6 +60,7 @@ Therefore, if you shut down your AIOHTTP applications cleanly, you don't have to
 ```{eval-rst}
 .. autofunction:: svcs_from
 .. function:: aget(request: aiohttp.web.Request, svc_type1: type, ...)
+   :async:
 
    Same as :meth:`svcs.Container.aget`, but uses the container from *request*.
 .. autofunction:: aget_abstract
