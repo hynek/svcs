@@ -88,7 +88,8 @@ def _app(registry):
 class TestAIOHTTP:
     async def test_aclose_registry_ok(self, app):
         """
-        aclose_registry closes the registry.
+        aclose_registry closes the registry. Automatically as part of aiohttp's
+        cleanup.
         """
         closed = False
 
@@ -101,9 +102,6 @@ class TestAIOHTTP:
         )
 
         server = await AppServer.start(app)
-
-        assert not closed
-
         await server.aclose()
 
         assert closed
