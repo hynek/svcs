@@ -60,7 +60,7 @@ jobs:
         run: |
           python -Im tox run \
             --installpkg dist/*.whl \
-            -f py$(echo ${{ matrix.python-version }} | tr -d .)
+            -f py$(echo ${{ matrix.python-version }} | tr -d .)-tests
 
       - name: Upload coverage data
         uses: actions/upload-artifact@v3
@@ -73,7 +73,7 @@ jobs:
         run: |
           python -Im tox run \
             --installpkg dist/*.whl \
-            -e mypy-api
+            -e py$(echo ${{ matrix.python-version }} | tr -d .)-mypy
 
   coverage:
     name: Ensure 100% test coverage
