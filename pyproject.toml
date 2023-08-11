@@ -189,7 +189,7 @@ line-length = 79
 
 
 [tool.ruff]
-src = ["src", "tests", "docs/conf.py"]
+src = ["src", "tests", "conftest.py", "docs/conf.py"]
 select = ["ALL"]
 ignore = [
   "A001",    # shadowing is fine
