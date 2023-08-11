@@ -7,10 +7,17 @@ We only support the latest version.
 We are following [*CalVer*](https://calver.org) with generous backwards-compatibility guarantees.
 Therefore we only support the latest version.
 
-Once the project is pronounced stable, the next paragraph will go into effect:
+Once the project is pronounced stable, the next two paragraphs will go into effect:
 
 That said, you shouldn't be afraid to upgrade if you're only using our documented public APIs and pay attention to `DeprecationWarning`s.
 Whenever there is a need to break compatibility, it is announced in the changelog and raises a `DeprecationWarning` for a year (if possible) before it's finally really broken.
+
+There is **one** exception:
+
+> [!WARNING]
+> We reserve the right to **remove framework integrations** at any time *without prior notice* to ease the maintenance burden.
+>
+> We *will* try to put them as separate packages on PyPI if we do so.
 
 
 ## Reporting a Vulnerability
