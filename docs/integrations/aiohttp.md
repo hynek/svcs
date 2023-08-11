@@ -62,5 +62,6 @@ Therefore, if you shut down your AIOHTTP applications cleanly, you don't have to
 .. function:: aget(request: aiohttp.web.Request, svc_type1: type, ...)
 
    Same as :meth:`svcs.Container.aget`, but uses the container from *request*.
+.. autofunction:: aget_abstract
 .. autofunction:: get_pings
 ```

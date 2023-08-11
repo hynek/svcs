@@ -68,6 +68,7 @@ async def view(request: Request) -> Response:
     return json_response(
         {
             "value": await svcs.aiohttp.aget(request, str),
+            "abstract": await svcs.aiohttp.aget_abstract(request, int),
             "factory": await svcs.aiohttp.svcs_from(request).aget(int),
         }
     )
@@ -126,7 +127,11 @@ class TestAIOHTTP:
 
         await server.aclose()
 
-        assert {"factory": 42, "value": "hello, world"} == json.loads(text)
+        assert {
+            "factory": 42,
+            "value": "hello, world",
+            "abstract": 42,
+        } == json.loads(text)
 
     async def test_get_registry(self, registry, app):
         """

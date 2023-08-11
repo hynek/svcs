@@ -221,6 +221,10 @@ ignore = [
   "EM101",  # no need for exception msg hygiene in tests
 ]
 
+"tests/typing/*" = [
+  "F841", # unused variables are fine in type checks
+]
+
 "conftest.py" = [
   "PT005", # we always add underscores and explicit names
 ]

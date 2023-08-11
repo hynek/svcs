@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import overload
+from typing import Any, overload
 
 from aiohttp import web
 
@@ -125,6 +125,14 @@ def get_pings(request: web.Request) -> list[svcs.ServicePing]:
     .. seealso:: :ref:`aiohttp-health`
     """
     return request[_KEY_CONTAINER].get_pings()  # type: ignore[no-any-return]
+
+
+async def aget_abstract(request: web.Request, *svc_types: type) -> Any:
+    """
+    Same as :meth:`svcs.Container.aget_abstract()`, but uses container from
+    *request*.
+    """
+    return await request[_KEY_CONTAINER].aget_abstract(*svc_types)
 
 
 @overload
