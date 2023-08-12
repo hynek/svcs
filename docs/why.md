@@ -98,16 +98,17 @@ However, it starts paying dividends *very fast* once you go past that.
 
 ## Is this Dependency Injection or Service Location!?
 
-It can be both!
+It can be both, depending on your perspective!
 At its core, *svcs* is a {term}`service locator` because it locates services for you when you call `get()` -- based on your configuration.
 
 But it depends *where* you choose to call `get()` whether you're doing *dependency injection* or *service location* in the classical sense.
 
-When people think of dependency injection, they usually think of *dependency injection frameworks* that use decorators or other magic to inject services into their code.
+When people think of dependency injection, they usually think of *dependency injection frameworks* that use decorators, parameter inspection, and other magic to inject services automatically into their code.
 But that's **not** what dependency injection means.
-It means the {term}`service layer` is called with all services it needs to do its job.
+It means that a piece of code doesn't instantiate its dependencies itself and is called with all services it needs to do its job (also known as {term}`Inversion of Control`).
 
-So, if you use *svcs* in your web view to look up a database connection and pass the database connection into your service layer, you're doing *dependency injection*.
+Therefore, if you use *svcs* in your web view to look up a database connection and pass the database connection into your {term}`service layer`, you're doing *dependency injection* for the arguably most important part of your application.
+You have moved your {term}`composition root` into the web view, which allows you to be more flexible with the acquisition of your services while maintaining loose coupling between your service layer and its dependencies.
 
 On the other hand, if you use *svcs* in your service layer -- or even business logic -- to look up a database connection and use it there, you're doing *service location*.
 

@@ -8,7 +8,7 @@ You will probably use some framework integration and not the low-level API direc
 ## Registries
 
 A **{class}`svcs.Registry`** allows registering factories for types.
-A registry should live as long as your application lives.
+A registry should live as long as your application lives and there should be only one per application.
 Its only job is to store and retrieve factories along with some metadata.
 
 It is possible to register either factory callables or values:
@@ -47,7 +47,7 @@ registry.register_factory(
 
 If this callback fails, it's logged at warning level but otherwise ignored.
 For instance, you could free a database connection pool in an {mod}`atexit` handler or *pytest* fixture.
-This frees you from keeping track of registered services yourself.
+This liberates you from keeping track of registered services yourself.
 You can also use a registry as an (async) context manager that (a)closes automatically on exit.
 
 
