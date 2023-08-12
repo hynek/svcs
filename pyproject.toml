@@ -38,11 +38,11 @@ docs = [
   "sphinx-inline-tabs",
   "myst-parser",
   "furo",
+  "sybil",
+  "pytest",
   "aiohttp",
   "flask",
   "pyramid",
-  "sybil",
-  "pytest",
 ]
 dev = ["svcs[tests,typing]", "tox>4"]
 
@@ -176,11 +176,11 @@ allow_untyped_decorators = true
 
 [tool.pyright]
 ignore = [
-  "src/svcs/pyramid.py",
-  "tests/typing/pyramid.py",
-  "tests",
-  "docs",
   "conftest.py",
+  "docs",
+  "src/svcs/pyramid.py",
+  "tests",
+  "tests/typing/pyramid.py",
 ]
 
 
