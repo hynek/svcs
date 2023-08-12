@@ -44,7 +44,7 @@ docs = [
   "flask",
   "pyramid",
 ]
-dev = ["svcs[tests,typing]", "tox>4"]
+dev = ["svcs[tests,typing]", "tox>4", "httpx"]
 
 [project.urls]
 Changelog = "https://github.com/hynek/svcs/blob/main/CHANGELOG.md"

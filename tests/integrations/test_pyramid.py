@@ -13,7 +13,7 @@ from tests.ifaces import AnotherService, Service
 
 
 try:
-    import webtest
+    import httpx
 
     from pyramid.config import Configurator
     from pyramid.view import view_config
@@ -21,7 +21,8 @@ except ImportError:
     pytest.skip("Pyramid not installed", allow_module_level=True)
 
 
-def make_config():
+@pytest.fixture(name="config")
+def _config():
     config = Configurator(settings={})
     svcs.pyramid.init(config)
 
@@ -33,35 +34,41 @@ def make_config():
     return config
 
 
-@pytest.fixture(name="tapp")
-def _tapp(config):
-    return webtest.TestApp(config.make_wsgi_app())
+@pytest.fixture(name="app")
+def _app(config):
+    return config.make_wsgi_app()
 
 
-@pytest.fixture(name="config")
-def _config():
-    return make_config()
+@pytest.fixture(name="client")
+def _client(app):
+    return httpx.Client(app=app, base_url="http://example.com/")
 
 
-def test_close_nop():
+@pytest.fixture(name="rh", params=(0, 1))
+def _rh(request, config, app):
     """
-    Closing a config that has no svcs_registry does nothing.
+    A RegistryHaver fixture -- usually that's configs and apps.
+    """
+    return (config, app)[request.param]
+
+
+def test_close_nop(rh):
+    """
+    Closing a config/app that has no svcs_registry does nothing.
     """
     svcs.pyramid.close_registry(Mock(registry={}))
 
 
-def test_close(config):
+def test_close(rh):
     """
-    Closing a config with svcs_registry calls on_registry_close callbacks on
-    the registered svcs.pyramid.
+    Closing a config/app with svcs_registry calls on_registry_close callbacks
+    on the registered svcs.pyramid.
     """
     orc = Mock()
 
-    svcs.pyramid.register_factory(
-        config, int, int_factory, on_registry_close=orc
-    )
+    svcs.pyramid.register_factory(rh, int, int_factory, on_registry_close=orc)
 
-    svcs.pyramid.close_registry(config)
+    svcs.pyramid.close_registry(rh)
 
     assert orc.called
 
@@ -93,26 +100,6 @@ def tl_view(request):
     return {"svc": svc}
 
 
-def test_thread_locals(tapp):
-    """
-    Thread locals are available in views.
-    """
-    closed = False
-
-    def closing_factory():
-        yield 1.0
-
-        nonlocal closed
-        closed = True
-
-    svcs.pyramid.get_registry(tapp.app).register_value(Service, 42)
-    svcs.pyramid.register_value(tapp.app, AnotherService, 23)
-    svcs.pyramid.register_factory(tapp.app, float, closing_factory)
-
-    assert {"svc": 42} == tapp.get("/tl").json
-    assert closed
-
-
 @view_config(route_name="health_view", renderer="json")
 def health_view(request):
     assert (
@@ -123,10 +110,30 @@ def health_view(request):
     return {"num": len(svcs.pyramid.svcs_from(request).get_pings())}
 
 
-def test_get_pings(tapp):
-    """
-    get_pings() returns service pings with and without passing a request.
-    """
-    svcs.pyramid.get_registry(tapp.app).register_value(Service, 42, ping=nop)
+class TestIntergration:
+    def test_get(self, app, client):
+        """
+        Service acquisition via svcs_get and thread locals works.
+        """
+        closed = False
 
-    assert {"num": 1} == tapp.get("/health").json
+        def closing_factory():
+            yield 1.0
+
+            nonlocal closed
+            closed = True
+
+        svcs.pyramid.get_registry(app).register_value(Service, 42)
+        svcs.pyramid.register_value(app, AnotherService, 23)
+        svcs.pyramid.register_factory(app, float, closing_factory)
+
+        assert {"svc": 42} == client.get("/tl").json()
+        assert closed
+
+    def test_get_pings(self, app, client):
+        """
+        get_pings() returns service pings with and without passing a request.
+        """
+        svcs.pyramid.get_registry(app).register_value(Service, 42, ping=nop)
+
+        assert {"num": 1} == client.get("/health").json()
