@@ -72,7 +72,7 @@ As with services, you have the option to either {func}`svcs.pyramid.svcs_from` o
 
 A health endpoint could look like this:
 
-```{literalinclude} ../examples/health_check_pyramid.py
+```{literalinclude} ../examples/pyramid/health_check.py
 ```
 
 

@@ -20,7 +20,7 @@ As with services, you have the option to either {func}`svcs.aiohttp.svcs_from` o
 
 A health endpoint could look like this:
 
-```{literalinclude} ../examples/health_check_aiohttp.py
+```{literalinclude} ../examples/aiohttp/health_check.py
 ```
 
 (aiohttp-cleanup)=

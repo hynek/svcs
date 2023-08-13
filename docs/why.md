@@ -85,15 +85,15 @@ Next, you can write a simple health check endpoint if you've registered health c
 This is how it could look with the shipped integrations:
 
 ::: {tab} AIOHTTP
-```{literalinclude} examples/health_check_aiohttp.py
+```{literalinclude} examples/aiohttp/health_check.py
 ```
 :::
 ::: {tab} Flask
-```{literalinclude} examples/health_check_flask.py
+```{literalinclude} examples/flask/health_check.py
 ```
 :::
 ::: {tab} Pyramid
-```{literalinclude} examples/health_check_pyramid.py
+```{literalinclude} examples/flask/health_check.py
 ```
 :::
 

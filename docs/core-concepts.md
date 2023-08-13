@@ -149,15 +149,15 @@ You can look at the {attr}`~svcs.ServicePing.is_async` property to check whether
 Here's how a health check endpoint could look like:
 
 ::: {tab} AIOHTTP
-```{literalinclude} examples/health_check_aiohttp.py
+```{literalinclude} examples/aiohttp/health_check.py
 ```
 :::
 ::: {tab} Flask
-```{literalinclude} examples/health_check_flask.py
+```{literalinclude} examples/flask/health_check.py
 ```
 :::
 ::: {tab} Pyramid
-```{literalinclude} examples/health_check_pyramid.py
+```{literalinclude} examples/flask/health_check.py
 ```
 :::
 
