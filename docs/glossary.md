@@ -31,6 +31,10 @@ Resource
     Used interchangeably with {term}`service`, but also a heavily overloaded term.
 
 
+Dependency
+    Used interchangeably with {term}`service`, but also a heavily overloaded term.
+
+
 Service Layer
     The service layer is where your business logic (also known as the *domain model*) meets your {term}`service`s.
 
