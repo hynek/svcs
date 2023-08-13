@@ -46,7 +46,7 @@ def view():
 :::
 ::: {tab} Pyramid
 ```python
-import  svcs
+import svcs
 
 @view_config(route_name="index")
 def view(request):
