@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import contextlib
+import gc
 import inspect
 import logging
 
@@ -14,6 +15,7 @@ import svcs
 
 from .fake_factories import (
     async_str_gen_factory,
+    nop,
     str_gen_factory,
 )
 from .ifaces import AnotherService, Interface, Service
@@ -265,6 +267,23 @@ class TestRegistry:
 
         assert Service in registry
         assert AnotherService not in registry
+
+    def test_gc_warning(self, recwarn):
+        """
+        If a registry is gc'ed with pending cleanups, a warning is raised.
+        """
+
+        def scope():
+            registry = svcs.Registry()
+            registry.register_value(int, 42, on_registry_close=nop)
+
+        scope()
+
+        gc.collect()
+
+        assert (
+            "Registry was garbage-collected with pending cleanups.",
+        ) == recwarn.list[0].message.args
 
 
 class TestRegisteredService:

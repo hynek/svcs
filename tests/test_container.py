@@ -2,9 +2,13 @@
 #
 # SPDX-License-Identifier: MIT
 
+import gc
+
 from unittest.mock import Mock
 
 import pytest
+
+import svcs
 
 from .fake_factories import (
     async_bool_cm_factory,
@@ -38,6 +42,8 @@ class TestContainer:
         await container.aget(YetAnotherService)
 
         assert "<Container(instantiated=4, cleanups=4)>" == repr(container)
+
+        await container.aclose()
 
     def test_contains(self, container):
         """
@@ -88,6 +94,24 @@ class TestContainer:
             assert 42 == await container.aget(int)
 
         assert closed
+
+    def test_gc_warning(self, recwarn, registry):
+        """
+        If a container is gc'ed with pending cleanups, a warning is raised.
+        """
+
+        def scope():
+            container = svcs.Container(registry)
+            registry.register_factory(str, str_gen_factory)
+            container.get(str)
+
+        scope()
+
+        gc.collect()
+
+        assert (
+            "Container was garbage-collected with pending cleanups.",
+        ) == recwarn.list[0].message.args
 
 
 class TestServicePing:

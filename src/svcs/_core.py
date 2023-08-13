@@ -176,6 +176,17 @@ class Registry:
     ) -> None:
         await self.aclose()
 
+    def __del__(self) -> None:
+        """
+        Warn if the registry is gc'ed before being closed.
+        """
+        if getattr(self, "_on_close", None):
+            warnings.warn(
+                "Registry was garbage-collected with pending cleanups.",
+                ResourceWarning,
+                stacklevel=1,
+            )
+
     def register_factory(
         self,
         svc_type: type,
@@ -464,6 +475,17 @@ class Container:
         exc_tb: TracebackType | None,
     ) -> None:
         await self.aclose()
+
+    def __del__(self) -> None:
+        """
+        Warn if the container is gc'ed before being closed.
+        """
+        if getattr(self, "_on_close", None):
+            warnings.warn(
+                "Container was garbage-collected with pending cleanups.",
+                ResourceWarning,
+                stacklevel=1,
+            )
 
     def close(self) -> None:
         """

@@ -183,6 +183,8 @@ def test_none_is_a_valid_factory_result(registry, container):
     assert None is container.get(Service)
     assert 1 == i
 
+    container.close()
+
 
 @pytest.mark.parametrize(
     "factory",
@@ -379,3 +381,5 @@ class TestAsync:
         assert None is await container.aget(Service)
         assert None is await container.aget(Service)
         assert 1 == i
+
+        await container.aclose()
