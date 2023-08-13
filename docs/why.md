@@ -20,12 +20,12 @@ If you follow the **{term}`Hexagonal Architecture`** (aka "*ports and adapters*"
 :end-before: "<!-- end benefits -->"
 ```
 
-If you don't shy away from some global state and your web framework supports it, you can go even further and write:
-
-```python
-def view():
-    db, api, cache = svcs.flask.get(Database, WebAPIClient, Cache)
+```{include} index.md
+:start-after: "<!-- begin tabbed teaser -->"
+:end-before: "<!-- end tabbed teaser -->"
 ```
+
+To a type checker like [Mypy](https://mypy-lang.org), `db` has the type `Database`, `api` has the type `WebAPIClient`, and `cache` has the type `Cache`.
 
 You set it up like this:
 

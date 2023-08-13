@@ -56,6 +56,9 @@ Benefits:
 
 The goal is to minimize the code for acquiring pluggable services to:
 
+<!-- end index -->
+<!-- end benefits -->
+
 <!--
 ; skip: next
 -->
@@ -67,13 +70,12 @@ def view(request):
     db, api, cache = svcs_from(request).get(Database, WebAPIClient, Cache)
 ```
 
+<!-- begin addendum -->
 To a type checker like [Mypy](https://mypy-lang.org), `db` has the type `Database`, `api` has the type `WebAPIClient`, and `cache` has the type `Cache`.
-
-<!-- end benefits -->
+<!-- end addendum -->
 
 *svcs* comes with seamless integration for **AIOHTTP**, **Flask**, **Pyramid**, and first-class **async** support.
 
-<!-- end index -->
 <!-- begin typing -->
 While *svcs* also has first-class support for static typing, it is **strictly optional** and will always remain so.
 *svcs* also doesn't check your types at runtime.
