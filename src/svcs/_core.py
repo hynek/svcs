@@ -131,6 +131,11 @@ class Registry:
         closed!
 
     ``async with`` is also supported.
+
+    Warns:
+
+        ResourceWarning: If a registry with pending cleanups is
+            garbage-collected.
     """
 
     _services: dict[type, RegisteredService] = attrs.Factory(dict)
@@ -430,10 +435,16 @@ class Container:
         ...     _ = con.get(str)
         Cleaned up!
 
+    Warns:
+
+        ResourceWarning: If a container with pending cleanups is
+            garbage-collected.
+
     Attributes:
 
         registry: The :class:`Registry` instance that this container uses for
            service type lookup.
+
     """
 
     registry: Registry
