@@ -212,7 +212,7 @@ def index():
 .. autofunction:: svcs_from
 .. function:: get(svc_types)
 
-   Same as :meth:`svcs.Container.get()`, but uses container on :obj:`flask.g`.
+   Same as :meth:`svcs.Container.get()`, but uses the container from :obj:`flask.g`.
 
 .. autofunction:: get_abstract
 .. autofunction:: get_pings

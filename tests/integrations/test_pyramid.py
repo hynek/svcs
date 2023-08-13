@@ -78,13 +78,14 @@ def tl_view(request):
     """
     Thread locals return the same objects as the direct way.
     """
-    svc = svcs.pyramid.get(Service)
-    svcs.pyramid.get(float)
+    svc = svcs.pyramid.get(request, Service)
+    svcs.pyramid.get(request, float)
 
     assert (
         svc
+        is svcs.pyramid.get(request, Service)
         is svcs.pyramid.svcs_from(request).get(Service)
-        is svcs.pyramid.get_abstract(Service)
+        is svcs.pyramid.get_abstract(request, Service)
     )
     assert (
         request.registry["svcs_registry"]
@@ -104,7 +105,6 @@ def tl_view(request):
 def health_view(request):
     assert (
         svcs.pyramid.get_pings(request)
-        == svcs.pyramid.get_pings()
         == svcs.pyramid.svcs_from(request).get_pings()
     )
     return {"num": len(svcs.pyramid.svcs_from(request).get_pings())}

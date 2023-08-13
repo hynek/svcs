@@ -55,7 +55,7 @@ Therefore, if you shut down your AIOHTTP applications cleanly, you don't have to
 .. autofunction:: register_value
 ```
 
-### Retrieving Services
+### Service Acquisition
 
 ```{eval-rst}
 .. autofunction:: svcs_from

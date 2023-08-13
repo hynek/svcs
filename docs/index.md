@@ -46,11 +46,11 @@ def view():
 :::
 ::: {tab} Pyramid
 ```python
-from svcs.pyramid import svcs_from
+from svcs
 
 @view_config(route_name="index")
 def view(request):
-    db, api, cache = svcs_from(request).get(Database, WebAPI, Cache)
+    db, api, cache = svcs.pyramid.get(request, Database, WebAPI, Cache)
 
     ...
 ```

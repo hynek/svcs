@@ -28,13 +28,17 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   For your convenience, if you pass an (async) generator function for a factory, the registry will automatically wrap it for you into an (async) context manager.
   [#92](https://github.com/hynek/svcs/pull/29)
 
+- Pyramid: `svcs.pyramid.get()` now takes a Pyramid request as the first argument.
+  `svcs.pyramid.get_pings()` also doesn't look at thread locals anymore.
+  If you still want to use them, you can use `svcs.pyramid.from_svcs(None)`.
+
 
 ## [23.14.0](https://github.com/hynek/svcs/compare/23.13.0...23.14.0) - 2023-08-11
 
 ### Added
 
-- aiohttp: missing `aget_abstract()` function.
-- pyramid: missing `get_pings()` function.
+- AIOHTTP: missing `aget_abstract()` function.
+- Pyramid: missing `get_pings()` function.
 
 
 ## [23.13.0](https://github.com/hynek/svcs/compare/23.12.0...23.13.0) - 2023-08-11

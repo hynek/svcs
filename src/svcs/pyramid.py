@@ -170,49 +170,52 @@ def get_registry(rh: PyramidRegistryHaver | None = None) -> svcs.Registry:
     return get_current_registry()[_KEY_REGISTRY]  # type: ignore[no-any-return]
 
 
-def get_pings(request: Request | None = None) -> list[svcs.ServicePing]:
+def get_pings(request: Request) -> list[svcs.ServicePing]:
     """
-    Like :meth:`svcs.Container.get_pings()`, but uses container on *request* or
-    from thread local.
-
-    Arguments:
-        request: If none, thread locals are used.
+    Like :meth:`svcs.Container.get_pings()`, but uses container on *request*.
 
     .. seealso:: :ref:`pyramid-health`
     """
-    if not request:
-        request = get_current_request()
-
     return getattr(request, _KEY_CONTAINER).get_pings()  # type: ignore[no-any-return]
 
 
-def get_abstract(*svc_types: type) -> Any:
+def get_abstract(request: Request, *svc_types: type) -> Any:
     """
-    Same as :meth:`svcs.Container.get_abstract()`, but uses container on
-    thread locals.
+    Same as :meth:`svcs.Container.get_abstract()`, but uses container from
+    *request*.
     """
-    return get(*svc_types)
+    return getattr(request, _KEY_CONTAINER).get(*svc_types)
 
 
 @overload
-def get(svc_type: type[T1], /) -> T1:
-    ...
-
-
-@overload
-def get(svc_type1: type[T1], svc_type2: type[T2], /) -> tuple[T1, T2]:
+def get(request: Request, svc_type: type[T1], /) -> T1:
     ...
 
 
 @overload
 def get(
-    svc_type1: type[T1], svc_type2: type[T2], svc_type3: type[T3], /
+    request: Request,
+    svc_type1: type[T1],
+    svc_type2: type[T2],
+    /,
+) -> tuple[T1, T2]:
+    ...
+
+
+@overload
+def get(
+    request: Request,
+    svc_type1: type[T1],
+    svc_type2: type[T2],
+    svc_type3: type[T3],
+    /,
 ) -> tuple[T1, T2, T3]:
     ...
 
 
 @overload
 def get(
+    request: Request,
     svc_type1: type[T1],
     svc_type2: type[T2],
     svc_type3: type[T3],
@@ -224,6 +227,7 @@ def get(
 
 @overload
 def get(
+    request: Request,
     svc_type1: type[T1],
     svc_type2: type[T2],
     svc_type3: type[T3],
@@ -236,6 +240,7 @@ def get(
 
 @overload
 def get(
+    request: Request,
     svc_type1: type[T1],
     svc_type2: type[T2],
     svc_type3: type[T3],
@@ -249,6 +254,7 @@ def get(
 
 @overload
 def get(
+    request: Request,
     svc_type1: type[T1],
     svc_type2: type[T2],
     svc_type3: type[T3],
@@ -263,6 +269,7 @@ def get(
 
 @overload
 def get(
+    request: Request,
     svc_type1: type[T1],
     svc_type2: type[T2],
     svc_type3: type[T3],
@@ -278,6 +285,7 @@ def get(
 
 @overload
 def get(
+    request: Request,
     svc_type1: type[T1],
     svc_type2: type[T2],
     svc_type3: type[T3],
@@ -294,6 +302,7 @@ def get(
 
 @overload
 def get(
+    request: Request,
     svc_type1: type[T1],
     svc_type2: type[T2],
     svc_type3: type[T3],
@@ -309,9 +318,9 @@ def get(
     ...
 
 
-def get(*svc_types: type) -> object:
+def get(request: Request, *svc_types: type) -> object:
     """
     Same as :meth:`svcs.Container.get()`, but uses thread locals to find the
     current request.
     """
-    return svcs_from().get(*svc_types)
+    return getattr(request, _KEY_CONTAINER).get(*svc_types)

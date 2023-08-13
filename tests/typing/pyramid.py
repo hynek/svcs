@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+from __future__ import annotations
+
 from typing import Generator
 
 import pyramid
@@ -26,8 +28,10 @@ svcs.pyramid.register_factory(config, str, str)
 svcs.pyramid.register_factory(config, int, factory_with_cleanup)
 svcs.pyramid.register_value(config, str, str, ping=lambda: None)
 
-o1: object = svcs.pyramid.get(object)
-o2: int = svcs.pyramid.get_abstract(object)
+req = pyramid.request.Request()
+
+o1: object = svcs.pyramid.get(req, object)
+o2: int = svcs.pyramid.get_abstract(req, object)
 
 a: int
 b: str
@@ -40,13 +44,15 @@ h: dict
 i: set
 j: bytes
 a, b, c, d, e, f, g, h, i, j = svcs.pyramid.get(
-    int, str, bool, tuple, object, float, list, dict, set, bytes
+    req, int, str, bool, tuple, object, float, list, dict, set, bytes
 )
+
+pings: list[svcs.ServicePing] = svcs.pyramid.get_pings(req)
 
 reg: svcs.Registry = svcs.pyramid.get_registry(config)
 reg = svcs.pyramid.get_registry()
 
 con: svcs.Container = svcs.pyramid.svcs_from()
-con = svcs.pyramid.svcs_from(pyramid.request.Request())
+con = svcs.pyramid.svcs_from(req)
 
 svcs.pyramid.close_registry(config)
