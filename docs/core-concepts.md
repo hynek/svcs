@@ -96,7 +96,10 @@ If a factory takes a first argument called `svcs_container` or the first argumen
 It is possible to overwrite registered service factories later -- e.g., for testing -- **without monkey-patching**.
 This is especially interesting if you want to replace a low-level service with a mock without re-jiggering all services that depend on it.
 
-If there's a chance
+If there's a chance that the container has been used by your fixtures to acquire a service, it's possible that the service is already cached by the container.
+
+In this case make sure to reset it by calling {meth}`svcs.Container.close` on it after overwriting.
+Closing a container is idempotent and it's safe to use it again afterwards.
 :::
 
 
