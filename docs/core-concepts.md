@@ -50,6 +50,8 @@ For instance, you could free a database connection pool in an {mod}`atexit` hand
 This liberates you from keeping track of registered services yourself.
 You can also use a registry as an (async) context manager that (a)closes automatically on exit.
 
+*svcs* will raise a {class}`ResourceWarning` if a registry with pending cleanups is garbage-collected.
+
 
 ## Containers
 
@@ -133,6 +135,8 @@ The key idea is that your business code doesn't have to care about cleaning up s
 :::
 
 That makes testing even easier because the business code makes fewer assumptions about the object it's getting.
+
+*svcs* will raise a {class}`ResourceWarning` if a container with pending cleanups is garbage-collected.
 
 (health)=
 
