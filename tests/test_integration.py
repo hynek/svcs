@@ -9,7 +9,12 @@ import pytest
 
 import svcs
 
-from .fake_factories import async_int_factory, async_str_cleanup_factory, nop
+from .fake_factories import (
+    async_bool_cm_factory,
+    async_int_factory,
+    async_str_gen_factory,
+    nop,
+)
 from .ifaces import AnotherService, Interface, Service, YetAnotherService
 
 
@@ -160,28 +165,6 @@ def test_close_resilient(container, registry, caplog):
     assert cleaned_up
 
 
-def test_warns_if_generator_does_not_stop_after_cleanup(registry, container):
-    """
-    If a generator doesn't stop after cleanup, a warning is emitted.
-    """
-
-    def factory():
-        yield Service()
-        yield 42
-
-    registry.register_factory(Service, factory)
-
-    container.get(Service)
-
-    with pytest.warns(UserWarning) as wi:
-        container.close()
-
-    assert (
-        "Container clean up for 'tests.ifaces.Service' "
-        "didn't stop iterating." == wi.pop().message.args[0]
-    )
-
-
 def test_none_is_a_valid_factory_result(registry, container):
     """
     None is a valid factory result and is cached as such.
@@ -202,9 +185,16 @@ def test_none_is_a_valid_factory_result(registry, container):
 
 
 @pytest.mark.parametrize(
-    "factory", [async_int_factory, async_str_cleanup_factory]
+    "factory",
+    [
+        async_int_factory,
+        async_str_gen_factory,
+        async_bool_cm_factory,
+    ],
 )
-def test_get_on_async_factory_raises_type_error(registry, container, factory):
+def test_get_on_async_factory_raises_type_error(
+    registry, container, factory, recwarn
+):
     """
     get() on an async factory raises a TypeError.
     """
@@ -212,9 +202,14 @@ def test_get_on_async_factory_raises_type_error(registry, container, factory):
     registry.register_factory(Service, factory)
 
     with pytest.raises(
-        TypeError, match=re.escape("Please use `aget()` for async factories.")
+        TypeError, match=re.escape("Use `aget()` for async factories.")
     ):
         container.get(Service)
+
+    if recwarn.list:
+        assert (
+            "coroutine 'async_int_factory' was never awaited",
+        ) == recwarn.pop().message.args
 
 
 @pytest.mark.asyncio()
@@ -337,29 +332,6 @@ class TestAsync:
         assert cleaned_up
         assert not container._instantiated
         assert not container._on_close
-
-    async def test_warns_if_generator_does_not_stop_after_cleanup(
-        self, registry, container
-    ):
-        """
-        If a generator doesn't stop after cleanup, a warning is emitted.
-        """
-
-        async def factory():
-            yield Service()
-            yield 42
-
-        registry.register_factory(Service, factory)
-
-        await container.aget(Service)
-
-        with pytest.warns(UserWarning) as wi:
-            await container.aclose()
-
-        assert (
-            "Container clean up for 'tests.ifaces.Service' "
-            "didn't stop iterating." == wi.pop().message.args[0]
-        )
 
     async def test_aping(self, registry, container):
         """

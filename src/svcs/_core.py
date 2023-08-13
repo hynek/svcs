@@ -6,14 +6,25 @@ from __future__ import annotations
 
 import inspect
 import logging
-import sys
 import warnings
 
 from collections.abc import Callable
-from contextlib import suppress
-from inspect import isasyncgenfunction, isawaitable, iscoroutinefunction
+from contextlib import (
+    AbstractAsyncContextManager,
+    AbstractContextManager,
+    asynccontextmanager,
+    contextmanager,
+    suppress,
+)
+from inspect import (
+    isasyncgenfunction,
+    isawaitable,
+    iscoroutine,
+    iscoroutinefunction,
+    isgeneratorfunction,
+)
 from types import TracebackType
-from typing import Any, AsyncGenerator, Awaitable, Generator, TypeVar, overload
+from typing import Any, Awaitable, TypeVar, overload
 
 import attrs
 
@@ -21,11 +32,6 @@ from .exceptions import ServiceNotFoundError
 
 
 log = logging.getLogger("svcs")
-
-if sys.version_info < (3, 10):
-
-    def anext(gen: AsyncGenerator) -> Any:
-        return gen.__anext__()
 
 
 def _full_name(obj: object) -> str:
@@ -45,7 +51,6 @@ class RegisteredService:
     svc_type: type
     factory: Callable = attrs.field(hash=False)
     takes_container: bool
-    is_async: bool
     ping: Callable | None = attrs.field(hash=False)
 
     @property
@@ -56,7 +61,7 @@ class RegisteredService:
         return (
             f"<RegisteredService(svc_type="
             f"{self.name}, "
-            f"{self.factory}, "
+            f"factory={self.factory}, "
             f"takes_container={self.takes_container}, "
             f"has_ping={ self.ping is not None}"
             ")>"
@@ -100,7 +105,7 @@ class ServicePing:
         use this.
         """
         svc: Any = await self._container.aget(self._svc_type)
-        if iscoroutinefunction(self._ping):
+        if self.is_async:
             await self._ping(svc)
         else:
             self._ping(svc)
@@ -191,10 +196,10 @@ class Registry:
             svc_type: The type of the service to register.
 
             factory: A callable that is used to instantiated *svc_type* if
-                asked. If it's a generator, a cleanup is registered after
-                instantiation.
+                asked. If it's a generator or a context manager, a cleanup is
+                registered after instantiation.
 
-                Can also be an async callable or an async generator.
+                Can also be an async callable/generator/context manager..
 
                 If *factory* takes a first argument called ``svcs_container``
                 or the first argument (of any name) is annotated as being
@@ -211,7 +216,7 @@ class Registry:
                 :meth:`svcs.Registry.close()` method is called.
 
                 Can also be an async callable or an
-                :class:`collections.abc.Awaitable`, then
+                :class:`collections.abc.Awaitable`; then
                 :meth:`svcs.Registry.aclose()` must be called.
         """
         rs = self._register_factory(
@@ -269,12 +274,13 @@ class Registry:
         ping: Callable | None,
         on_registry_close: Callable | Awaitable | None = None,
     ) -> RegisteredService:
+        if isgeneratorfunction(factory):
+            factory = contextmanager(factory)
+        elif isasyncgenfunction(factory):
+            factory = asynccontextmanager(factory)
+
         rs = RegisteredService(
-            svc_type,
-            factory,
-            _takes_container(factory),
-            iscoroutinefunction(factory) or isasyncgenfunction(factory),
-            ping,
+            svc_type, factory, _takes_container(factory), ping
         )
         self._services[svc_type] = rs
         if on_registry_close is not None:
@@ -422,9 +428,9 @@ class Container:
 
     registry: Registry
     _instantiated: dict[type, object] = attrs.Factory(dict)
-    _on_close: list[tuple[str, Generator | AsyncGenerator]] = attrs.Factory(
-        list
-    )
+    _on_close: list[
+        tuple[str, AbstractContextManager | AbstractAsyncContextManager]
+    ] = attrs.Factory(list)
 
     def __repr__(self) -> str:
         return (
@@ -475,26 +481,20 @@ class Container:
 
         Errors are logged at warning level, but otherwise ignored.
         """
-        for name, gen in reversed(self._on_close):
+        for name, cm in reversed(self._on_close):
             try:
-                if isinstance(gen, AsyncGenerator):
+                if isinstance(cm, AbstractAsyncContextManager):
                     warnings.warn(
                         f"Skipped async cleanup for {name!r}. "
                         "Use aclose() instead.",
-                        # stacklevel doesn't matter here; it's coming from a framework.
+                        # stacklevel doesn't matter here; it's coming from a
+                        # framework.
                         stacklevel=1,
                     )
                     continue
 
-                next(gen)
-
-                warnings.warn(
-                    f"Container clean up for {name!r} didn't stop iterating.",
-                    stacklevel=1,
-                )
-            except StopIteration:  # noqa: PERF203
-                pass
-            except Exception:  # noqa: BLE001
+                cm.__exit__(None, None, None)
+            except Exception:  # noqa: BLE001, PERF203
                 log.warning(
                     "Container clean up failed for %r.",
                     name,
@@ -514,21 +514,14 @@ class Container:
         Also works with synchronous services, so in an async application, just
         use this.
         """
-        for name, gen in reversed(self._on_close):
+        for name, cm in reversed(self._on_close):
             try:
-                if isinstance(gen, AsyncGenerator):
-                    await anext(gen)
+                if isinstance(cm, AbstractContextManager):
+                    cm.__exit__(None, None, None)
                 else:
-                    next(gen)
+                    await cm.__aexit__(None, None, None)
 
-                warnings.warn(
-                    f"Container clean up for {name!r} didn't stop iterating.",
-                    stacklevel=1,
-                )
-
-            except (StopAsyncIteration, StopIteration):  # noqa: PERF203
-                pass
-            except Exception:  # noqa: BLE001
+            except Exception:  # noqa: BLE001, PERF203
                 log.warning(
                     "Container clean up failed for %r.",
                     name,
@@ -550,7 +543,7 @@ class Container:
         return [
             ServicePing(
                 rs.name,
-                rs.is_async or iscoroutinefunction(rs.ping),
+                iscoroutinefunction(rs.ping),
                 rs.svc_type,
                 rs.ping,
                 self,
@@ -714,15 +707,17 @@ class Container:
                 continue
 
             rs = self.registry.get_registered_service_for(svc_type)
-            if rs.is_async:
-                msg = "Please use `aget()` for async factories."
-                raise TypeError(msg)
-
             svc = rs.factory(self) if rs.takes_container else rs.factory()
 
-            if isinstance(svc, Generator):
+            if iscoroutine(svc) or isinstance(
+                svc, AbstractAsyncContextManager
+            ):
+                msg = "Use `aget()` for async factories."
+                raise TypeError(msg)
+
+            if isinstance(svc, AbstractContextManager):
                 self._on_close.append((rs.name, svc))
-                svc = next(svc)
+                svc = svc.__enter__()
 
             self._instantiated[svc_type] = svc
 
@@ -865,9 +860,9 @@ class Container:
             rs = self.registry.get_registered_service_for(svc_type)
             svc = rs.factory()
 
-            if isinstance(svc, AsyncGenerator):
+            if isinstance(svc, AbstractAsyncContextManager):
                 self._on_close.append((rs.name, svc))
-                svc = await anext(svc)
+                svc = await svc.__aenter__()
             elif isawaitable(svc):
                 svc = await svc
 

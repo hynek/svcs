@@ -51,7 +51,17 @@ async def async_gen() -> AsyncGenerator:
     yield 42
 
 
+@contextlib.asynccontextmanager
+async def async_cm() -> AsyncGenerator:
+    yield 42
+
+
 def factory_with_cleanup() -> Generator[int, None, None]:
+    yield 1
+
+
+@contextlib.contextmanager
+def factory_with_cleanup_ctx() -> Generator[int, None, None]:
     yield 1
 
 
@@ -70,9 +80,11 @@ reg.register_value(int, gen)
 
 reg.register_factory(str, str)
 reg.register_factory(int, factory_with_cleanup)
+reg.register_factory(int, factory_with_cleanup_ctx)
 reg.register_factory(int, factory_with_cleanup, ping=async_ping)
+reg.register_factory(str, async_gen)
+reg.register_factory(str, async_cm)
 reg.register_value(str, str, ping=lambda: None)
-reg.register_value(str, async_gen)
 
 con = svcs.Container(reg)
 

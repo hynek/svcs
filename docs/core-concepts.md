@@ -105,11 +105,13 @@ How to achieve this in other frameworks elegantly is TBD.
 
 ### Cleanup
 
-If a factory is a [generator](https://docs.python.org/3/tutorial/classes.html#generators) and *yields* the instance instead of returning it, the container will remember the generator.
-At the end, you run {meth}`svcs.Container.close()` and all generators will be finished (i.e. called `next(factory)` again).
+If a factory returns a [context manager](https://docs.python.org/3/library/stdtypes.html#context-manager-types), it will be immediately entered and the instance will be added to the cleanup list.
+If a factory is a [generator](https://docs.python.org/3/tutorial/classes.html#generators) that *yields* the instance instead of returning it, it will be wrapped in a context manager automatically.
+At the end, you run {meth}`svcs.Container.close()` and all context managers will be exited.
 You can use this to close files, return database connections to a pool, et cetera.
 
-If you have async generators, await {meth}`svcs.Container.aclose()` instead which calls `await anext(factory)` on all async generators (and `next(factory)` on sync ones).
+Async context managers and async generators work the same way.
+
 You can also use containers as (async) context managers that (a)close automatically on exit:
 
 ```python
