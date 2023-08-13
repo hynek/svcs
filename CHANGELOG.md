@@ -15,6 +15,13 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/23.14.0...HEAD)
 
+### Removed
+
+- `svcs.Container.forget_about()`, `svcs.flask.replace_factory()`, and `svcs.flask.replace_value()`.
+  They don't make any sense in a world of recursive dependencies.
+  Just reset the container using `svcs.Container.(a)close()`.`
+
+
 ### Changed
 
 - Cleanups for services are internally context managers now.

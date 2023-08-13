@@ -14,7 +14,6 @@ from contextlib import (
     AbstractContextManager,
     asynccontextmanager,
     contextmanager,
-    suppress,
 )
 from inspect import (
     isasyncgenfunction,
@@ -466,13 +465,6 @@ class Container:
     ) -> None:
         await self.aclose()
 
-    def forget_about(self, svc_type: type) -> None:
-        """
-        Forget cached instances of *svc_type* if there are any.
-        """
-        with suppress(KeyError):
-            del self._instantiated[svc_type]
-
     def close(self) -> None:
         """
         Run all registered *synchronous* cleanups.
@@ -480,6 +472,11 @@ class Container:
         Async closes are *not* awaited and a warning is raised.
 
         Errors are logged at warning level, but otherwise ignored.
+
+        .. hint::
+
+            The Container can be used again after this. Closing it is an
+            idempotent way to reset it.
         """
         for name, cm in reversed(self._on_close):
             try:
@@ -513,6 +510,11 @@ class Container:
 
         Also works with synchronous services, so in an async application, just
         use this.
+
+        .. hint::
+
+            The Container can be used again after this. Closing it is an
+            idempotent way to reset it.
         """
         for name, cm in reversed(self._on_close):
             try:

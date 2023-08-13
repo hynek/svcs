@@ -97,51 +97,6 @@ def register_value(
     )
 
 
-def replace_factory(
-    svc_type: type,
-    factory: Callable,
-    *,
-    ping: Callable | None = None,
-    on_registry_close: Callable | None = None,
-) -> None:
-    """
-    Register *factory* for *svc_type* and clear any cached values for it in the
-    current container on :obj:`flask.g`.
-
-    .. seealso::
-        :ref:`flask-testing`
-    """
-    container = svcs_from(g)
-    registry = container.registry
-
-    container.forget_about(svc_type)
-    registry.register_factory(
-        svc_type, factory, ping=ping, on_registry_close=on_registry_close
-    )
-
-
-def replace_value(
-    svc_type: type,
-    value: object,
-    *,
-    ping: Callable | None = None,
-    on_registry_close: Callable | None = None,
-) -> None:
-    """
-    Register *instance* for *svc_type* and clear any cached values for it.
-
-    .. seealso::
-        :ref:`flask-testing`
-    """
-    container = svcs_from(g)
-    registry = container.registry
-
-    container.forget_about(svc_type)
-    registry.register_value(
-        svc_type, value, ping=ping, on_registry_close=on_registry_close
-    )
-
-
 def get_pings() -> list[ServicePing]:
     """
     See :meth:`svcs.Container.get_pings()`.

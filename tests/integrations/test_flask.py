@@ -50,7 +50,7 @@ class TestFlask:
         assert [1, 2] == svcs.flask.get(Service, AnotherService)
         assert [1, 2] == svcs.flask.get(Service, AnotherService)
 
-    def test_cleanup_added(self, registry):
+    def test_cleanup_added(self, registry, app):
         """
         get() handles the case where there is already a cleanup registered.
         """
@@ -67,7 +67,7 @@ class TestFlask:
             cleanup2()
 
         registry.register_factory(Service, factory1)
-        svcs.flask.replace_factory(AnotherService, factory2)
+        svcs.flask.register_factory(app, AnotherService, factory2)
 
         svc1 = svcs.flask.get(Service)
         svc2 = svcs.flask.get(AnotherService)
@@ -81,38 +81,44 @@ class TestFlask:
         cleanup1.assert_called_once_with()
         cleanup2.assert_called_once_with()
 
-    def test_overwrite_value(self, registry):
+    def test_overwrite_value(self, registry, app):
         """
-        It's possible to overwrite an already registered type.
+        It's possible to overwrite an already registered and acquired type, if
+        the container is closed.
         """
         registry.register_value(Interface, Service(), ping=nop)
 
         assert isinstance(svcs.flask.get(Interface), Interface)
 
-        svcs.flask.replace_value(Interface, AnotherService())
+        svcs.flask.register_value(app, Interface, AnotherService())
+
+        svcs.flask.svcs_from().close()
 
         assert isinstance(svcs.flask.get(Interface), AnotherService)
         assert [] == svcs.flask.get_pings()
 
-    def test_overwrite_factory(self):
+    def test_overwrite_factory(self, app):
         """
-        It's possible to overwrite an already registered type using a factory.
+        It's possible to overwrite an already registered and acquired type
+        using a factory, if the container is closed..
         """
-        svcs.flask.replace_value(Interface, Service(), ping=nop)
+        svcs.flask.register_value(app, Interface, Service(), ping=nop)
 
         assert isinstance(svcs.flask.get(Interface), Interface)
 
-        svcs.flask.replace_factory(Interface, AnotherService)
+        svcs.flask.register_factory(app, Interface, AnotherService)
+
+        svcs.flask.svcs_from().close()
 
         assert isinstance(svcs.flask.get(Interface), AnotherService)
         assert [] == svcs.flask.get_pings()
 
-    def test_cache(self):
+    def test_cache(self, app):
         """
         Getting a service twice within the same request returns the same
         object.
         """
-        svcs.flask.replace_factory(Interface, Service)
+        svcs.flask.register_factory(app, Interface, Service)
 
         assert svcs.flask.get(Interface) is svcs.flask.get(Interface)
 
@@ -124,43 +130,18 @@ class TestFlask:
         with pytest.raises(svcs.exceptions.ServiceNotFoundError):
             svcs.flask.get(Interface)
 
-    def test_get_pingeable(self):
+    def test_get_pingeable(self, app):
         """
         get_pingable returns only pingable svcs.
         """
-        svcs.flask.replace_factory(Service, Service)
-        svcs.flask.replace_factory(AnotherService, AnotherService, ping=nop)
+        svcs.flask.register_factory(app, Service, Service)
+        svcs.flask.register_factory(
+            app, AnotherService, AnotherService, ping=nop
+        )
 
         assert [AnotherService] == [
             ping._svc_type for ping in svcs.flask.get_pings()
         ]
-
-    def test_cleanup_purge_tolerant(self, container):
-        """
-        If other svcs are registered, they are ignored by the cleanup
-        purge.
-        """
-
-        def factory1():
-            yield Service()
-
-        def factory2():
-            yield AnotherService()
-
-        svcs.flask.replace_factory(Interface, factory1)
-        svcs.flask.replace_factory(AnotherService, factory2)
-
-        svcs.flask.get(Interface)
-        svcs.flask.get(AnotherService)
-
-        assert 2 == len(container._on_close)
-
-        svcs.flask.replace_factory(Interface, Service)
-
-        svcs.flask.get(Interface)
-        svcs.flask.get(AnotherService)
-
-        assert 2 == len(container._on_close)
 
     @pytest.mark.asyncio()
     async def test_teardown_warns_on_async_on_close(self, container):
@@ -171,7 +152,7 @@ class TestFlask:
         async def factory():
             yield Service()
 
-        svcs.flask.replace_factory(Service, factory)
+        container.registry.register_factory(Service, factory)
 
         await container.aget(Service)
 

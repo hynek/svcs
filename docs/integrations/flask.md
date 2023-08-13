@@ -118,22 +118,22 @@ def test_handles_db_failure():
         conn = Mock(spec_set=Connection)
         conn.execute.side_effect = Exception("Database is down!")
 
-        #################################################
+        ######################################################################
         # Overwrite the Connection factory with the Mock.
         # This is all it takes to mock the database.
-        reg_svc.flask.replace_value(Connection, conn)
-        #################################################
+        svcs.flask.register_value(Connection, conn)
+        # The next line is to make sure that the container doesn't already
+        # have a cached connection. This can happen if you used the container
+        # in a fixture, for instance. If you never do that, you can skip this.
+        #
+        # It's valid to use a container again # after closing it.
+        svcs.flask.svc_from().close()
+        ######################################################################
 
         # Now, the endpoint should return a 500.
         response = app.test_client().get("/")
         assert response.status_code == 500
 ```
-
-::: {important}
-The `replace_(factory|value)` method *requires* an application context and ensures that if a factory/value has already been created *and cached*, they're removed before the new factory/value is registered.
-
-Possible situations where this can occur are *pytest* fixtures where you don't control the order in which they're called.
-:::
 
 
 ## Quality of Life
@@ -149,8 +149,6 @@ from svcs.flask import (
     init_app,
     register_factory,
     register_value,
-    replace_factory,
-    replace_value,
 )
 
 
@@ -160,8 +158,6 @@ __all__ = [
     "init_app",
     "register_factory",
     "register_value",
-    "replace_factory",
-    "replace_value",
 ]
 ```
 
@@ -207,8 +203,6 @@ def index():
 ```{eval-rst}
 .. autofunction:: register_factory
 .. autofunction:: register_value
-.. autofunction:: replace_factory
-.. autofunction:: replace_value
 ```
 
 

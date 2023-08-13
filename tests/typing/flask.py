@@ -19,14 +19,8 @@ app = flask.Flask("tests")
 app = svcs.flask.init_app(app, registry=reg)
 app = svcs.flask.init_app(app)
 
-svcs.flask.replace_value(int, 1)
-svcs.flask.replace_value(int, 1, ping=lambda: None)
-
 svcs.flask.register_value(app, int, 1)
 svcs.flask.register_value(app, int, 1, ping=lambda: None)
-
-svcs.flask.replace_factory(str, str)
-svcs.flask.replace_value(str, str, ping=lambda: None)
 
 svcs.flask.register_factory(app, str, str)
 svcs.flask.register_factory(app, int, factory_with_cleanup)

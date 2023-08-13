@@ -22,23 +22,6 @@ class TestContainer:
         """
         assert [] == container.get_pings()
 
-    def test_forget_about_nothing_registered(self, container):
-        """
-        forget_about does nothing if nothing has been registered.
-        """
-        container.forget_about(Service)
-
-    def test_forget_about_no_cleanup(self, container, rs, svc):
-        """
-        forget_about removes the registered service from the container.
-        """
-        container._instantiated[rs.svc_type] = (rs, svc)
-
-        container.forget_about(Service)
-
-        assert {} == container._instantiated
-        assert [] == container._on_close
-
     @pytest.mark.asyncio()
     async def test_repr(self, registry, container):
         """

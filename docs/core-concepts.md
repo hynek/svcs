@@ -96,9 +96,7 @@ If a factory takes a first argument called `svcs_container` or the first argumen
 It is possible to overwrite registered service factories later -- e.g., for testing -- **without monkey-patching**.
 This is especially interesting if you want to replace a low-level service with a mock without re-jiggering all services that depend on it.
 
-However, if you already used those services in your test setup code, you have to remove their cached instances from the container using {meth}`svcs.Container.forget_about()`.
-
-This is usually part of integration methods named `replace_factory()` or `replace_value()`.
+If there's a chance
 :::
 
 
@@ -210,7 +208,7 @@ You can see that the datetime factory and the str value have both been registere
    :members: register_factory, register_value, close, aclose, __contains__
 
 .. autoclass:: Container()
-   :members: get, aget, get_abstract, aget_abstract, close, aclose, forget_about, get_pings, __contains__
+   :members: get, aget, get_abstract, aget_abstract, close, aclose, get_pings, __contains__
 
 .. autoclass:: ServicePing()
    :members: name, ping, aping, is_async
