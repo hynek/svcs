@@ -66,7 +66,7 @@ Therefore, you can *pass* a context manager as a factory, too and the following 
 ```python
 registry.register_factory(
     Connection,
-    engine.connect,
+    engine.connect,  # ← sqlalchemy.engine.Connection() is a context manager
     ping=lambda conn: conn.execute(text("SELECT 1")),
     on_registry_close=engine.dispose
 )
