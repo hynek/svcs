@@ -146,8 +146,12 @@ If you have async services (factory or ping callable), you can use {meth}`~svcs.
 `aping()` works with sync services, too, so you can use it universally in async code.
 You can look at the {attr}`~svcs.ServicePing.is_async` property to check whether you *need* to use `aping()`, though.
 
-Here's how a health check endpoint could look in Flask or Pyramid:
+Here's how a health check endpoint could look like:
 
+::: {tab} AIOHTTP
+```{literalinclude} examples/health_check_aiohttp.py
+```
+:::
 ::: {tab} Flask
 ```{literalinclude} examples/health_check_flask.py
 ```
