@@ -58,6 +58,27 @@ def cleanup():
 ```
 
 The generator-based setup and cleanup may remind you of [*pytest* fixtures](https://docs.pytest.org/en/stable/explanation/fixtures.html).
+However, internally *svcs* uses context managers to manage cleanups, and if you pass a generator, it just wraps it with {func}`~contextlib.contextmanager` for your convenience.
+But of course, you can directly pass a context manager as a factory, too, and the following is equivalent to the above:
+
+% skip: next
+
+```python
+engine = create_engine("postgresql://localhost")
+
+registry = svcs.Registry()
+registry.register_factory(
+    Connection,
+    engine.connect,  # ← sqlalchemy.Connection is a context manager
+    ping=lambda conn: conn.execute(text("SELECT 1")),
+    on_registry_close=engine.dispose
+)
+
+@atexit.register
+def cleanup():
+    registry.close()
+```
+
 The callbacks defined as `on_registry_close` are called when you call `Registry.close()` -- for example, when your application is shutting down.
 
 Next, you can write a simple health check endpoint if you've registered health checks (called *pings*) for your services.

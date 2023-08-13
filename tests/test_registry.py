@@ -13,10 +13,8 @@ import pytest
 import svcs
 
 from .fake_factories import (
-    async_int_factory,
-    async_str_cleanup_factory,
-    int_factory,
-    str_cleanup_factory,
+    async_str_gen_factory,
+    str_gen_factory,
 )
 from .ifaces import AnotherService, Interface, Service
 
@@ -42,6 +40,29 @@ class TestRegistry:
         registry.register_factory(AnotherService, AnotherService)
 
         assert "<svcs.Registry(num_services=2)>" == repr(registry)
+
+    def test_generators_become_context_managers(self, registry):
+        """
+        If a generator-based factory is passed, it's automatically wrapped with
+        @contextmanager.
+        """
+        registry.register_factory(Service, str_gen_factory)
+        cm = registry.get_registered_service_for(Service).factory
+
+        with cm():
+            ...
+
+    @pytest.mark.asyncio()
+    async def test_async_generators_become_context_managers(self, registry):
+        """
+        If a generator-based factory is passed, it's automatically wrapped with
+        @contextmanager.
+        """
+        registry.register_factory(Service, async_str_gen_factory)
+        cm = registry.get_registered_service_for(Service).factory
+
+        async with cm():
+            ...
 
     def test_empty_close(self):
         """
@@ -180,44 +201,6 @@ class TestRegistry:
 
         assert closed
 
-    def test_detects_async_factories(self, registry):
-        """
-        The is_async property of the RegisteredService is True if the factory
-        needs to be awaited.
-        """
-
-        registry.register_factory(int, async_int_factory)
-        registry.register_factory(str, async_str_cleanup_factory)
-
-        assert (
-            svcs.RegisteredService(int, async_int_factory, False, True, None)
-            == registry._services[int]
-        )
-        assert (
-            svcs.RegisteredService(
-                str, async_str_cleanup_factory, False, True, None
-            )
-            == registry._services[str]
-        )
-
-    def test_no_false_positive_async(self, registry):
-        """
-        is_async is False for sync factories.
-        """
-        registry.register_factory(int, int_factory)
-        registry.register_factory(str, str_cleanup_factory)
-
-        assert (
-            svcs.RegisteredService(int, int_factory, False, False, None)
-            == registry._services[int]
-        )
-        assert (
-            svcs.RegisteredService(
-                str, str_cleanup_factory, False, False, None
-            )
-            == registry._services[str]
-        )
-
     @pytest.mark.skipif(
         not hasattr(contextlib, "aclosing"),
         reason="Hasn't contextlib.aclosing()",
@@ -292,7 +275,7 @@ class TestRegisteredService:
 
         assert (
             "<RegisteredService(svc_type=tests.ifaces.Service, "
-            "<class 'tests.ifaces.Service'>, takes_container=False, "
+            "factory=<class 'tests.ifaces.Service'>, takes_container=False, "
             "has_ping=False"
             ")>"
         ) == repr(rs)

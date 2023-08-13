@@ -14,10 +14,10 @@ import pytest
 
 from .fake_factories import (
     async_int_factory,
-    async_str_cleanup_factory,
+    async_str_gen_factory,
     int_factory,
     nop,
-    str_cleanup_factory,
+    str_gen_factory,
 )
 
 
@@ -42,7 +42,7 @@ def test_str_cleanup_factory():
     str_cleanup_factory takes no arguments and returns a generator that yields
     a string.
     """
-    gen = str_cleanup_factory()
+    gen = str_gen_factory()
 
     assert isinstance(gen, Generator)
     assert isinstance(next(gen), str)
@@ -65,7 +65,7 @@ async def test_async_str_cleanup_factory():
     async_str_cleanup_factory takes no arguments and returns an async generator
     that yields a string.
     """
-    gen = async_str_cleanup_factory()
+    gen = async_str_gen_factory()
 
     assert isinstance(gen, AsyncGenerator)
     assert isinstance(await anext(gen), str)

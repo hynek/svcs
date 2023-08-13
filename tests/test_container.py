@@ -6,7 +6,13 @@ from unittest.mock import Mock
 
 import pytest
 
-from .ifaces import AnotherService, Service
+from .fake_factories import (
+    async_bool_cm_factory,
+    async_str_gen_factory,
+    bool_cm_factory,
+    str_gen_factory,
+)
+from .ifaces import AnotherService, Service, YetAnotherService
 
 
 class TestContainer:
@@ -38,20 +44,17 @@ class TestContainer:
         """
         The repr counts correctly.
         """
-
-        def factory():
-            yield 42
-
-        async def async_factory():
-            yield 42
-
-        registry.register_factory(Service, factory)
-        registry.register_factory(AnotherService, async_factory)
+        registry.register_factory(Service, str_gen_factory)
+        registry.register_factory(bool, bool_cm_factory)
+        registry.register_factory(AnotherService, async_str_gen_factory)
+        registry.register_factory(YetAnotherService, async_bool_cm_factory)
 
         container.get(Service)
+        container.get(bool)
         await container.aget(AnotherService)
+        await container.aget(YetAnotherService)
 
-        assert "<Container(instantiated=2, cleanups=2)>" == repr(container)
+        assert "<Container(instantiated=4, cleanups=4)>" == repr(container)
 
     def test_contains(self, container):
         """

@@ -15,6 +15,12 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/23.14.0...HEAD)
 
+### Changed
+
+- Cleanups for services are internally context managers now.
+  For your convenience, if you pass an (async) generator function for a factory, the registry will automatically wrap it for you into an (async) context manager.
+  [#92](https://github.com/hynek/svcs/pull/29)
+
 
 ## [23.14.0](https://github.com/hynek/svcs/compare/23.13.0...23.14.0) - 2023-08-11
 
