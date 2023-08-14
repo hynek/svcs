@@ -84,6 +84,8 @@ def cleanup():
     registry.close()
 ```
 
+The automatic entering of context managers can be disabled on registration if you want to decide yourself when to enter it (for example, for database transaction managers).
+
 The callbacks defined as `on_registry_close` are called when you call `Registry.close()` -- for example, when your application is shutting down.
 
 Next, you can write a simple health check endpoint if you've registered health checks (called *pings*) for your services.
