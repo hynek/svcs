@@ -21,6 +21,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
     "sphinx_inline_tabs",
+    "sphinxext.opengraph",
 ]
 
 myst_enable_extensions = [
@@ -28,6 +29,8 @@ myst_enable_extensions = [
     "smartquotes",
     "deflist",
 ]
+
+ogp_image = "https://svcs.hynek.me/en/latest/_static/social%20card.png"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

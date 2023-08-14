@@ -36,6 +36,7 @@ docs = [
   "sphinx",
   "sphinx-notfound-page",
   "sphinx-inline-tabs",
+  "sphinxext-opengraph",
   "myst-parser",
   "furo",
   "sybil",
