@@ -28,14 +28,17 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 - Pyramid: `svcs.pyramid.get()` now takes a Pyramid request as the first argument.
   `svcs.pyramid.get_pings()` also doesn't look at thread locals anymore.
-  If you still want to use them, you can use `svcs.pyramid.from_svcs(None)`.
+  If you still want to use thread locals, you can use `svcs.pyramid.from_svcs(None)` to obtain the currently active container.
+
+- Flask: `replace_(value|factory)()` is now called `overwrite_(value|factory())` to be consistent with the docs lingo.
+  They also completely reset the instantiation cache now (practically speaking: they close the container).
 
 
 ### Removed
 
-- `svcs.Container.forget_about()`, `svcs.flask.replace_factory()`, and `svcs.flask.replace_value()`.
-  They don't make any sense in a world of recursive dependencies.
-  Just reset the container using `svcs.Container.(a)close()`.`
+- `svcs.Container.forget_about()`.
+  It doesn't make any sense in a world of recursive dependencies.
+  Just reset the container using `svcs.Container.(a)close()`.
 
 
 ## [23.14.0](https://github.com/hynek/svcs/compare/23.13.0...23.14.0) - 2023-08-11

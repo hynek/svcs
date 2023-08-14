@@ -97,6 +97,56 @@ def register_value(
     )
 
 
+def overwrite_factory(
+    svc_type: type,
+    factory: Callable,
+    *,
+    ping: Callable | None = None,
+    on_registry_close: Callable | None = None,
+) -> None:
+    """
+    Obtain the currently active container on ``g`` and overwrite the factory
+    for *svc_type*.
+
+    Afterwards resets the instantiation cache on ``g``.
+
+    .. seealso::
+        - :meth:`svcs.Registry.register_factory()`
+        - :meth:`svcs.Container.close()`
+        - :ref:`flask-testing`
+    """
+    container = svcs_from()
+    container.registry.register_factory(
+        svc_type, factory, ping=ping, on_registry_close=on_registry_close
+    )
+    container.close()
+
+
+def overwrite_value(
+    svc_type: type,
+    value: object,
+    *,
+    ping: Callable | None = None,
+    on_registry_close: Callable | None = None,
+) -> None:
+    """
+    Obtain the currently active container on ``g`` and overwrite the value
+    for *svc_type*.
+
+    Afterwards resets the instantiation cache on ``g``.
+
+    .. seealso::
+        - :meth:`svcs.Registry.register_factory()`
+        - :meth:`svcs.Container.close()`
+        - :ref:`flask-testing`
+    """
+    container = svcs_from()
+    container.registry.register_value(
+        svc_type, value, ping=ping, on_registry_close=on_registry_close
+    )
+    container.close()
+
+
 def get_pings() -> list[ServicePing]:
     """
     See :meth:`svcs.Container.get_pings()`.

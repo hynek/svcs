@@ -99,9 +99,10 @@ It is possible to overwrite registered service factories later -- e.g., for test
 This is especially interesting if you want to replace a low-level service with a mock without re-jiggering all services that depend on it.
 
 If there's a chance that the container has been used by your fixtures to acquire a service, it's possible that the service is already cached by the container.
-
 In this case make sure to reset it by calling {meth}`svcs.Container.close` on it after overwriting.
 Closing a container is idempotent and it's safe to use it again afterwards.
+
+If your integration has a function called `overwrite_(value|factory)()`, it will do all of that for you.
 :::
 
 
@@ -167,12 +168,13 @@ Here's how a health check endpoint could look like:
 
 ## Life Cycle Summary
 
-- The {class}`svcs.Registry` object should live on an application-scoped object like Flask's {attr}`flask.Flask.config` object or in Pyramid's {attr}`pyramid.config.Configurator.registry`.
-- The {class}`svcs.Container` object should live on a request-scoped object like Flask's {data}`~flask.g` object or Pyramid's {class}`~pyramid.request.Request` object.
+- The {class}`svcs.Registry` object should live on an **application-scoped** object like Flask's {attr}`flask.Flask.config` object.
+- The {class}`svcs.Container` object should live on a **request-scoped** object like Flask's {data}`~flask.g` object.
 
 
 ::: {important}
 The core APIs only use vanilla objects without any global state -- but also without any comfort.
+
 It gets more interesting when using framework-specific integrations where the life cycle of the container and, thus, services is handled automatically.
 :::
 

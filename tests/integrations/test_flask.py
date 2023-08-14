@@ -83,16 +83,20 @@ class TestFlask:
 
     def test_overwrite_value(self, registry, app):
         """
-        It's possible to overwrite an already registered and acquired type, if
-        the container is closed.
+        It's possible to overwrite an already registered and acquired type
+        using a value. The container cache is cleared.
         """
         registry.register_value(Interface, Service(), ping=nop)
 
         assert isinstance(svcs.flask.get(Interface), Interface)
 
-        svcs.flask.register_value(app, Interface, AnotherService())
+        container = svcs.flask.svcs_from()
 
-        svcs.flask.svcs_from().close()
+        assert container._instantiated
+
+        svcs.flask.overwrite_value(Interface, AnotherService())
+
+        assert not container._instantiated
 
         assert isinstance(svcs.flask.get(Interface), AnotherService)
         assert [] == svcs.flask.get_pings()
@@ -100,15 +104,19 @@ class TestFlask:
     def test_overwrite_factory(self, app):
         """
         It's possible to overwrite an already registered and acquired type
-        using a factory, if the container is closed..
+        using a factory. The container cache is cleared.
         """
         svcs.flask.register_value(app, Interface, Service(), ping=nop)
 
         assert isinstance(svcs.flask.get(Interface), Interface)
 
-        svcs.flask.register_factory(app, Interface, AnotherService)
+        container = svcs.flask.svcs_from()
 
-        svcs.flask.svcs_from().close()
+        assert container._instantiated
+
+        svcs.flask.overwrite_factory(Interface, AnotherService)
+
+        assert not container._instantiated
 
         assert isinstance(svcs.flask.get(Interface), AnotherService)
         assert [] == svcs.flask.get_pings()

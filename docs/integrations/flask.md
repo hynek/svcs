@@ -121,19 +121,15 @@ def test_handles_db_failure():
         ######################################################################
         # Overwrite the Connection factory with the Mock.
         # This is all it takes to mock the database.
-        svcs.flask.register_value(Connection, conn)
-        # The next line is to make sure that the container doesn't already
-        # have a cached connection. This can happen if you used the container
-        # in a fixture, for instance. If you never do that, you can skip this.
-        #
-        # It's valid to use a container again # after closing it.
-        svcs.flask.svc_from().close()
+        svcs.flask.overwrite_value(Connection, conn)
         ######################################################################
 
         # Now, the endpoint should return a 500.
         response = app.test_client().get("/")
         assert response.status_code == 500
 ```
+
+{meth}`svcs.flask.overwrite_value`  makes sure that the instantiation cache of the active container is cleared, such that possibly existing connections that you've used in setup are closed and removed.
 
 
 ## Quality of Life
@@ -144,20 +140,28 @@ Say this is `app/services.py`:
 
 ```python
 from svcs.flask import (
+    close_registry,
     get,
     get_pings,
     init_app,
+    overwrite_factory,
+    overwrite_value,
     register_factory,
     register_value,
+    svcs_from,
 )
 
 
 __all__ = [
+    "close_registry",
     "get_pings",
     "get",
     "init_app",
+    "overwrite_factory",
+    "overwrite_value",
     "register_factory",
     "register_value",
+    "svcs_from",
 ]
 ```
 
@@ -203,6 +207,8 @@ def index():
 ```{eval-rst}
 .. autofunction:: register_factory
 .. autofunction:: register_value
+.. autofunction:: overwrite_factory
+.. autofunction:: overwrite_value
 ```
 
 
