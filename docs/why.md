@@ -9,6 +9,11 @@ In practice, that means that you say "*Give me a database connection*!" at runti
 That can be an actual database connection, or it can be a mock object for testing.
 All this happens *within* your application -- service locators are **not** related to {term}`service discovery`.
 
+A key feature of service locators is that you only ask for the services once you *know* that you will need them.
+So you don't have to pre-instantiate all services just in case (*wasteful*!), or move the instantiation further into, for example, your web views (*resource management*!).
+
+---
+
 If you follow the **{term}`Dependency Inversion Principle`**, you would register concrete factories for abstract interfaces.
 In Python, usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [*abstract base class*](https://docs.python.org/3.11/library/abc.html).
 
