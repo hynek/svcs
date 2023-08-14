@@ -50,6 +50,7 @@ class RegisteredService:
     svc_type: type
     factory: Callable = attrs.field(hash=False)
     takes_container: bool
+    enter: bool
     ping: Callable | None = attrs.field(hash=False)
 
     @property
@@ -62,6 +63,7 @@ class RegisteredService:
             f"{self.name}, "
             f"factory={self.factory}, "
             f"takes_container={self.takes_container}, "
+            f"enter={self.enter}, "
             f"has_ping={ self.ping is not None}"
             ")>"
         )
@@ -197,6 +199,7 @@ class Registry:
         svc_type: type,
         factory: Callable,
         *,
+        enter: bool = True,
         ping: Callable | None = None,
         on_registry_close: Callable | Awaitable | None = None,
     ) -> None:
@@ -222,6 +225,11 @@ class Registry:
                 instantiating the service is passed into the factory as the
                 first positional argument.
 
+            enter: Whether to enter context managers if one is returned by
+                 *factory*. Usually you want that, but there are occasions --
+                 like database transaction managers -- that you want to enter
+                 manually.
+
             ping: A callable that marks the service as having a health check.
 
                 .. seealso::
@@ -235,7 +243,11 @@ class Registry:
                 :meth:`svcs.Registry.aclose()` must be called.
         """
         rs = self._register_factory(
-            svc_type, factory, ping=ping, on_registry_close=on_registry_close
+            svc_type,
+            factory,
+            enter=enter,
+            ping=ping,
+            on_registry_close=on_registry_close,
         )
 
         log.debug(
@@ -254,6 +266,7 @@ class Registry:
         svc_type: type,
         value: object,
         *,
+        enter: bool = True,
         ping: Callable | None = None,
         on_registry_close: Callable | Awaitable | None = None,
     ) -> None:
@@ -263,6 +276,7 @@ class Registry:
            register_factory(
                svc_type,
                lambda: value,
+               enter=enter,
                ping=ping,
                on_registry_close=on_registry_close
            )
@@ -270,6 +284,7 @@ class Registry:
         rs = self._register_factory(
             svc_type,
             lambda: value,
+            enter=enter,
             ping=ping,
             on_registry_close=on_registry_close,
         )
@@ -286,6 +301,7 @@ class Registry:
         self,
         svc_type: type,
         factory: Callable,
+        enter: bool,
         ping: Callable | None,
         on_registry_close: Callable | Awaitable | None = None,
     ) -> RegisteredService:
@@ -295,7 +311,7 @@ class Registry:
             factory = asynccontextmanager(factory)
 
         rs = RegisteredService(
-            svc_type, factory, _takes_container(factory), ping
+            svc_type, factory, _takes_container(factory), enter, ping
         )
         self._services[svc_type] = rs
         if on_registry_close is not None:
@@ -750,7 +766,7 @@ class Container:
                 msg = "Use `aget()` for async factories."
                 raise TypeError(msg)
 
-            if isinstance(svc, AbstractContextManager):
+            if rs.enter and isinstance(svc, AbstractContextManager):
                 self._on_close.append((rs.name, svc))
                 svc = svc.__enter__()
 
@@ -895,7 +911,7 @@ class Container:
             rs = self.registry.get_registered_service_for(svc_type)
             svc = rs.factory()
 
-            if isinstance(svc, AbstractAsyncContextManager):
+            if rs.enter and isinstance(svc, AbstractAsyncContextManager):
                 self._on_close.append((rs.name, svc))
                 svc = await svc.__aenter__()
             elif isawaitable(svc):

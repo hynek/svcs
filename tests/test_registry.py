@@ -294,7 +294,9 @@ class TestRegisteredService:
 
         assert (
             "<RegisteredService(svc_type=tests.ifaces.Service, "
-            "factory=<class 'tests.ifaces.Service'>, takes_container=False, "
+            "factory=<class 'tests.ifaces.Service'>, "
+            "takes_container=False, "
+            "enter=True, "
             "has_ping=False"
             ")>"
         ) == repr(rs)

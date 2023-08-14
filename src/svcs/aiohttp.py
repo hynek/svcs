@@ -68,6 +68,7 @@ def register_value(
     svc_type: type,
     value: object,
     *,
+    enter: bool = True,
     ping: Callable | None = None,
     on_registry_close: Callable | None = None,
 ) -> None:
@@ -76,7 +77,11 @@ def register_value(
     *app*.
     """
     app[_KEY_REGISTRY].register_value(
-        svc_type, value, ping=ping, on_registry_close=on_registry_close
+        svc_type,
+        value,
+        enter=enter,
+        ping=ping,
+        on_registry_close=on_registry_close,
     )
 
 
@@ -85,6 +90,7 @@ def register_factory(
     svc_type: type,
     factory: Callable,
     *,
+    enter: bool = True,
     ping: Callable | None = None,
     on_registry_close: Callable | None = None,
 ) -> None:
@@ -93,7 +99,11 @@ def register_factory(
     *app*.
     """
     app[_KEY_REGISTRY].register_factory(
-        svc_type, factory, ping=ping, on_registry_close=on_registry_close
+        svc_type,
+        factory,
+        enter=enter,
+        ping=ping,
+        on_registry_close=on_registry_close,
     )
 
 

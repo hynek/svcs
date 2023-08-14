@@ -5,6 +5,13 @@
 import asyncio
 import re
 
+from contextlib import (
+    AbstractAsyncContextManager,
+    AbstractContextManager,
+    asynccontextmanager,
+    contextmanager,
+)
+
 import pytest
 
 import svcs
@@ -96,6 +103,32 @@ def test_passes_container_bc_annotation(registry, container):
     registry.register_factory(str, factory)
 
     assert "42" == container.get(str)
+
+
+def test_get_enter_false(registry, container):
+    """
+    If the factory is registered with enter=False and returns a context
+    manager, it is not entered on instantiation.
+    """
+    entered = False
+
+    @contextmanager
+    def factory():
+        nonlocal entered
+        entered = True
+        yield 42
+
+    registry.register_factory(Service, factory, enter=False)
+
+    cm = container.get(Service)
+
+    assert not entered
+    assert isinstance(cm, AbstractContextManager)
+
+    with cm as i:
+        assert 42 == i
+
+    assert entered
 
 
 def test_get_pings(registry, container, svc):
@@ -259,6 +292,31 @@ class TestAsync:
 
         assert [42, "42"] == (await container.aget_abstract(int, str))
         assert [42, "42"] == (await container.aget_abstract(int, str))
+
+    async def test_get_enter_false(self, registry, container):
+        """
+        If the factory is registered with enter=False and returns a context
+        manager, it is not entered on instantiation.
+        """
+        entered = False
+
+        @asynccontextmanager
+        async def factory():
+            nonlocal entered
+            entered = True
+            yield 42
+
+        registry.register_factory(Service, factory, enter=False)
+
+        cm = await container.aget(Service)
+
+        assert not entered
+        assert isinstance(cm, AbstractAsyncContextManager)
+
+        async with cm as i:
+            assert 42 == i
+
+        assert entered
 
     async def test_async_cleanup(self, registry, container):
         """

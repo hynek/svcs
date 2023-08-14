@@ -15,6 +15,12 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/23.15.0...HEAD)
 
+### Added
+
+- *enter* keyword argument to all `register_(value|factory)()`.
+  It prevents *svcs* from entering context managers if the factory returns one.
+  This is useful for context managers like database transactions that you want to start manually.
+
 
 ## [23.15.0](https://github.com/hynek/svcs/compare/23.14.0...23.15.0) - 2023-08-14
 
