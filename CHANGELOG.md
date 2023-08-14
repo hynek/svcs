@@ -21,14 +21,14 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   It prevents *svcs* from entering context managers if the factory returns one.
   This is useful for context managers like database transactions that you want to start manually.
 
+- Services acquired using `aget()` now also can receive the current container if they take one argument that is named `svcs_container` or that is annotated as being `svcs.Container` and has any name.
+
 
 ## [23.15.0](https://github.com/hynek/svcs/compare/23.14.0...23.15.0) - 2023-08-14
 
 ### Added
 
 - A `ResourceWarning` is now raised when a container or a registry are garbage-collected with pending cleanups.
-
-- Services acquired using `aget()` now also can receive the current container if they take one argument that is named `svcs_container` or that is annotated as being `svcs.Container` and has any name.
 
 
 ### Changed
