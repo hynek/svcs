@@ -28,6 +28,8 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 - A `ResourceWarning` is now raised when a container or a registry are garbage-collected with pending cleanups.
 
+- Services acquired using `aget()` now also can receive the current container if they take one argument that is named `svcs_container` or that is annotated as being `svcs.Container` and has any name.
+
 
 ### Changed
 

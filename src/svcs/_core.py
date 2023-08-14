@@ -624,6 +624,23 @@ class Container:
         """
         return await self.aget(*svc_types)
 
+    def _lookup(self, svc_type: type) -> tuple[bool, object, str, bool]:
+        """
+        Look up svc_type first in our cache, then in the registry.
+
+        If it's cached, only the first two items of the returned tupled are
+        meaningful.
+        """
+        if (
+            svc := self._instantiated.get(svc_type, attrs.NOTHING)
+        ) is not attrs.NOTHING:
+            return True, svc, "", False
+
+        rs = self.registry.get_registered_service_for(svc_type)
+        svc = rs.factory(self) if rs.takes_container else rs.factory()
+
+        return False, svc, rs.name, rs.enter
+
     @overload
     def get(self, svc_type: type[T1], /) -> T1:
         ...
@@ -751,14 +768,10 @@ class Container:
         """
         rv = []
         for svc_type in svc_types:
-            if (
-                svc := self._instantiated.get(svc_type, attrs.NOTHING)
-            ) is not attrs.NOTHING:
+            cached, svc, name, enter = self._lookup(svc_type)
+            if cached:
                 rv.append(svc)
                 continue
-
-            rs = self.registry.get_registered_service_for(svc_type)
-            svc = rs.factory(self) if rs.takes_container else rs.factory()
 
             if iscoroutine(svc) or isinstance(
                 svc, AbstractAsyncContextManager
@@ -766,8 +779,8 @@ class Container:
                 msg = "Use `aget()` for async factories."
                 raise TypeError(msg)
 
-            if rs.enter and isinstance(svc, AbstractContextManager):
-                self._on_close.append((rs.name, svc))
+            if enter and isinstance(svc, AbstractContextManager):
+                self._on_close.append((name, svc))
                 svc = svc.__enter__()
 
             self._instantiated[svc_type] = svc
@@ -902,22 +915,18 @@ class Container:
         """
         rv = []
         for svc_type in svc_types:
-            if (
-                svc := self._instantiated.get(svc_type, attrs.NOTHING)
-            ) is not attrs.NOTHING:
+            cached, svc, name, enter = self._lookup(svc_type)
+            if cached:
                 rv.append(svc)
                 continue
 
-            rs = self.registry.get_registered_service_for(svc_type)
-            svc = rs.factory()
-
-            if rs.enter and isinstance(svc, AbstractAsyncContextManager):
-                self._on_close.append((rs.name, svc))
+            if enter and isinstance(svc, AbstractAsyncContextManager):
+                self._on_close.append((name, svc))
                 svc = await svc.__aenter__()
             elif isawaitable(svc):
                 svc = await svc
 
-            self._instantiated[rs.svc_type] = svc
+            self._instantiated[svc_type] = svc
 
             rv.append(svc)
 

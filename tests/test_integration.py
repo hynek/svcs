@@ -293,7 +293,7 @@ class TestAsync:
         assert [42, "42"] == (await container.aget_abstract(int, str))
         assert [42, "42"] == (await container.aget_abstract(int, str))
 
-    async def test_get_enter_false(self, registry, container):
+    async def test_aget_enter_false(self, registry, container):
         """
         If the factory is registered with enter=False and returns a context
         manager, it is not entered on instantiation.
@@ -317,6 +317,34 @@ class TestAsync:
             assert 42 == i
 
         assert entered
+
+    async def test_passes_container_bc_name(self, registry, container):
+        """
+        If the factory takes an argument called `svcs_container`, it is passed on
+        instantiation.
+        """
+
+        async def factory(svcs_container):
+            return str(svcs_container.get(int))
+
+        registry.register_value(int, 42)
+        registry.register_factory(str, factory)
+
+        assert "42" == await container.aget(str)
+
+    async def test_passes_container_bc_annotation(self, registry, container):
+        """
+        If the factory takes an argument annotated with svcs.Container, it is
+        passed on instantiation.
+        """
+
+        async def factory(foo: svcs.Container):
+            return str(foo.get(int))
+
+        registry.register_value(int, 42)
+        registry.register_factory(str, factory)
+
+        assert "42" == await container.aget(str)
 
     async def test_async_cleanup(self, registry, container):
         """
