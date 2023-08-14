@@ -13,14 +13,15 @@ suppress_warnings = ["image.nonlocal_uri"]
 
 extensions = [
     "myst_parser",
+    "sphinx.ext.autodoc",  # MUST be up here!
     "notfound.extension",
-    "sphinx.ext.autodoc",
+    "sphinx_copybutton",
+    "sphinx_inline_tabs",
     "sphinx.ext.autodoc.typehints",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    "sphinx_inline_tabs",
+    "sphinx.ext.viewcode",
     "sphinxext.opengraph",
 ]
 

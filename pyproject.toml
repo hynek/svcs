@@ -34,8 +34,9 @@ typing = [
 ]
 docs = [
   "sphinx",
-  "sphinx-notfound-page",
+  "sphinx-copybutton",
   "sphinx-inline-tabs",
+  "sphinx-notfound-page",
   "sphinxext-opengraph",
   "myst-parser",
   "furo",
