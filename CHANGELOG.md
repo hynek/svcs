@@ -18,6 +18,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 ### Added
 
 - FastAPI integration.
+  [#20](https://github.com/hynek/svcs/pull/30)
 
 
 ## [23.16.0](https://github.com/hynek/svcs/compare/23.15.0...23.16.0) - 2023-08-14
@@ -42,7 +43,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 - Cleanups for services are internally context managers now.
   For your convenience, if you pass an (async) generator function for a factory, the registry will automatically wrap it for you into an (async) context manager.
-  [#92](https://github.com/hynek/svcs/pull/29)
+  [#29](https://github.com/hynek/svcs/pull/29)
 
 - Pyramid: `svcs.pyramid.get()` now takes a Pyramid request as the first argument.
   `svcs.pyramid.get_pings()` also doesn't look at thread locals anymore.
