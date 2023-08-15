@@ -9,6 +9,7 @@ Here's documentation on those we ship and how you can write your own.
 :maxdepth: 1
 
 aiohttp
+fastapi
 flask
 pyramid
 custom

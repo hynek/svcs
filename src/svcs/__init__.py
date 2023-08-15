@@ -27,6 +27,11 @@ except ImportError:
     __all__ += ["aiohttp"]
 
 try:
+    from . import fastapi
+except ImportError:
+    __all__ += ["fastapi"]
+
+try:
     from . import flask
 except ImportError:
     __all__ += ["flask"]

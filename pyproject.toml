@@ -28,6 +28,7 @@ dependencies = [
 tests = ["pytest", "pytest-asyncio", "sybil"]
 typing = [
   "mypy>=1.4",
+  "fastapi",
   "flask",
   "aiohttp; python_version<'3.12'",
   "pyramid; python_version<'3.12'",
@@ -42,7 +43,9 @@ docs = [
   "furo",
   "sybil",
   "pytest",
+  "httpx",
   "aiohttp",
+  "fastapi",
   "flask",
   "pyramid",
 ]
@@ -163,6 +166,10 @@ module = "pyramid.*"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
+module = "pytest.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
 module = "tests.*"
 ignore_errors = true
 
@@ -236,3 +243,4 @@ ignore = [
 [tool.ruff.isort]
 lines-between-types = 1
 lines-after-imports = 2
+known-first-party = ["svcs", "tests", "simple_app"]

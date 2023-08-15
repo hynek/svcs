@@ -10,9 +10,10 @@ import pytest
 
 from sybil import Sybil
 from sybil.parsers import myst, rest
-from tests.ifaces import Service
 
 import svcs
+
+from tests.ifaces import Service
 
 
 markdown_examples = Sybil(
