@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 import asyncio
-import sys
 
 from contextlib import asynccontextmanager
 
@@ -13,14 +12,8 @@ import svcs
 
 
 try:
-    from fastapi import Depends, FastAPI
+    from fastapi import FastAPI
     from fastapi.testclient import TestClient
-
-    if sys.version_info < (3, 9):
-        from typing_extensions import Annotated
-    else:
-        from typing import Annotated
-
 except ImportError:
     pytest.skip("FastAPI not installed", allow_module_level=True)
 
@@ -70,9 +63,7 @@ async def test_integration(yield_something, cm):
     app = FastAPI(lifespan=svcs.fastapi.lifespan(lifespan))
 
     @app.get("/")
-    async def view(
-        services: Annotated[svcs.Container, Depends(svcs.fastapi.container)]
-    ):
+    async def view(services: svcs.fastapi.DepContainer):
         return {"val": await services.aget(int)}
 
     with TestClient(app) as client:

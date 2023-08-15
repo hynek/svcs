@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Annotated, AsyncGenerator
+from typing import AsyncGenerator
 
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
 import svcs
@@ -23,9 +23,7 @@ app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/healthy")
-async def healthy(
-    services: Annotated[svcs.Container, Depends(svcs.fastapi.container)]
-) -> JSONResponse:
+async def healthy(services: svcs.fastapi.DepContainer) -> JSONResponse:
     """
     Ping all external services.
     """

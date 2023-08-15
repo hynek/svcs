@@ -38,9 +38,7 @@ async def view(request):
 import svcs
 
 @app.get("/")
-async def view(
-    services: Annotated[svcs.Container, Depends(svcs.fastapi.container)],
-):
+async def view(services: svcs.fastapi.DepContainer):
     db, api, cache = await services.aget(Database, WebAPI, Cache)
 
     ...

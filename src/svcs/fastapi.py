@@ -5,17 +5,24 @@
 from __future__ import annotations
 
 import inspect
+import sys
 
 from contextlib import AbstractAsyncContextManager, asynccontextmanager
 from typing import AsyncGenerator, Callable
 
 import attrs
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 
 import svcs
 
 from svcs._core import _KEY_REGISTRY
+
+
+if sys.version_info < (3, 9):
+    from typing_extensions import Annotated
+else:
+    from typing import Annotated
 
 
 @attrs.define
@@ -77,3 +84,17 @@ async def container(request: Request) -> AsyncGenerator[svcs.Container, None]:
     """
     async with svcs.Container(getattr(request.state, _KEY_REGISTRY)) as cont:
         yield cont
+
+
+DepContainer = Annotated[svcs.Container, Depends(container)]
+"""
+An alias for::
+
+    typing.Annotated[svcs.Container, fastapi.Depends(svcs.fastapi.container)]
+
+This allows you write your view like::
+
+    @app.get("/")
+    async def view(services: svcs.fastapi.DepContainer):
+        ...
+"""

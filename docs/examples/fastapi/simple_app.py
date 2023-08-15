@@ -4,8 +4,7 @@ import os
 
 from typing import AsyncGenerator
 
-from fastapi import Depends, FastAPI
-from typing_extensions import Annotated
+from fastapi import FastAPI
 
 import svcs
 
@@ -20,7 +19,7 @@ class Database:
         return Database()
 
     async def get_user(self, user_id: int) -> dict[str, str]:
-        return {}  # TODO
+        return {}  # not interesting here
 
 
 @svcs.fastapi.lifespan
@@ -39,11 +38,8 @@ app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/users/{user_id}")
-async def get_user(
-    user_id: int,
-    svcs: Annotated[svcs.Container, Depends(svcs.fastapi.container)],
-) -> dict:
-    db = await svcs.aget(Database)
+async def get_user(user_id: int, services: svcs.fastapi.DepContainer) -> dict:
+    db = await services.aget(Database)
 
     try:
         return {"data": await db.get_user(user_id)}

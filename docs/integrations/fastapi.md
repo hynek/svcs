@@ -1,9 +1,9 @@
 # FastAPI
 
+*svcs*'s *centralization* and *on-demand* capabilities are a great complement to FastAPI's dependency injection system – especially when the annotated decorator approach becomes unwieldy because of too many dependencies.
+
 *svcs*'s [FastAPI](https://fastapi.tiangolo.com) integration stores the {class}`svcs.Registry` on the *lifespan state* and the {class}`svcs.Container` is a [dependency](https://fastapi.tiangolo.com/tutorial/dependencies/) that can be injected into your views.
 That makes very little API necessary from *svcs* itself.
-
-*svcs*'s centralization and on-demand capabilities are a great complement to FastAPI's dependency injection system – especially when the annotated decorator approach becomes unwieldy because of too many dependencies.
 
 (fastapi-init)=
 
@@ -52,8 +52,16 @@ from fastapi import Depends
 
 
 @app.get("/")
-async def index(svcs: Annotated[svcs.Container, Depends(svcs.fastapi.container)]):
-    db = svcs.get(Database)
+async def index(services: Annotated[svcs.Container, Depends(svcs.fastapi.container)]):
+    db = services.get(Database)
+```
+
+For your convenience, *svcs* comes with the alias {class}`svcs.fastapi.DepContainer` that allows you to use the shorter and even nicer:
+
+```python
+@app.get("/")
+async def index(services: svcs.fastapi.DepContainer):
+    db = services.get(Database)
 ```
 
 (fastapi-health)=
@@ -108,4 +116,6 @@ If you initialize the application with a lifespan as shown above, and use the {f
 
 ```{eval-rst}
 .. autofunction:: svcs.fastapi.container
+
+.. autoclass:: svcs.fastapi.DepContainer
 ```
