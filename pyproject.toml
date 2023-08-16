@@ -243,4 +243,4 @@ ignore = [
 [tool.ruff.isort]
 lines-between-types = 1
 lines-after-imports = 2
-known-first-party = ["svcs", "tests", "simple_app"]
+known-first-party = ["svcs", "tests", "simple_fastapi_app"]

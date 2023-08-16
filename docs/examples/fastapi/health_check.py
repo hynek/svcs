@@ -1,25 +1,12 @@
 from __future__ import annotations
 
-from typing import AsyncGenerator
-
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
 import svcs
 
 
-@svcs.fastapi.lifespan
-async def lifespan(
-    app: FastAPI, registry: svcs.Registry
-) -> AsyncGenerator[dict[str, object], None]:
-    # Register your services here using the *registry* argument.
-
-    yield {"your": "other state"}
-
-
-app = FastAPI(lifespan=lifespan)
-
-##############################################################################
+app = FastAPI(...)
 
 
 @app.get("/healthy")

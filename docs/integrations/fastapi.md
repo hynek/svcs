@@ -80,12 +80,12 @@ The centralized service registry makes it straight-forward to selectively replac
 
 Let's take this simple FastAPI application as an example:
 
-```{literalinclude} ../examples/fastapi/simple_app.py
+```{literalinclude} ../examples/fastapi/simple_fastapi_app.py
 ```
 
 Now if you want to make a request against the `get_user` view, but want the database to raise an error to see if it's properly handled, you can do this:
 
-```{literalinclude} ../examples/fastapi/test_simple_app.py
+```{literalinclude} ../examples/fastapi/test_simple_fastapi_app.py
 ```
 
 As you can see, we can inspect the decorated lifespan function to get the registry that got injected and you can overwrite it later.

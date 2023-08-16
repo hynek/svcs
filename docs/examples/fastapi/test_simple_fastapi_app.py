@@ -4,7 +4,7 @@ import pytest
 
 from fastapi.testclient import TestClient
 
-from simple_app import Database, app, lifespan
+from simple_fastapi_app import Database, app, lifespan
 
 
 @pytest.fixture(name="client")

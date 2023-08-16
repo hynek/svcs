@@ -153,8 +153,13 @@ You can look at the {attr}`~svcs.ServicePing.is_async` property to check whether
 
 Here's how a health check endpoint could look like:
 
+<!-- begin health checks -->
 ::: {tab} AIOHTTP
 ```{literalinclude} examples/aiohttp/health_check.py
+```
+:::
+::: {tab} FastAPI
+```{literalinclude} examples/fastapi/health_check.py
 ```
 :::
 ::: {tab} Flask
@@ -165,6 +170,8 @@ Here's how a health check endpoint could look like:
 ```{literalinclude} examples/flask/health_check.py
 ```
 :::
+<!-- end health checks -->
+
 
 ## Life Cycle Summary
 

@@ -61,6 +61,7 @@ exclude_patterns = ["_build"]
 nitpick_ignore = [
     ("py:class", "AbstractAsyncContextManager"),
     ("py:class", "aiohttp.web_request.Request"),
+    # Welcome, MkDocs projects. :(
     ("py:class", "FastAPI"),
 ]
 

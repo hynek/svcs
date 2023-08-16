@@ -91,22 +91,10 @@ The callbacks defined as `on_registry_close` are called when you call `Registry.
 Next, you can write a simple health check endpoint if you've registered health checks (called *pings*) for your services.
 This is how it could look with the shipped integrations:
 
-::: {tab} AIOHTTP
-```{literalinclude} examples/aiohttp/health_check.py
+```{include} core-concepts.md
+:start-after: "<!-- begin health checks -->"
+:end-before: "<!-- end health checks -->"
 ```
-:::
-::: {tab} FastAPI
-```{literalinclude} examples/fastapi/health_check.py
-```
-:::
-::: {tab} Flask
-```{literalinclude} examples/flask/health_check.py
-```
-:::
-::: {tab} Pyramid
-```{literalinclude} examples/flask/health_check.py
-```
-:::
 
 Once written, you never touch this view endpoint again and define the service health checks *where you define the services*.
 
