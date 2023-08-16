@@ -21,7 +21,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 ### Added
 
 - FastAPI integration.
-  [#20](https://github.com/hynek/svcs/pull/30)
+  [#30](https://github.com/hynek/svcs/pull/30)
 
 
 ## [23.16.0](https://github.com/hynek/svcs/compare/23.15.0...23.16.0) - 2023-08-14
