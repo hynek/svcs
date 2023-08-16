@@ -15,7 +15,7 @@ So you don't have to pre-instantiate all services just in case (*wasteful*!), or
 ---
 
 If you follow the **{term}`Dependency Inversion Principle`**, you would register concrete factories for abstract interfaces.
-In Python, usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [*abstract base class*](https://docs.python.org/3.11/library/abc.html).
+In Python, usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [*abstract base class*](https://docs.python.org/3/library/abc.html).
 
 If you follow the **{term}`Hexagonal Architecture`** (aka "*ports and adapters*"), the registered types are *ports*, and the factories produce the *adapters*.
 *svcs* gives you a well-defined way to make your application *pluggable*.
