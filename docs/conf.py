@@ -63,6 +63,8 @@ nitpick_ignore = [
     ("py:class", "aiohttp.web_request.Request"),
     # Welcome, MkDocs projects. :(
     ("py:class", "FastAPI"),
+    ("py:class", "Starlette"),
+    ("py:class", "starlette.requests.Request"),
 ]
 
 # If true, '()' will be appended to :func: etc. cross-reference text.

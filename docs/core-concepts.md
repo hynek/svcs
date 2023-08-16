@@ -170,6 +170,10 @@ Here's how a health check endpoint could look like:
 ```{literalinclude} examples/flask/health_check.py
 ```
 :::
+::: {tab} Starlette
+```{literalinclude} examples/starlette/health_check.py
+```
+:::
 <!-- end health checks -->
 
 

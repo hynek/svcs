@@ -66,6 +66,16 @@ def view(request):
     ...
 ```
 :::
+::: {tab} Starlette
+```python
+import svcs
+
+async def view(request):
+    db, api, cache = await svcs.starlette.aget(request, Database, WebAPI, Cache)
+
+    ...
+```
+:::
 <!-- end tabbed teaser -->
 
 ```{include} ../README.md
