@@ -55,6 +55,13 @@ def init_app(app: FlaskAppT, *, registry: Registry | None = None) -> FlaskAppT:
     return app
 
 
+def get_registry(app: Flask) -> Registry:
+    """
+    Get the registry from *app*.
+    """
+    return app.config[_KEY_REGISTRY]  # type: ignore[no-any-return]
+
+
 def get_abstract(*svc_types: type) -> Any:
     """
     Same as :meth:`svcs.Container.get_abstract()`, but uses container on

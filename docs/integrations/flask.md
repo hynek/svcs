@@ -198,6 +198,7 @@ def index():
 .. module:: svcs.flask
 
 .. autofunction:: init_app
+.. autofunction:: get_registry
 .. autofunction:: close_registry
 ```
 

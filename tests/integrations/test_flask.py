@@ -201,6 +201,14 @@ class TestFlask:
 
 
 class TestNonContextHelpers:
+    def test_get_registry(self, registry, app):
+        """
+        get_registry() returns the registry that has been put on the app.
+        """
+        svcs.flask.init_app(app, registry=registry)
+
+        assert registry is svcs.flask.get_registry(app)
+
     def test_register_factory_helper(self, registry, app):
         """
         register_factory() registers a factory to the app that is passed.
