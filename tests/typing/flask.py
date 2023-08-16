@@ -19,6 +19,8 @@ app = flask.Flask("tests")
 app = svcs.flask.init_app(app, registry=reg)
 app = svcs.flask.init_app(app)
 
+reg = svcs.flask.get_registry(app)
+
 svcs.flask.register_value(app, int, 1)
 svcs.flask.register_value(app, int, 1, ping=lambda: None)
 
@@ -54,3 +56,4 @@ class CustomApp(flask.Flask):
 
 
 app = svcs.flask.init_app(CustomApp("tests"))
+reg = svcs.flask.get_registry(CustomApp("tests"))
