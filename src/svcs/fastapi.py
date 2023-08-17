@@ -4,10 +4,10 @@
 
 from __future__ import annotations
 
+import contextlib
 import inspect
 import sys
 
-from contextlib import AbstractAsyncContextManager, asynccontextmanager
 from typing import AsyncGenerator, Callable
 
 import attrs
@@ -42,10 +42,10 @@ class lifespan:  # noqa: N801
 
     _lifespan: Callable[
         [FastAPI, svcs.Registry],
-        AbstractAsyncContextManager[dict[str, object]],
+        contextlib.AbstractAsyncContextManager[dict[str, object]],
     ] | Callable[
         [FastAPI, svcs.Registry],
-        AbstractAsyncContextManager[None],
+        contextlib.AbstractAsyncContextManager[None],
     ] | Callable[
         [FastAPI, svcs.Registry], AsyncGenerator[dict[str, object], None]
     ] | Callable[
@@ -54,13 +54,15 @@ class lifespan:  # noqa: N801
     _state: dict[str, object] = attrs.field(factory=dict)
     registry: svcs.Registry = attrs.field(factory=svcs.Registry)
 
-    @asynccontextmanager
+    @contextlib.asynccontextmanager
     async def __call__(
         self, app: FastAPI
     ) -> AsyncGenerator[dict[str, object], None]:
-        cm: Callable[[FastAPI, svcs.Registry], AbstractAsyncContextManager]
+        cm: Callable[
+            [FastAPI, svcs.Registry], contextlib.AbstractAsyncContextManager
+        ]
         if inspect.isasyncgenfunction(self._lifespan):
-            cm = asynccontextmanager(self._lifespan)
+            cm = contextlib.asynccontextmanager(self._lifespan)
         else:
             cm = self._lifespan  # type: ignore[assignment]
 

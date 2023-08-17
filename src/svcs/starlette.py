@@ -4,9 +4,9 @@
 
 from __future__ import annotations
 
+import contextlib
 import inspect
 
-from contextlib import AbstractAsyncContextManager, asynccontextmanager
 from operator import attrgetter
 from typing import Any, AsyncGenerator, Callable, overload
 
@@ -61,10 +61,10 @@ class lifespan:  # noqa: N801
 
     _lifespan: Callable[
         [Starlette, svcs.Registry],
-        AbstractAsyncContextManager[dict[str, object]],
+        contextlib.AbstractAsyncContextManager[dict[str, object]],
     ] | Callable[
         [Starlette, svcs.Registry],
-        AbstractAsyncContextManager[None],
+        contextlib.AbstractAsyncContextManager[None],
     ] | Callable[
         [Starlette, svcs.Registry], AsyncGenerator[dict[str, object], None]
     ] | Callable[
@@ -73,13 +73,15 @@ class lifespan:  # noqa: N801
     _state: dict[str, object] = attrs.field(factory=dict)
     registry: svcs.Registry = attrs.field(factory=svcs.Registry)
 
-    @asynccontextmanager
+    @contextlib.asynccontextmanager
     async def __call__(
         self, app: Starlette
     ) -> AsyncGenerator[dict[str, object], None]:
-        cm: Callable[[Starlette, svcs.Registry], AbstractAsyncContextManager]
+        cm: Callable[
+            [Starlette, svcs.Registry], contextlib.AbstractAsyncContextManager
+        ]
         if inspect.isasyncgenfunction(self._lifespan):
-            cm = asynccontextmanager(self._lifespan)
+            cm = contextlib.asynccontextmanager(self._lifespan)
         else:
             cm = self._lifespan  # type: ignore[assignment]
 
