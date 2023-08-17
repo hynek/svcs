@@ -41,6 +41,11 @@ try:
 except ImportError:
     __all__ += ["pyramid"]
 
+try:
+    from . import starlette
+except ImportError:
+    __all__ += ["starlette"]
+
 
 # Make nicer public names.
 __locals = locals()

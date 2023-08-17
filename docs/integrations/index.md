@@ -12,5 +12,6 @@ aiohttp
 fastapi
 flask
 pyramid
+starlette
 custom
 ```

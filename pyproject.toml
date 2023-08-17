@@ -34,6 +34,7 @@ typing = [
   "mypy>=1.4",
   "fastapi",
   "flask",
+  "starlette",
   "aiohttp; python_version<'3.12'",
   "pyramid; python_version<'3.12'",
 ]
@@ -52,6 +53,7 @@ docs = [
   "fastapi",
   "flask",
   "pyramid",
+  "starlette",
 ]
 dev = ["svcs[tests,typing]", "tox>4", "httpx"]
 
@@ -247,4 +249,9 @@ ignore = [
 [tool.ruff.isort]
 lines-between-types = 1
 lines-after-imports = 2
-known-first-party = ["svcs", "tests", "simple_fastapi_app"]
+known-first-party = [
+  "svcs",
+  "tests",
+  "simple_fastapi_app",
+  "simple_starlette_app",
+]

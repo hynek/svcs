@@ -15,9 +15,12 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/23.17.0...HEAD)
 
-###
+### Added
 
 - Flask: `svcs.flask.get_registry()`.
+
+- Starlette integration.
+  [#31](https://github.com/hynek/svcs/pull/31)
 
 
 ## [23.17.0](https://github.com/hynek/svcs/compare/23.16.0...23.17.0) - 2023-08-15
