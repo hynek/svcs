@@ -540,7 +540,7 @@ class Container:
                     continue
 
                 cm.__exit__(None, None, None)
-            except Exception:  # noqa: BLE001, PERF203
+            except Exception:  # noqa: BLE001
                 log.warning(
                     "Container clean up failed for %r.",
                     name,
