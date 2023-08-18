@@ -1,0 +1,9 @@
+@font-face {
+    font-family: "BerkeleyMono";
+    src: local("Berkeley Mono"),
+            url("https://static.hynek.me/bm/BerkeleyMono-Regular.woff2") format("woff2"),
+            url("https://static.hynek.me/bm/BerkeleyMono-Italic.woff2") format("woff2"),
+            url("https://static.hynek.me/bm/BerkeleyMono-BoldItalic.woff2") format("woff2"),
+            url("https://static.hynek.me/bm/BerkeleyMono-Bold.woff2") format("woff2");
+    font-display: swap;
+}

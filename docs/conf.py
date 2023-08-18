@@ -84,9 +84,14 @@ html_theme = "furo"
 html_theme_options = {
     "top_of_page_button": None,
     "sidebar_hide_name": True,
+    "light_css_variables": {
+        "font-stack--monospace": "BerkeleyMono, MonoLisa, ui-monospace, "
+        "SFMono-Regular, Menlo, Consolas, Liberation Mono, monospace",
+    },
 }
 html_logo = "_static/logo_with_name.svg"
 html_static_path = ["_static"]
+html_css_files = ["custom.css"]
 
 htmlhelp_basename = "svcsdoc"
 
