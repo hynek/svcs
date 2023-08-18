@@ -39,10 +39,10 @@ typing = [
   "pyramid; python_version<'3.12'",
 ]
 docs = [
-  "sphinx<7.2",
+  "sphinx",
   "sphinx-copybutton",
   "sphinx-inline-tabs",
-  "sphinx-notfound-page",
+  # "sphinx-notfound-page",
   "sphinxext-opengraph",
   "myst-parser",
   "furo",
