@@ -131,7 +131,6 @@ def overwrite_factory(
     .. seealso::
         - :meth:`svcs.Registry.register_factory()`
         - :meth:`svcs.Container.close()`
-        - :ref:`flask-testing`
     """
     container = svcs_from()
     container.registry.register_factory(
@@ -161,7 +160,6 @@ def overwrite_value(
     .. seealso::
         - :meth:`svcs.Registry.register_factory()`
         - :meth:`svcs.Container.close()`
-        - :ref:`flask-testing`
     """
     container = svcs_from()
     container.registry.register_value(

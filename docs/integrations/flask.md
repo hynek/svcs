@@ -203,11 +203,25 @@ def index():
 ```
 
 
-### Registering and Overwriting Services
+### Registering Services
 
 ```{eval-rst}
 .. autofunction:: register_factory
 .. autofunction:: register_value
+```
+
+
+### Testing
+
+:::{caution}
+This functions should not be used in production code.
+
+They always reset the container and run all cleanups after overwriting a service.
+
+See also {ref}`flask-testing`.
+:::
+
+```{eval-rst}
 .. autofunction:: overwrite_factory
 .. autofunction:: overwrite_value
 ```
