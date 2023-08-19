@@ -232,4 +232,6 @@ You can see that the datetime factory and the str value have both been registere
 
 .. autoclass:: ServicePing()
    :members: name, ping, aping, is_async
+
+.. autoclass:: svcs.exceptions.ServiceNotFoundError
 ```

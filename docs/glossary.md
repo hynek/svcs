@@ -229,6 +229,15 @@ Inversion of Control
     :::
 
 
+Late Binding
+
+    Late binding is a very general term, but in our context, we mean that the concrete instance type of a service is only determined (*bound*) when it's requested using {meth}`svcs.Container.get()`.
+
+    This makes your code very testable because you can easily replace services with test objects without having to use brittle and intrusive methods like monkey-patching.
+
+    On the other hand, the downside is that the registry might not have been configured to provide the requested service, which will cause a {class}`svcs.exceptions.ServiceNotFoundError` *at runtime*.
+
+
 Dependency Inversion Principle
     Sometimes confused with {term}`Dependency Injection` due to the similarity of "Injection" and "Inversion", but only tangentially related.
     It's the D in [SOLID](https://en.wikipedia.org/wiki/SOLID) and also known as "*program against interfaces, not implementations*".
