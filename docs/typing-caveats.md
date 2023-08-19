@@ -19,7 +19,7 @@ Since `Any` disables any kind of type-checking, you have to use it like this:
 ac: SomeAbstractClass = container.get_abstract(SomeAbstractClass)
 ```
 
-You can also create quality-of-life wrappers for your services:
+You can also create bespoke wrappers for your services:
 
 ```python
 def get_connection() -> Connection:
