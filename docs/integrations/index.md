@@ -3,7 +3,7 @@
 Framework integrations are the main way to use *svcs*.
 Thanks to its flexibility, it's possible to integrate with any framework in their own most idiosyncratic way.
 
-*svcs* currently ships inegrations for the following ones:
+*svcs* currently integrates out-of-the-box with the following ones:
 
 ```{toctree}
 :maxdepth: 1
