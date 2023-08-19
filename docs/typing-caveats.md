@@ -26,7 +26,7 @@ def get_connection() -> Connection:
     return svcs.flask.get(Connection)
 ```
 
-Sadly, this is the best compromise to date.
+Sadly, these are the best compromises to date.
 
 
 ## Multiple Services
