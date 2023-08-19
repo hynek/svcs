@@ -106,7 +106,7 @@ However, it starts paying dividends *very fast* once you go past that.
 
 ## asyncio
 
-*svcs* comes with **full async** support via a-prefixed methods (i.e. `aget()` instead of `get()`, et cetera).
+*svcs* comes with **full async** support via a-prefixed methods (like `aget()` instead of `get()`, and so on).
 
 In fact, most of our {doc}`integrations/index` are for async frameworks!
 

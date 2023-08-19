@@ -39,7 +39,7 @@ Service Layer
     The service layer is where your business logic (also known as the *domain model*) meets your {term}`service`s.
 
     Since services can use other services, it's not a flat layer but more of a tree.
-    The entry point is called from your {term}`composition root` (e.g., your web framework's views) and coordinates database transactions, other services and, the domain model.
+    The entry point is called from your {term}`composition root` (for example, your web framework's views) and coordinates database transactions, other services and, the domain model.
 
     If you pass in all the services it needs, it's *{term}`dependency injection`*.
     If you look up the services *within* the service layer, it's *{term}`service location`*.
@@ -216,7 +216,7 @@ Inversion of Control
     ```
 
     Why do we say IoC and not just dependency injection?
-    Inversion of Control is a broader term that applies to any situation where we "invert" the flow of control so that lower-level code (frameworks, data access layers, et cetera) invoke our higher-level code: the business logic we care about.
+    Inversion of Control is a broader term that applies to any situation where we "invert" the flow of control so that lower-level code (frameworks, data access layers, and so on) invoke our higher-level code: the business logic we care about.
 
     ::: {seealso}
 
@@ -255,7 +255,7 @@ Hexagonal Architecture
 
     The business code doesn't use those services directly, but only through interfaces that are called *ports* here.
 
-    Now a service locator like *svcs* can be used to register factories for those interfaces such that the business code can use the services as *adapters* to the real world (e.g., query a database) without knowing what they are and where they come from.
+    Now a service locator like *svcs* can be used to register factories for those interfaces such that the business code can use the services as *adapters* to the real world (for example, query a database) without knowing what they are and where they come from.
 
     It is therefore a special case of the {term}`Dependency Inversion Principle`.
 
@@ -275,7 +275,7 @@ Hexagonal Architecture
 
 
 Service Discovery
-    An completely unrelated concept for finding *remote* services (e.g., web services, database servers, ...).
+    An completely unrelated concept for finding *remote* services (for example, web services, database servers, and so on).
 
     Another sad consequence of the overloaded term {term}`service`.
 

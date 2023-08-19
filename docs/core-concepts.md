@@ -95,7 +95,7 @@ If a factory takes a first argument called `svcs_container` or the first argumen
 ```
 
 ::: {note}
-It is possible to overwrite registered service factories later -- e.g., for testing -- **without monkey-patching**.
+It is possible to overwrite registered service factories later -- for example, for testing -- **without monkey-patching**.
 This is especially interesting if you want to replace a low-level service with a mock without re-jiggering all services that depend on it.
 
 If there's a chance that the container has been used by your fixtures to acquire a service, it's possible that the service is already cached by the container.
@@ -111,7 +111,7 @@ If your integration has a function called `overwrite_(value|factory)()`, it will
 If a factory returns a [context manager](https://docs.python.org/3/library/stdtypes.html#context-manager-types), it will be immediately entered and the instance will be added to the cleanup list (you can disabled this behavior by passing `enter=False` to {meth}`~svcs.Registry.register_factory` and {meth}`~svcs.Registry.register_value`).
 If a factory is a [generator](https://docs.python.org/3/tutorial/classes.html#generators) that *yields* the instance instead of returning it, it will be wrapped in a context manager automatically.
 At the end, you run {meth}`svcs.Container.close()` and all context managers will be exited.
-You can use this to close files, return database connections to a pool, et cetera.
+You can use this to close files, return database connections to a pool, and so on.
 
 Async context managers and async generators work the same way.
 
