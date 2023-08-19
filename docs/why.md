@@ -108,7 +108,7 @@ However, it starts paying dividends *very fast* once you go past that.
 
 *svcs* comes with **full async** support via a-prefixed methods (i.e. `aget()` instead of `get()`, et cetera).
 
-In fact, most of our {doc}`integrations/index.md` are for async frameworks!
+In fact, most of our {doc}`integrations/index` are for async frameworks!
 
 
 ## Static Typing
