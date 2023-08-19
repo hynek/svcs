@@ -143,7 +143,11 @@ If you're curious, check the [glossary](glossary) entries for {term}`Service Loc
 
 The main downside of service locators is that it's impossible to verify whether all required dependencies have been configured without running the code.
 
-That's a consequence of being imperative instead of declarative and the main trade-off when deciding between a traditional dependency injection framework and a service locator like *svcs*.
+That's a consequence of late binding happening *imperatively*.
+This is the main trade-off when deciding between a service locator like *svcs* and a traditional dependency injection framework that is usually *declarative* and knows the requirements ahead of time.
+
+We feel that the upsides of service locators outweigh the downsides and that its easy to avoid the late binding problems.
+For instance by configuring the same service at the same place for all environments, based on configuration.
 
 If you still prefer a dependency injection framework, check out [*incant*](https://github.com/Tinche/incant) -- a very nice package by a friend of the project.
 
