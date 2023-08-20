@@ -7,7 +7,6 @@ from __future__ import annotations
 import contextlib
 import inspect
 
-from operator import attrgetter
 from typing import Any, AsyncGenerator, Callable, overload
 
 import attrs
@@ -34,14 +33,11 @@ from svcs._core import (
 )
 
 
-_get_container = attrgetter(f"state.{_KEY_CONTAINER}")
-
-
 def svcs_from(request: Request) -> svcs.Container:
     """
     Get the current container from *request*.
     """
-    return _get_container(request)  # type: ignore[no-any-return]
+    return getattr(request.state, _KEY_CONTAINER)  # type: ignore[no-any-return]
 
 
 @attrs.define

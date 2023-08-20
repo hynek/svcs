@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from contextlib import suppress
 from typing import Any, overload
 
 from aiohttp import web
@@ -32,6 +33,13 @@ def svcs_from(request: web.Request) -> svcs.Container:
     Get the current container from *request*.
     """
     return request[_KEY_CONTAINER]  # type: ignore[no-any-return]
+
+
+def get_registry(app: web.Application) -> svcs.Registry:
+    """
+    Get the registry from *app*.
+    """
+    return app[_KEY_REGISTRY]  # type: ignore[no-any-return]
 
 
 def init_app(
@@ -76,7 +84,7 @@ def register_value(
     Same as :meth:`svcs.Registry.register_value()`, but uses registry on
     *app*.
     """
-    app[_KEY_REGISTRY].register_value(
+    get_registry(app).register_value(
         svc_type,
         value,
         enter=enter,
@@ -98,20 +106,13 @@ def register_factory(
     Same as :meth:`svcs.Registry.register_factory()`, but uses registry on
     *app*.
     """
-    app[_KEY_REGISTRY].register_factory(
+    get_registry(app).register_factory(
         svc_type,
         factory,
         enter=enter,
         ping=ping,
         on_registry_close=on_registry_close,
     )
-
-
-def get_registry(app: web.Application) -> svcs.Registry:
-    """
-    Get the registry from *app*.
-    """
-    return app[_KEY_REGISTRY]  # type: ignore[no-any-return]
 
 
 async def aclose_registry(app: web.Application) -> None:
@@ -123,8 +124,8 @@ async def aclose_registry(app: web.Application) -> None:
 
     .. seealso:: :ref:`aiohttp-cleanup`
     """
-    if reg := app.get(_KEY_REGISTRY):
-        await reg.aclose()
+    with suppress(KeyError):
+        await get_registry(app).aclose()
 
 
 def get_pings(request: web.Request) -> list[svcs.ServicePing]:
@@ -134,7 +135,7 @@ def get_pings(request: web.Request) -> list[svcs.ServicePing]:
 
     .. seealso:: :ref:`aiohttp-health`
     """
-    return request[_KEY_CONTAINER].get_pings()  # type: ignore[no-any-return]
+    return svcs_from(request).get_pings()
 
 
 async def aget_abstract(request: web.Request, *svc_types: type) -> Any:
@@ -142,7 +143,7 @@ async def aget_abstract(request: web.Request, *svc_types: type) -> Any:
     Same as :meth:`svcs.Container.aget_abstract()`, but uses container from
     *request*.
     """
-    return await request[_KEY_CONTAINER].aget_abstract(*svc_types)
+    return await svcs_from(request).aget_abstract(*svc_types)
 
 
 @overload
@@ -277,4 +278,4 @@ async def aget(request: web.Request, *svc_types: type) -> object:
     """
     Same as :meth:`svcs.Container.aget`, but uses the container from *request*.
     """
-    return await request[_KEY_CONTAINER].aget(*svc_types)
+    return await svcs_from(request).aget(*svc_types)

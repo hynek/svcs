@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from contextlib import suppress
 from typing import Any, Protocol, overload
 
 import attrs
@@ -45,6 +46,18 @@ def svcs_from(request: Request | None = None) -> svcs.Container:
         request = get_current_request()
 
     return getattr(request, _KEY_CONTAINER)  # type: ignore[no-any-return]
+
+
+def get_registry(rh: PyramidRegistryHaver | None = None) -> svcs.Registry:
+    """
+    Get the registry from *rh* or thread locals.
+
+    Arguments:
+        rh: If None, thread locals are used.
+    """
+    registry = rh.registry if rh else get_current_registry()
+
+    return registry[_KEY_REGISTRY]  # type: ignore[no-any-return]
 
 
 def init(
@@ -153,8 +166,8 @@ def close_registry(rh: PyramidRegistryHaver) -> None:
     Parameters:
         rh: An object that carries a :class:`pyramid.registry.Registry`.
     """
-    if reg := rh.registry.pop(_KEY_REGISTRY, None):
-        reg.close()
+    with suppress(KeyError):
+        get_registry(rh).close()
 
 
 class PyramidRegistryHaver(Protocol):
@@ -167,26 +180,13 @@ class PyramidRegistryHaver(Protocol):
     registry: dict[str, Any]
 
 
-def get_registry(rh: PyramidRegistryHaver | None = None) -> svcs.Registry:
-    """
-    Get the registry from *rh* or thread locals.
-
-    Arguments:
-        rh: If None, thread locals are used.
-    """
-    if rh:
-        return rh.registry[_KEY_REGISTRY]  # type: ignore[no-any-return]
-
-    return get_current_registry()[_KEY_REGISTRY]  # type: ignore[no-any-return]
-
-
 def get_pings(request: Request) -> list[svcs.ServicePing]:
     """
     Like :meth:`svcs.Container.get_pings()`, but uses container on *request*.
 
     .. seealso:: :ref:`pyramid-health`
     """
-    return getattr(request, _KEY_CONTAINER).get_pings()  # type: ignore[no-any-return]
+    return svcs_from(request).get_pings()
 
 
 def get_abstract(request: Request, *svc_types: type) -> Any:
@@ -194,7 +194,7 @@ def get_abstract(request: Request, *svc_types: type) -> Any:
     Same as :meth:`svcs.Container.get_abstract()`, but uses container from
     *request*.
     """
-    return getattr(request, _KEY_CONTAINER).get(*svc_types)
+    return svcs_from(request).get(*svc_types)
 
 
 @overload
@@ -333,4 +333,4 @@ def get(request: Request, *svc_types: type) -> object:
     Same as :meth:`svcs.Container.get()`, but uses thread locals to find the
     current request.
     """
-    return getattr(request, _KEY_CONTAINER).get(*svc_types)
+    return svcs_from(request).get(*svc_types)
