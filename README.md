@@ -86,7 +86,7 @@ It only forwards the type you have asked for to the type checker.
 If you don't use a type checker, that information is ignored without any runtime overhead.
 <!-- end typing -->
 
-Read on in [*Why?*](https://svcs.hynek.me/en/latest/why.html), if you're intrigued!
+Read on in [*Why?*](https://svcs.hynek.me/en/latest/why.html) if you're intrigued!
 
 
 ## Project Links
