@@ -75,7 +75,7 @@ True
 'Hello World'
 ```
 
-A container lives as long as you want the instances to live -- for example, as long as a request lives.
+A container lives as long as you want the instances within to live -- for example, as long as a request lives.
 
 If a factory takes a first argument called `svcs_container` or the first argument (of any name) is annotated as being {class}`svcs.Container`, the current container instance is passed into the factory as the first *positional* argument allowing for recursive service acquisition:
 
@@ -179,8 +179,10 @@ Here's how a health check endpoint could look like:
 
 ## Life Cycle Summary
 
-- The {class}`svcs.Registry` object should live on an **application-scoped** object like Flask's {attr}`flask.Flask.config` object.
-- The {class}`svcs.Container` object should live on a **request-scoped** object like Flask's {data}`~flask.g` object.
+While *svcs*'s core is entirely agnostic on how you use the registry and the container, all our {doc}`integrations/index` follow the same life cycle:
+
+- The {class}`svcs.Registry` objects live on **application-scoped** objects like {attr}`flask.Flask.config`.
+- The {class}`svcs.Container` objects live on **request-scoped** objects like {data}`flask.g`.
 
 
 ::: {important}
