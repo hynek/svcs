@@ -8,7 +8,7 @@ If you want a more narrative introduction into the concepts, we strongly recomme
 :::{glossary}
 
 Service
-    Unfortunately, a "service" is a highly overloaded term in software engineering, but we've resisted to come up with a new term that's even more confusing.
+    Unfortunately, *service* is a highly overloaded term in software engineering, but we've resisted to come up with a new term that's even more confusing.
 
     In our context, it's a *local* object managed by *svcs*.
     This can be anything you'd like to be loosely coupled to your application code.
