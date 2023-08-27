@@ -1,8 +1,9 @@
 # Core Concepts
 
-You will probably use some framework integration and not the low-level API directly, but knowing what's happening underneath is good to dispel any concerns about magic.
+In order to understand how *svcs* works regardless of your environemtn, you have to understand only two concepts: **registries** and **containers**.
+They have different life cycles and responsibilities.
 
-*svcs* has two core concepts: **registries** and **containers** that have different life cycles and responsibilities.
+I practice, you will use one of our [framework integrations](integrations/index.md) (or [write your own](integrations/custom.md)) and not the low-level API directly – but knowing what's happening underneath is good to dispel any concerns about magic.
 
 
 ## Registries
