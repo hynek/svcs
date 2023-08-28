@@ -16,9 +16,9 @@ from .fake_factories import (
     async_int_factory,
     async_str_gen_factory,
     int_factory,
-    nop,
     str_gen_factory,
 )
+from .helpers import nop
 
 
 def test_nop():

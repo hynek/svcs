@@ -13,11 +13,8 @@ import pytest
 
 import svcs
 
-from .fake_factories import (
-    async_str_gen_factory,
-    nop,
-    str_gen_factory,
-)
+from .fake_factories import async_str_gen_factory, str_gen_factory
+from .helpers import nop
 from .ifaces import AnotherService, Interface, Service
 
 

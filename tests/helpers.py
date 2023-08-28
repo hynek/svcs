@@ -3,6 +3,10 @@
 # SPDX-License-Identifier: MIT
 
 
+def nop(*_, **__):
+    pass
+
+
 class CloseMe:
     is_aclosed = is_closed = False
 

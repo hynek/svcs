@@ -8,7 +8,8 @@ import pytest
 
 import svcs
 
-from tests.fake_factories import int_factory, nop
+from tests.fake_factories import int_factory
+from tests.helpers import nop
 from tests.ifaces import AnotherService, Service
 
 

@@ -20,8 +20,8 @@ from .fake_factories import (
     async_bool_cm_factory,
     async_int_factory,
     async_str_gen_factory,
-    nop,
 )
+from .helpers import nop
 from .ifaces import AnotherService, Interface, Service, YetAnotherService
 
 

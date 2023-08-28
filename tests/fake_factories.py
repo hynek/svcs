@@ -7,10 +7,6 @@ import asyncio
 from contextlib import asynccontextmanager, contextmanager
 
 
-def nop(*_, **__):
-    pass
-
-
 def int_factory():
     return 42
 
