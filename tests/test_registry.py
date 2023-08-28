@@ -184,24 +184,22 @@ class TestRegistry:
         orc.assert_called_once_with()
 
     @pytest.mark.asyncio()
-    async def test_async_context_manager(self):
+    async def test_async_context_manager(self, close_me):
         """
         The registry is also an async context manager that acloses on exit.
 
         Passing an awaitable to on_registry_close works.
         """
-        closed = False
 
         async def closer():
-            nonlocal closed
-            closed = True
+            close_me.close()
 
         async with svcs.Registry() as registry:
             registry.register_factory(
                 Service, Service, on_registry_close=closer()
             )
 
-        assert closed
+        assert close_me.is_closed
 
     @pytest.mark.skipif(
         not hasattr(contextlib, "aclosing"),

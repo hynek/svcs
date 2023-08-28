@@ -11,6 +11,7 @@ import pytest
 import svcs
 
 from tests.fake_factories import async_bool_cm_factory, async_int_factory
+from tests.helpers import CloseMe
 
 
 try:
@@ -30,19 +31,18 @@ async def test_integration(yield_something, cm):
     """
     Acquiring registered services using a Starlette dependency works.
     """
-    registry_closed = closed = False
+    close_me_registry = CloseMe()
+    close_me_container = CloseMe()
 
     async def factory():
         await asyncio.sleep(0)
         yield 42
         await asyncio.sleep(0)
 
-        nonlocal closed
-        closed = True
+        await close_me_container.aclose()
 
     async def close_registry():
-        nonlocal registry_closed
-        registry_closed = True
+        await close_me_registry.aclose()
 
     if yield_something:
 
@@ -84,9 +84,9 @@ async def test_integration(yield_something, cm):
 
     with TestClient(app) as client:
         assert {"val": 42} == client.get("/").json()
-        assert closed
+        assert close_me_container.is_aclosed
 
-    assert registry_closed
+    assert close_me_registry.is_aclosed
 
 
 async def healthy(request):

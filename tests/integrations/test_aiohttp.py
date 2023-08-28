@@ -87,16 +87,14 @@ def _app(registry):
 
 @pytest.mark.asyncio()
 class TestAIOHTTP:
-    async def test_aclose_registry_ok(self, app):
+    async def test_aclose_registry_ok(self, app, close_me):
         """
         aclose_registry closes the registry. Automatically as part of aiohttp's
         cleanup.
         """
-        closed = False
 
         async def closer():
-            nonlocal closed
-            closed = True
+            await close_me.aclose()
 
         svcs.aiohttp.register_factory(
             app, Service, Service, on_registry_close=closer
@@ -105,7 +103,7 @@ class TestAIOHTTP:
         server = await AppServer.start(app)
         await server.aclose()
 
-        assert closed
+        assert close_me.is_aclosed
 
     async def test_aclose_registry_robust(self):
         """

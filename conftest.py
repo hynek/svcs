@@ -12,6 +12,7 @@ from sybil.parsers import myst, rest
 
 import svcs
 
+from tests.helpers import CloseMe
 from tests.ifaces import Service
 
 
@@ -59,3 +60,8 @@ def _registry():
 @pytest.fixture(name="container")
 def _container(registry):
     return svcs.Container(registry)
+
+
+@pytest.fixture(name="close_me")
+def _close_me():
+    return CloseMe()

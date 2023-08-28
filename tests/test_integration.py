@@ -141,31 +141,29 @@ def test_get_pings(registry, container, svc):
     assert [Service] == [ping._svc_type for ping in container.get_pings()]
 
 
-def test_cleanup_called(registry, container):
+def test_cleanup_called(registry, container, close_me):
     """
     Services that have a cleanup have them called on cleanup.
     """
-    cleaned_up = False
 
     def factory():
-        nonlocal cleaned_up
         yield 42
-        cleaned_up = True
+        close_me.close()
 
     registry.register_factory(Service, factory)
 
     container.get(Service)
 
-    assert not cleaned_up
+    assert not close_me.is_closed
 
     container.close()
 
-    assert cleaned_up
+    assert close_me.is_closed
     assert not container._instantiated
     assert not container._on_close
 
 
-def test_close_resilient(container, registry, caplog):
+def test_close_resilient(container, registry, caplog, close_me):
     """
     Failing cleanups are logged and ignored. They do not break the cleanup
     process.
@@ -175,14 +173,10 @@ def test_close_resilient(container, registry, caplog):
         yield 1
         raise Exception
 
-    cleaned_up = False
-
     def factory_no_boom():
-        nonlocal cleaned_up
-
         yield 3
 
-        cleaned_up = True
+        close_me.close()
 
     registry.register_factory(Service, factory)
     registry.register_factory(YetAnotherService, factory_no_boom)
@@ -190,12 +184,12 @@ def test_close_resilient(container, registry, caplog):
     assert 1 == container.get(Service)
     assert 3 == container.get(YetAnotherService)
 
-    assert not cleaned_up
+    assert not close_me.is_closed
 
     container.close()
 
     assert "tests.ifaces.Service" == caplog.records[0].svcs_service_name
-    assert cleaned_up
+    assert close_me.is_closed
 
 
 def test_none_is_a_valid_factory_result(registry, container):
@@ -346,20 +340,18 @@ class TestAsync:
 
         assert "42" == await container.aget(str)
 
-    async def test_async_cleanup(self, registry, container):
+    async def test_async_cleanup(self, registry, container, close_me):
         """
         Async cleanups are handled by aclose.
         """
-        cleaned_up = False
 
         async def factory():
-            nonlocal cleaned_up
             await asyncio.sleep(0)
 
             yield Service()
 
             await asyncio.sleep(0)
-            cleaned_up = True
+            await close_me.aclose()
 
         registry.register_factory(Service, factory)
 
@@ -367,16 +359,18 @@ class TestAsync:
 
         assert 1 == len(container._on_close)
         assert Service() == svc
-        assert not cleaned_up
+        assert not close_me.is_aclosed
 
         await container.aclose()
 
-        assert cleaned_up
+        assert close_me.is_aclosed
         assert not container._instantiated
         assert not container._on_close
 
     @pytest.mark.asyncio()
-    async def test_aclose_resilient(self, container, registry, caplog):
+    async def test_aclose_resilient(
+        self, container, registry, caplog, close_me
+    ):
         """
         Failing cleanups are logged and ignored. They do not break the
         cleanup process.
@@ -390,14 +384,10 @@ class TestAsync:
             yield 2
             raise Exception
 
-        cleaned_up = False
-
         async def factory_no_boom():
-            nonlocal cleaned_up
-
             yield 3
 
-            cleaned_up = True
+            await close_me.aclose()
 
         registry.register_factory(Service, factory)
         registry.register_factory(AnotherService, async_factory)
@@ -407,7 +397,7 @@ class TestAsync:
         assert 2 == await container.aget(AnotherService)
         assert 3 == await container.aget(YetAnotherService)
 
-        assert not cleaned_up
+        assert not close_me.is_aclosed
 
         await container.aclose()
 
@@ -417,7 +407,7 @@ class TestAsync:
             == caplog.records[0].svcs_service_name
         )
         assert "tests.ifaces.Service" == caplog.records[1].svcs_service_name
-        assert cleaned_up
+        assert close_me.is_aclosed
         assert not container._instantiated
         assert not container._on_close
 

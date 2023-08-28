@@ -111,24 +111,22 @@ def health_view(request):
 
 
 class TestIntergration:
-    def test_get(self, app, client):
+    def test_get(self, app, client, close_me):
         """
         Service acquisition via svcs_get and thread locals works.
         """
-        closed = False
 
         def closing_factory():
             yield 1.0
 
-            nonlocal closed
-            closed = True
+            close_me.close()
 
         svcs.pyramid.get_registry(app).register_value(Service, 42)
         svcs.pyramid.register_value(app, AnotherService, 23)
         svcs.pyramid.register_factory(app, float, closing_factory)
 
         assert {"svc": 42} == client.get("/tl").json()
-        assert closed
+        assert close_me.is_closed
 
     def test_get_pings(self, app, client):
         """

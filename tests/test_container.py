@@ -58,42 +58,38 @@ class TestContainer:
 
         assert int in container
 
-    def test_context_manager(self, container):
+    def test_context_manager(self, container, close_me):
         """
         The container is also a context manager that closes on exit.
         """
-        closed = False
 
         def factory():
             yield 42
-            nonlocal closed
-            closed = True
+            close_me.close()
 
         container.registry.register_factory(int, factory)
 
         with container:
             assert 42 == container.get(int)
 
-        assert closed
+        assert close_me.is_closed
 
     @pytest.mark.asyncio()
-    async def test_async_context_manager(self, container):
+    async def test_async_context_manager(self, container, close_me):
         """
         The container is also an async context manager that acloses on exit.
         """
-        closed = False
 
         async def factory():
             yield 42
-            nonlocal closed
-            closed = True
+            await close_me.aclose()
 
         container.registry.register_factory(int, factory)
 
         async with container:
             assert 42 == await container.aget(int)
 
-        assert closed
+        assert close_me.is_aclosed
 
     def test_gc_warning(self, recwarn, registry):
         """
@@ -115,18 +111,15 @@ class TestContainer:
 
 
 class TestServicePing:
-    def test_ping(self, registry, container):
+    def test_ping(self, registry, container, close_me):
         """
         Calling ping instantiates the service using its factory, appends it to
         the cleanup list, and calls the service's ping method.
         """
 
-        cleaned_up = False
-
         def factory():
-            nonlocal cleaned_up
             yield Service()
-            cleaned_up = True
+            close_me.close()
 
         ping = Mock(spec_set=["__call__"])
         registry.register_factory(Service, factory, ping=ping)
@@ -137,10 +130,10 @@ class TestServicePing:
 
         ping.assert_called_once()
 
-        assert not cleaned_up
+        assert not close_me.is_closed
 
         container.close()
 
-        assert cleaned_up
+        assert close_me.is_closed
         assert not container._instantiated
         assert not container._on_close
