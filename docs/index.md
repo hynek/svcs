@@ -83,7 +83,7 @@ async def view(request):
 :end-before: "<!-- end addendum -->"
 ```
 
-Read on in *{doc}`why`*, if you're intrigued!
+Read on in *{doc}`why`* if you're intrigued!
 
 ```{toctree}
 :hidden:
