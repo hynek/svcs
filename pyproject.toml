@@ -99,7 +99,7 @@ pattern = "\n(###.+?\n)## "
 text = """
 ---
 
-[→ Full Changelog](https://github.com/hynek/svcs/blob/main/CHANGELOG.md)
+[Full Changelog →](https://github.com/hynek/svcs/blob/main/CHANGELOG.md)
 
 
 """
