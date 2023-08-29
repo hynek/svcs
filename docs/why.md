@@ -1,7 +1,7 @@
 # Why?
 
 {attribution="Brandon Rhodes"}
-> Monkey patching is software bankruptcy
+> Monkey patching is software bankruptcy.
 
 A {term}`service locator` like *svcs* allows you to configure and manage all your {term}`service`s in *one central place*, access them in a *consistent* way without worrying about *cleaning them up* and achieve *loose coupling*.
 This gives you a well-defined place and a well-defined method for storing -- *and replacing!* -- your application's configurable dependencies.
