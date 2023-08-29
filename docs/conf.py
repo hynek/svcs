@@ -16,13 +16,13 @@ extensions = [
     "sphinx.ext.autodoc",  # MUST be up here!
     # "notfound.extension",
     "sphinx_copybutton",
-    "sphinx_inline_tabs",
     "sphinx.ext.autodoc.typehints",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinxext.opengraph",
+    "sphinx_design",
 ]
 
 myst_enable_extensions = [

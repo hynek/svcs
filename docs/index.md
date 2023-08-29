@@ -23,7 +23,8 @@ The code has 100% test and type coverage, and the shipped *Flask* and *Pyramid* 
 <!--
 ; skip: start
 -->
-::: {tab} AIOHTTP
+:::: {tab-set}
+::: {tab-item} AIOHTTP
 ```python
 import svcs
 
@@ -33,7 +34,7 @@ async def view(request):
     ...
 ```
 :::
-::: {tab} FastAPI
+::: {tab-item} FastAPI
 ```python
 import svcs
 
@@ -44,7 +45,7 @@ async def view(services: svcs.fastapi.DepContainer):
     ...
 ```
 :::
-::: {tab} Flask
+::: {tab-item} Flask
 ```python
 import svcs
 
@@ -55,7 +56,7 @@ def view():
     ...
 ```
 :::
-::: {tab} Pyramid
+::: {tab-item} Pyramid
 ```python
 import svcs
 
@@ -66,7 +67,7 @@ def view(request):
     ...
 ```
 :::
-::: {tab} Starlette
+::: {tab-item} Starlette
 ```python
 import svcs
 
@@ -76,6 +77,8 @@ async def view(request):
     ...
 ```
 :::
+
+::::
 <!-- end tabbed teaser -->
 
 ```{include} ../README.md
