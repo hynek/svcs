@@ -36,7 +36,7 @@ Dependency
 
 
 Service Layer
-    The service layer -- sometimes called an *orchestration layer* or a *use-case layer* -- is where your business logic (also known as the *domain model*) meets your {term}`service`s.
+    The service layer -- sometimes called the *orchestration layer* or the *use-case layer* -- is where your business logic (also known as the *domain model*) meets your {term}`service`s.
 
     Since services can use other services, it's not a flat layer but more of a tree.
     The entry point is called from your {term}`composition root` (for example, your web framework's views) and coordinates database transactions, other services and, the domain model.
