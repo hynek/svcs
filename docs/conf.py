@@ -15,7 +15,7 @@ extensions = [
     "myst_parser",
     "sphinx.ext.autodoc",  # MUST be up here!
     "sphinx.ext.autodoc.typehints",
-    # "notfound.extension",
+    "notfound.extension",
     "sphinx_copybutton",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
