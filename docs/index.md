@@ -29,7 +29,7 @@ The code has 100% test and type coverage, and the shipped *Flask* and *Pyramid* 
 import svcs
 
 async def view(request):
-    db, api, cache = await svcs.aiohttp.aget(request, Database, WebAPI, Cache)
+    db, api, cache = await svcs.aiohttp.aget(request, Database, WebAPIClient, Cache)
 
     ...
 ```
@@ -40,7 +40,7 @@ import svcs
 
 @app.get("/")
 async def view(services: svcs.fastapi.DepContainer):
-    db, api, cache = await services.aget(Database, WebAPI, Cache)
+    db, api, cache = await services.aget(Database, WebAPIClient, Cache)
 
     ...
 ```
@@ -51,7 +51,7 @@ import svcs
 
 @app.route("/")
 def view():
-    db, api, cache = svcs.flask.get(Database, WebAPI, Cache)
+    db, api, cache = svcs.flask.get(Database, WebAPIClient, Cache)
 
     ...
 ```
@@ -62,7 +62,7 @@ import svcs
 
 @view_config(route_name="index")
 def view(request):
-    db, api, cache = svcs.pyramid.get(request, Database, WebAPI, Cache)
+    db, api, cache = svcs.pyramid.get(request, Database, WebAPIClient, Cache)
 
     ...
 ```
@@ -72,7 +72,7 @@ def view(request):
 import svcs
 
 async def view(request):
-    db, api, cache = await svcs.starlette.aget(request, Database, WebAPI, Cache)
+    db, api, cache = await svcs.starlette.aget(request, Database, WebAPIClient, Cache)
 
     ...
 ```

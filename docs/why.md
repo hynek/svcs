@@ -3,18 +3,19 @@
 {attribution="Brandon Rhodes"}
 > Monkey patching is software bankruptcy.
 
-A {term}`service locator` like *svcs* allows you to configure and manage all your {term}`service`s in *one central place*, access them in a *consistent* way without worrying about *cleaning them up* and achieve *loose coupling*.
-This gives you a well-defined place and a well-defined method for storing -- *and replacing!* -- your application's configurable dependencies.
+A {term}`service locator` like *svcs* allows you to configure and manage all your {term}`service`s in *one central place*, acquire them in a *consistent* way without worrying about *cleaning them up*, and thus achieve *loose coupling*.
+This gives you a well-defined place and method for storing -- *and replacing!* -- your application's configurable dependencies.
+
+All this happens *within* your application -- service locators are **not** related to {term}`service discovery`.
 
 
 ## Modus Operandi
 
-In practice, that means that you say "*Give me a database connection*!" at runtime, and *svcs* will give you whatever you've configured to return when asked for a database connection.
-That can be an actual database connection, or it can be a mock object for testing.
-All this happens *within* your application -- service locators are **not** related to {term}`service discovery`.
+In practice, you say "*Give me a database connection*!" at runtime, and *svcs* will give you whatever you've configured to return when asked for a database connection.
+That can be an actual database connection, or it can be a fake test object.
 
 A key feature of service locators is that you only ask for the services once you *know* that you will need them.
-So you don't have to pre-instantiate all services just in case (*wasteful*!), or move the instantiation further into, for example, your web views (*resource management*!).
+So you don't have to pre-instantiate all services just in case (*wasteful*!), or move the instantiation further into, for example, your web views (*onerous resource management*!).
 
 ---
 
@@ -90,7 +91,7 @@ def cleanup():
 
 The automatic entering of context managers can be disabled on registration if you need control over when they're entered (for example, for database transaction managers).
 
-The callbacks defined as `on_registry_close` are called when you call `Registry.close()` -- for example, when your application is shutting down.
+The callbacks defined as `on_registry_close` are called when you call {meth}`svcs.Registry.close()` -- for example, when your application is shutting down or after a test.
 
 Next, you can write a simple health check endpoint if you've registered health checks (called *pings*) for your services.
 This is how it could look with the shipped integrations:

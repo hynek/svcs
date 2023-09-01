@@ -126,7 +126,8 @@ def test_handles_db_failure():
 
         # Now, the endpoint should return a 500.
         response = app.test_client().get("/")
-        assert response.status_code == 500
+
+        assert 500 == response.status_code
 ```
 
 {meth}`svcs.flask.overwrite_value`  makes sure that the instantiation cache of the active container is cleared, such that possibly existing connections that you've used in setup are closed and removed.
@@ -134,9 +135,9 @@ def test_handles_db_failure():
 
 ## Quality of Life
 
-In practice, you can simplify/beautify the code within your views by creating a `services` module that re-exports those Flask helpers.
+In practice, you can simplify/beautify the code within your views by creating a module that re-exports those Flask helpers.
 
-Say this is `app/services.py`:
+Say this is `your_app/services.py`:
 
 ```python
 from svcs.flask import (
@@ -214,7 +215,7 @@ def index():
 ### Testing
 
 :::{caution}
-This functions should not be used in production code.
+These functions should not be used in production code.
 
 They always reset the container and run all cleanups after overwriting a service.
 

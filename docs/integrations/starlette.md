@@ -2,6 +2,8 @@
 
 *svcs*'s [Starlette](https://www.starlette.io/) integration stores the {class}`svcs.Registry` on the *lifespan state* and the {class}`svcs.Container` is added to the request state using a [pure ASGI middleware](https://www.starlette.io/middleware/#pure-asgi-middleware).
 
+It's a great way to get type-safety and rich life cycle management on top of Starlette's low-level dependency capabilities.
+
 (starlette-init)=
 
 ## Initialization

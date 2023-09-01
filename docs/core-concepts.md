@@ -133,7 +133,7 @@ Cleaned up!
 Failing cleanups are logged at warning level but otherwise ignored.
 
 ::: {important}
-The key idea is that your business code doesn't have to care about cleaning up services it has requested.
+The key idea is that your business code doesn't have to care about cleaning up services it has acquired.
 :::
 
 That makes testing even easier because the business code makes fewer assumptions about the object it's getting.
@@ -170,7 +170,7 @@ Here's how a health check endpoint could look like:
 ```
 :::
 ::: {tab-item} Pyramid
-```{literalinclude} examples/flask/health_check.py
+```{literalinclude} examples/pyramid/health_check.py
 ```
 :::
 ::: {tab-item} Starlette
@@ -189,12 +189,7 @@ While *svcs*'s core is entirely agnostic on how you use the registry and the con
 - The {class}`svcs.Registry` objects live on **application-scoped** objects like {attr}`flask.Flask.config`.
 - The {class}`svcs.Container` objects live on **request-scoped** objects like {data}`flask.g`.
 
-
-::: {important}
-The core APIs only use vanilla objects without any global state -- but also without any comfort.
-
-It gets more interesting when using framework-specific integrations where the life cycle of the container and, thus, services is handled automatically.
-:::
+You're free to structure your own integrations as you want, though.
 
 
 ## Debugging Registrations

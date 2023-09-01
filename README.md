@@ -41,7 +41,7 @@
 <!-- begin index -->
 
 *svcs* (pronounced *services*) is a **dependency container** for Python.
-It gives you a central place to register factories for types/interfaces and then imperatively request instances of those types with **automatic cleanup** and **health checks**.
+It gives you a central place to register factories for types/interfaces and then imperatively acquire instances of those types with **automatic cleanup** and **health checks**.
 
 It's suitable for implementing [Inversion of Control](https://svcs.hynek.me/en/latest/glossary.html#term-Inversion-of-Control) using either **dependency injection** or **service location** while not requiring global state, decorators, or mangling of function signatures.
 

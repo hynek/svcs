@@ -67,7 +67,7 @@ def view(request):
 ```
 
 ::: {caution}
-These functions only works from within an **active** Pyramid request.
+These functions only works from within **active** Pyramid requests.
 :::
 
 
