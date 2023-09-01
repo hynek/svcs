@@ -144,6 +144,35 @@ Dependency Injection
     Dependency Injection means that the {term}`service layer` is called with all services it needs to do its job.
     It is a fundamental technique to achieve loose coupling between your business code and the services it depends on -- and to achieve {term}`Inversion of Control`.
 
+    For example, in the following code, we have a function that adds a user to a database then sends them an email.
+    To do that, it needs an `SmtpSender` and a `DbConnection` which it constructs.
+    This makes the code hard to test, since we don't want our unit tests to send people emails.
+
+    ```python
+    def add_user(email):
+        smtp = SmtpSender()
+        db = get_database_connection()
+
+        try:
+            user = db.create_user(email)
+            smtp.send_welcome_email(user)
+        except DuplicateUserError:
+            log.warning("Duplicate user", email=email)
+    ```
+
+    To fix that, we need to take _control_ of the dependencies out of the function, and pass them in as parameters -- we _inject_ them:
+
+    ```python
+    def add_user(email, smtp, db):
+        try:
+            user = db.create_user(email)
+            smtp.send_welcome_email(user)
+        except DuplicateUserError:
+            log.warning("Duplicate user", email=email)
+    ```
+
+    ---
+
     Often when talking about dependency injection, people think of *dependency injection frameworks* that use decorators or other magic to inject services into their code.
     But *dependency injection* just means that services are passed from the outside, with no control over how that happens (hence {term}`Inversion of Control`).
 
@@ -186,39 +215,16 @@ IoC
     See {term}`Inversion of Control`.
 
 Inversion of Control
-    Inversion of Control is a complicated name for a simple idea.
+    Inversion of Control is a complicated name for the simple idea of **lower-level** code (frameworks, data access layers, and so on) **invoking** our **higher-level** code: the business logic we care about.
 
-    In the following code, we have a function that adds a user to a database then sends them an email.
-    To do that, it needs an `SmtpSender` and a `DbConnection` which it constructs.
-    This makes the code hard to test, since we don't want our unit tests to send people emails.
+    That's why it's sometimes called the *Hollywood Principle*: "Don't call us, we'll call you."
 
-    ```python
-    def add_user(email):
-        smtp = SmtpSender()
-        db = get_database_connection()
-
-        try:
-            user = db.create_user(email)
-            smtp.send_welcome_email(user)
-        except DuplicateUserError:
-            log.warning("Duplicate user", email=email)
-    ```
-
-    To fix that, we need to take _control_ of the dependencies out of the function, and provide them somehow, usually through {term}`dependency injection`:
-
-    ```python
-    def add_user(email, smtp, db):
-        try:
-            user = db.create_user(email)
-            smtp.send_welcome_email(user)
-        except DuplicateUserError:
-            log.warning("Duplicate user", email=email)
-    ```
-
-    Why do we say IoC and not just dependency injection?
-    Inversion of Control is a broader term that applies to any situation where we "invert" the flow of control so that lower-level code (frameworks, data access layers, and so on) invoke our higher-level code: the business logic we care about.
+    A critical consequence of that is that the *framework* can now take control of the services and make them available to the business logic it calls.
+    Usually, using {term}`dependency injection` or a {term}`service locator`.
 
     ::: {seealso}
+
+    - [*InversionOfControl*](https://martinfowler.com/bliki/InversionOfControl.html) by Martin Fowler.
 
     - [*What is Inversion of Control and Why Does it Matter?*](https://seddonym.me/2019/04/15/inversion-of-control/)
 
