@@ -6,16 +6,20 @@
 A {term}`service locator` like *svcs* allows you to configure and manage all your {term}`service`s in *one central place*, acquire them in a *consistent* way without worrying about *cleaning them up*, and thus achieve *loose coupling*.
 This gives you a well-defined place and method for storing -- *and replacing!* -- your application's configurable dependencies.
 
-All this happens *within* your application -- service locators are **not** related to {term}`service discovery`.
+This documentation mostly talks in terms of web frameworks because web applications are the most common use case for dependency injection and service location.
+However, *svcs* is useful for any application that can benefit from {term}`late binding`.
 
+:::{admonition} Terminology
+:class: tip
 
-:::{hint}
 If the term **_service_** seems confusing to you, it's because it is.
 The term is so overloaded in software engineering that it can mean everything and nothing.
 But it's the correct term, so we're using it to avoid making things even more confusing.
 
 If you want the full scoop, we have an extensive glossary that explains what we mean by {term}`service` in the context of *svcs*.
 But for now, you can think of it as a **configurable dependency** that your application needs to do things like accessing databases or web APIs and you'll be able to follow along just fine.
+
+Service location is **not** related to {term}`service discovery`.
 :::
 
 
