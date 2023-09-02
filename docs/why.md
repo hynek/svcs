@@ -4,10 +4,10 @@
 > Monkey patching is software bankruptcy.
 
 A {term}`service locator` like *svcs* allows you to configure and manage all your {term}`service`s in *one central place*, acquire them in a *consistent* way without worrying about *cleaning them up*, and thus achieve *loose coupling*.
-This gives you a well-defined place and method for storing -- *and replacing!* -- your application's configurable dependencies.
+That gives you a well-defined place and method for storing -- *and replacing!* -- your application's configurable dependencies.
 
 This documentation mostly talks in terms of web frameworks because web applications are the most common use case for dependency injection and service location.
-However, *svcs* is useful for any application that can benefit from {term}`late binding`.
+However, *svcs* is useful for any application that can benefit from {term}`late binding` and being pluggable.
 
 :::{admonition} Terminology
 :class: tip
@@ -17,7 +17,7 @@ The term is so overloaded in software engineering that it can mean everything an
 But it's the correct term, so we're using it to avoid making things even more confusing.
 
 If you want the full scoop, we have an extensive glossary that explains what we mean by {term}`service` in the context of *svcs*.
-But for now, you can think of it as a **configurable dependency** that your application needs to do things like accessing databases or web APIs and you'll be able to follow along just fine.
+But for now, you can think of it as a **configurable dependency** that your application needs to do things like accessing databases or web APIs, and you'll be able to follow along just fine.
 
 Service location is **not** related to {term}`service discovery`.
 :::
@@ -29,20 +29,14 @@ In practice, you say "*Give me a database connection*!" at runtime, and *svcs* w
 That can be an actual database connection, or it can be a fake test object.
 
 A key feature of service locators is that you only ask for the services once you *know* that you will need them.
-So you don't have to pre-instantiate all services just in case (*wasteful*!), or move the instantiation further into, for example, your web views (*onerous resource management*!).
-
----
+So you don't have to pre-instantiate all services just in case (*wasteful*!) or move the instantiation further into, for example, your web views (*onerous resource management*!).
 
 If you follow the **{term}`Dependency Inversion Principle`**, you would register concrete factories for abstract interfaces.
-In Python, usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [*abstract base class*](https://docs.python.org/3/library/abc.html).
+In Python, that would be usually a [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol) or an [*abstract base class*](https://docs.python.org/3/library/abc.html).
 
 If you follow the **{term}`Hexagonal Architecture`** (aka "*ports and adapters*"), the registered types are *ports*, and the factories produce the *adapters*.
-*svcs* gives you a well-defined way to make your application *pluggable*.
 
-```{include} ../README.md
-:start-after: "<!-- begin benefits -->"
-:end-before: "<!-- end benefits -->"
-```
+Here's how this looks in practice with our various integrations:
 
 ```{include} index.md
 :start-after: "<!-- begin tabbed teaser -->"
@@ -137,6 +131,7 @@ In fact, most of our {doc}`integrations/index` are for async frameworks!
 :end-before: "<!-- end typing -->"
 ```
 
+
 ## Is this Dependency Injection or Service Location!?
 
 It can be both, depending on your perspective!
@@ -156,6 +151,38 @@ On the other hand, if you use *svcs* in your service layer -- or even business l
 We strongly recommend the former over the latter because it's much easier to test and reason about.
 
 If you're curious, check the [glossary](glossary) entries for {term}`Service Locator` and {term}`Dependency Injection` for more details.
+
+
+## Benefits
+
+While it may take a moment to realize, all of this comes with many benefits:
+
+**Reduction in boilerplate.**
+Every web framework has some way to store data on long-lived objects like the application, and short-lived objects like requests (for example, in Flask it's {attr}`flask.Flask.config` and {obj}`flask.g` – Starlette uses `request.state` for both).
+Some frameworks also have helpers to control the lifecycle of those objects (like {meth}`flask.Flask.teardown_appcontext` or {meth}`pyramid.request.Request.add_finished_callback`).
+But they work subtly differently and you accumulate a lot of repetitive boilerplate code.
+In fact, Hynek started this project because of the repetitiveness of Flask's [`get_x` pattern](https://flask.palletsprojects.com/en/latest/appcontext/#storing-data).
+
+**Unification of acquisition and release.**
+Knowing where to find your services, how to acquire them, and not caring about their cleanup makes your application more robust and easier to reason about.
+It also makes it easier to write reusable middleware because you don't have to remember where a dependency it needs is stored on the request object (or was it on the application object!?).
+With *svcs* you just have to remember its *type* and gain a portable API for pluggable dependencies.
+
+**Type safety.**
+Since you're asking for objects of certain types, *svcs* can ensure that Mypy knows that the returned object is of that type.
+You can cheat, of course, by returning something else -- *svcs* doesn't care.
+And, of course, type hints are optional -- *svcs* is just as valuable without them.
+
+**Unintrusive testing through loose coupling.**
+As per Brandon's quote at the beginning of this section, monkey-patching is software bankruptcy.
+Adding {term}`late binding` to your application allows you to replace your dependencies with test objects in a well-defined, debuggable way.
+Just create your application and overwrite the service configurations before you perform your tests as necessary.
+
+**Health checks.**
+A production-ready application should be able to tell you whether it -- and all its external dependencies -- is healthy.
+Having that exposed as a web endpoint is great for monitoring and debugging.
+Providing a health endpoint without a centralized registry of services is highly boilerplate-heavy.
+With *svcs* you get that for free.
 
 
 ## Why not?
