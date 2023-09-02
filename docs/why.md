@@ -3,7 +3,7 @@
 {attribution="Brandon Rhodes"}
 > Monkey patching is software bankruptcy.
 
-A {term}`service locator` like *svcs* allows you to configure and manage all your {term}`service`s in *one central place*, acquire them in a *consistent* way without worrying about *cleaning them up*, and thus achieve *loose coupling*.
+A {term}`service locator` like *svcs* (pronounced *services*) allows you to configure and manage all your {term}`service`s in *one central place*, acquire them in a *consistent* way without worrying about *cleaning them up*, and thus achieve *loose coupling*.
 That gives you a well-defined place and method for storing -- *and replacing!* -- your application's configurable dependencies.
 
 This documentation mostly talks in terms of web frameworks because web applications are the most common use case for dependency injection and service location.
