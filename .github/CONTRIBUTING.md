@@ -1,9 +1,11 @@
 # Contributing Guide
 
+> [!WARNING]
+> Before starting to work on pull requests, **please** discuss your idea with us on the [Ideas board](https://github.com/hynek/svcs/discussions/categories/ideas) to save your time and effort.
+
 First off, thank you for considering contributing!
 It's people like *you* who make it is such a great tool for everyone.
 
-**Before starting to work on pull requests, please discuss your idea with us on the [Ideas board](https://github.com/hynek/svcs/discussions/categories/ideas) to save your time and effort.**
 
 This document is mainly to help you to get started by codifying tribal knowledge and expectations and make it more accessible to everyone.
 But don't be afraid to open half-finished PRs and ask questions if something is unclear!
