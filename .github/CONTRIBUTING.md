@@ -1,7 +1,7 @@
 # Contributing Guide
 
 > [!WARNING]
-> Before starting to work on pull requests, **please** discuss your idea with us on the [Ideas board](https://github.com/hynek/svcs/discussions/categories/ideas) to save your time and effort.
+> Before starting to work on pull requests, **please** discuss your idea with us on the [Ideas board](https://github.com/hynek/svcs/discussions/categories/ideas) to save you time and effort!
 
 First off, thank you for considering contributing!
 It's people like *you* who make it is such a great tool for everyone.
