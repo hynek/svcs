@@ -25,7 +25,7 @@ Service location is **not** related to {term}`service discovery`.
 
 ## Modus Operandi
 
-In practice, you say "*Give me a database connection*!" at runtime, and *svcs* will give you whatever you've configured to return when asked for a database connection.
+In practice, you say "*svcs*, give me a database connection!" once you need a database connection, and *svcs* will give you whatever you've configured to return when asked for a database connection.
 That can be an actual database connection, or it can be a fake test object.
 
 A key feature of service locators is that you only ask for the services once you *know* that you will need them.
