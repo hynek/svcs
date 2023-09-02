@@ -161,7 +161,7 @@ While it may take a moment to realize, all of this comes with many benefits:
 Every web framework has some way to store data on long-lived objects like the application, and short-lived objects like requests (for example, in Flask it's {attr}`flask.Flask.config` and {obj}`flask.g` – Starlette uses `request.state` for both).
 Some frameworks also have helpers to control the lifecycle of those objects (like {meth}`flask.Flask.teardown_appcontext` or {meth}`pyramid.request.Request.add_finished_callback`).
 But they work subtly differently and you accumulate a lot of repetitive boilerplate code.
-In fact, Hynek started this project because of the repetitiveness of Flask's [`get_x` pattern](https://flask.palletsprojects.com/en/latest/appcontext/#storing-data).
+In fact, Hynek started this project because of the repetitiveness of Flask's [`get_X` pattern](https://flask.palletsprojects.com/en/latest/appcontext/#storing-data).
 
 **Unification of acquisition and release.**
 Knowing where to find your services, how to acquire them, and not caring about their cleanup makes your application more robust and easier to reason about.
