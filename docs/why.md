@@ -199,7 +199,7 @@ If you still prefer a dependency injection framework, check out [*incant*](https
 
 ## What Next?
 
-If you're still interested, learn about our [core concepts](core-concepts) first -- it's just two of them!
+If you're still interested, learn about our [core concepts](core-concepts) -- it's just two of them! -- or check out our gentle {doc}`tutorials/flask/index`.
 
 Once you've understood the life cycles of registries and containers, you can look our [framework integrations](integrations/index.md) which should get you started right away.
 

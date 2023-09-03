@@ -93,6 +93,7 @@ Read on in *{doc}`why`* if you're intrigued!
 
 why
 core-concepts
+tutorials/index
 integrations/index
 typing-caveats
 glossary

@@ -222,6 +222,10 @@ Stack (most recent call last):
 
 You can see that the datetime factory and the str value have both been registered in `debugging_with_logging.py`, down to the line number.
 
+## What Next?
+
+Now that you're familiar with *svcs*'s core concepts, you're ready for our [tutorials](tutorials/index.md) and [framework integrations](integrations/index.md).
+
 
 ## API Reference
 
