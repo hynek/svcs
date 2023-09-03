@@ -89,6 +89,17 @@ def index() -> flask.ResponseValue:
     conn = svcs.flask.get(Connection)
 ```
 
+You can also use the {obj}`svcs.flask.container` local proxy:
+
+```python
+
+from svcs.flask import container
+
+@app.get("/")
+def index() -> flask.ResponseValue:
+    conn = container.get(Connection)
+```
+
 (flask-health)=
 
 ## Health Checks
@@ -232,6 +243,10 @@ See also {ref}`flask-testing`.
 
 ```{eval-rst}
 .. autofunction:: svcs_from
+.. attribute:: container
+
+   A :class:`werkzeug.local.LocalProxy` that transparently calls :func:`svcs_from` for you when
+   accessed within a request context.
 .. function:: get(svc_types)
 
    Same as :meth:`svcs.Container.get()`, but uses the container from :obj:`flask.g`.

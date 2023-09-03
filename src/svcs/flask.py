@@ -9,6 +9,7 @@ from typing import Any, TypeVar, overload
 
 from flask import Flask, current_app, g, has_app_context
 from flask.ctx import _AppCtxGlobals
+from werkzeug.local import LocalProxy
 
 from ._core import (
     _KEY_CONTAINER,
@@ -39,6 +40,8 @@ def svcs_from(g: _AppCtxGlobals = g) -> Container:
 
     return con  # type: ignore[no-any-return]
 
+
+container = LocalProxy(svcs_from)
 
 FlaskAppT = TypeVar("FlaskAppT", bound=Flask)
 

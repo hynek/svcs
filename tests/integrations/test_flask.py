@@ -199,6 +199,18 @@ class TestFlask:
             is svcs.flask.svcs_from()
         )
 
+    def test_local_proxy(self, container):
+        """
+        svcs.flask.container is a LocalProxy that returns the same container as
+        that is on g.
+        """
+        assert (
+            container
+            == flask.g.svcs_container
+            == svcs.flask.svcs_from()
+            == svcs.flask.container
+        )
+
 
 class TestNonContextHelpers:
     def test_get_registry(self, registry, app):

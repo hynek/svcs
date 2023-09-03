@@ -118,6 +118,7 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "aiohttp": ("https://docs.aiohttp.org/en/stable/", None),
     "flask": ("https://flask.palletsprojects.com/en/latest/", None),
+    "werkzeug": ("https://werkzeug.palletsprojects.com/en/latest/", None),
     "pyramid": (
         "https://docs.pylonsproject.org/projects/pyramid/en/main/",
         None,
