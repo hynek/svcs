@@ -57,3 +57,5 @@ class CustomApp(flask.Flask):
 
 app = svcs.flask.init_app(CustomApp("tests"))
 reg = svcs.flask.get_registry(CustomApp("tests"))
+
+local_p: svcs.Container = svcs.flask.container

@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, TypeVar, overload
+from typing import Any, TypeVar, cast, overload
 
 from flask import Flask, current_app, g, has_app_context
 from flask.ctx import _AppCtxGlobals
@@ -41,7 +41,7 @@ def svcs_from(g: _AppCtxGlobals = g) -> Container:
     return con  # type: ignore[no-any-return]
 
 
-container = LocalProxy(svcs_from)
+container = cast(Container, LocalProxy(svcs_from))
 
 FlaskAppT = TypeVar("FlaskAppT", bound=Flask)
 
