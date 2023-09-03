@@ -181,6 +181,8 @@ Here's how a health check endpoint could look like:
 ::::
 <!-- end health checks -->
 
+Now, you can point your monitoring tool of choice -- like Prometheus's [Blackbox Exporter](https://github.com/prometheus/blackbox_exporter) or [Nagios](https://www.nagios.org) -- at it and you'll get alerted whenever the application is broken.
+
 
 ## Life Cycle Summary
 
