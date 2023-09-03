@@ -52,7 +52,7 @@ Benefits:
 - unifies **acquisition** and **cleanups** of services,
 - provides full *static* **type safety** for them,
 - simplifies **testing** through **loose coupling**,
-- and allows for easy **health checks** across *all* services.
+- improves *live* **debuggability** and **monitoring** with **health checks**.
 
 The goal is to minimize the code for acquiring pluggable services to:
 
