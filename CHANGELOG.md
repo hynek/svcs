@@ -17,7 +17,11 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ### Added
 
-- Flask: `svcs.flask.container` which is a `werkzeug.local.LocalProxy` (like, for example, `flask.current_app`) and is the currently active container when accesses within a request context.
+- [Backwards-compatibility](https://github.com/hynek/svcs/blob/main/.github/SECURITY.md)!
+  *svcs* is pronounced stable now -- no more rug-pulls planned!
+  [#36](https://github.com/hynek/svcs/pull/36)
+
+- Flask: `svcs.flask.container` which is a `werkzeug.local.LocalProxy` (like, for example, `flask.current_app`) and is the currently active container when accessed within a request context.
 
 
 ## [23.19.0](https://github.com/hynek/svcs/compare/23.18.0...23.19.0) - 2023-08-21

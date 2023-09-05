@@ -1,11 +1,10 @@
 # Contributing Guide
 
 > [!WARNING]
-> Before starting to work on pull requests, **please** discuss your idea with us on the [Ideas board](https://github.com/hynek/svcs/discussions/categories/ideas) to save you time and effort!
+> Before starting to work on **feature** pull requests, **please** discuss your idea with us on the [Ideas board](https://github.com/hynek/svcs/discussions/categories/ideas) to save you time and effort!
 
 First off, thank you for considering contributing!
 It's people like *you* who make it is such a great tool for everyone.
-
 
 This document is mainly to help you to get started by codifying tribal knowledge and expectations and make it more accessible to everyone.
 But don't be afraid to open half-finished PRs and ask questions if something is unclear!
@@ -97,6 +96,7 @@ You will find the built documentation in `docs/_build/html`.
   As long as you run our full [*tox*] suite before committing, or install our [*pre-commit*] hooks, you won't have to spend any time on formatting your code at all.
   If you don't, CI will catch it for you -- but that seems like a waste of your time!
 
+
 ## Tests
 
 - Write your asserts as `expected == actual` to line them up nicely and leave an empty line before them:
@@ -108,10 +108,10 @@ You will find the built documentation in `docs/_build/html`.
   assert "foo" == x._a_private_attribute
   ```
 
-- To run the test suite, all you need is a recent [*tox*].
-  It will ensure the test suite runs with all (optional) dependencies against all Python versions just as it will in our CI.
+- You can run  the test suite runs with all (optional) dependencies against all Python versions just as it will in our CI by running `tox`.
 
 - Write [good test docstrings].
+
 
 ## Documentation
 
@@ -135,7 +135,7 @@ You will find the built documentation in `docs/_build/html`.
   First line of new section.
   ```
 
-- If your change is noteworthy, add an entry to the [changelog].
+- If your change is interesting to end-users, add an entry to the [changelog].
   Use [semantic newlines], and add a link to your pull request:
 
   ```markdown

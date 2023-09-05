@@ -203,4 +203,4 @@ If you're still interested, learn about our [core concepts](core-concepts) first
 
 Once you've understood the life cycles of registries and containers, you can look our [framework integrations](integrations/index.md) which should get you started right away.
 
-If you get overwhelmed by the jargon, we have put much effort into our [glossary](glossary)!
+Whenever you get overwhelmed by the jargon, we have put much effort into our [glossary](glossary)!
