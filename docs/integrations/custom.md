@@ -8,6 +8,7 @@ All you need to do is:
 
 - Ensure that the registry is closed when the application shuts down.
   Either by using the registry as a context manager, or by calling {meth}`~svcs.Registry.close()` or {meth}`~svcs.Registry.aclose()` on your registry instance.
+  Or by telling the user to do it themselves -- some web frameworks don't have a way to hook into the application shutdown process.
 
 - Give the user an API to access the registry instance such they can register factories on startup.
 
