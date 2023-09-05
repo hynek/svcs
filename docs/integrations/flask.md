@@ -5,7 +5,7 @@ It also installs a {meth}`flask.Flask.teardown_appcontext` handler to close the 
 
 ---
 
-*svcs*'s origin story is the frustration over the repetitiveness of the "write a `get_X` that creates an `X` and then stores it on `g` and register clean up -- for every single `X`"-[pattern](https://flask.palletsprojects.com/en/latest/appcontext/#storing-data) so let's a have a quick look at its problems for motivation.
+*svcs*'s origin story is the frustration over the repetitiveness of the "write a `get_X` that creates an `X` and then stores it on `g` and register clean up -- for every single `X`"-[pattern](https://flask.palletsprojects.com/en/latest/appcontext/#storing-data), so let's have a quick look at its problems for motivation.
 
 You can [skip this section](#flask-init) if you'd rather see solutions than problems.
 
@@ -32,10 +32,10 @@ def teardown_db(exception):
         db.close()
 ```
 
-Here we have a `get_db` function that creates a database connection and stores it on {obj}`~flask.g` so that it can be reused later.
+Here, we have a `get_db` function that creates a database connection and stores it on {obj}`~flask.g` so that it can be reused later.
 If you ask again, it returns the same connection from `g`.
 
-At the same time, it registers a {meth}`~flask.Flask.teardown_appcontext` handler that at the end of a request looks at `g` for the connection and closes it finds one.
+At the same time, it registers a {meth}`~flask.Flask.teardown_appcontext` handler that, at the end of a request, looks at `g` for the connection and closes it -- if it finds one.
 
 
 If you need to replace the database connection with a mock in tests, the canonical way is using {obj}`flask.appcontext_pushed`.
@@ -68,26 +68,26 @@ def test_broken_db(app):
 This pattern is repeated for **_every dependency_** you have and has multiple problems:
 
 - **Loads of boilerplate**.
-  We've taken this example straight from the Flask docs and you can see that only 2 out of 10 lines are actually relevant to the dependency it's handling.
-  This example is quite simple, but imagine you have 10 dependencies.
+  We've taken this example straight from the Flask docs, and you can see that only 2 out of 10 lines are relevant to the dependency it handles.
+  This example is quite simple, but imagine you have ten dependencies.
 
 - We've found that the necessity to import `get_db` from the place it's defined often leads to **circular imports** and **tight coupling**.
 
 - It puts Flask-specific code **where it doesn't belong**:
   into a module that handles database connections.
 
-- The **naming** of the dependency and the function that creates it is **ad-hoc**.
-  If you write other dependencies, you have to be careful about naming clashes.
-  At the same time if your other dependency wants to use the database, it has to import and call `get_db`.
+- The **naming** of the dependency and the function that creates it is **ad hoc**.
+  If you write other dependencies, you must be careful about naming clashes.
+  At the same time, if your other dependency wants to use the database, it has to import and call `get_db`.
 
-- Looking at **all dependencies** in your app is impossible without even more boilerplate.
+- Looking at **all dependencies** in your app is only possible with *even more* boilerplate.
 
 - Calling `get_db` outside of a **request context** raises an **opaque error**.
 
 - It's awkward to make `get_db` return **test objects**.
-  `appcontext_pushed` is a (boilerplate-rich!) hack that's not even documented in the narrative Flask docs and we pose that most people don't understand how it works at all.
+  `appcontext_pushed` is a (boilerplate-rich!) hack that's not even documented in the narrative Flask docs, and we claim that most people don't understand how it works in the first place.
 
-**This** was the reason why Hynek started writing *svcs* -- originally just as an module that got copy-pasted between work projects.
+**These** were the reasons why Hynek started writing *svcs* before adding more integrations, initially just as a module that got copy-pasted between work projects.
 It solves all of the above problems and more.
 
 :::{important}
