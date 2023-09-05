@@ -215,12 +215,24 @@ IoC
     See {term}`Inversion of Control`.
 
 Inversion of Control
-    Inversion of Control is a complicated name for the simple idea of **lower-level** code (frameworks, data access layers, and so on) **invoking** our **higher-level** code: the business logic we care about.
+    Inversion of Control (IoC) is when a program invokes something without directly depending on it.
+    Instead, some form of indirection is used.
 
     That's why it's sometimes called the *Hollywood Principle*: "Don't call us, we'll call you."
 
-    A critical consequence of that is that the *framework* can now take control of the services and make them available to the business logic it calls.
-    Usually, using {term}`dependency injection` or a {term}`service locator`.
+    Some libraries use inversion of control to allow pluggable third party behaviour.
+    Such libraries are often called 'frameworks'.
+    A framework is configured so that it *indirectly* calls code on which it has no direct dependency.
+
+    Inversion of control can be achieved using a few different patterns:
+
+    - {term}`Dependency injection`.
+
+    - {term}`Service locator`.
+
+    - [The Observer pattern](https://refactoring.guru/design-patterns/observer).
+
+    - [Webhooks](https://en.wikipedia.org/wiki/Webhook).
 
     ::: {seealso}
 
