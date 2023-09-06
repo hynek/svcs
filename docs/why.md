@@ -3,11 +3,19 @@
 {attribution="Brandon Rhodes"}
 > Monkey patching is software bankruptcy.
 
-A {term}`service locator` like *svcs* (pronounced *services*) allows you to configure and manage all your {term}`service`s in *one central place*, acquire them in a *consistent* way without worrying about *cleaning them up*, and thus achieve *loose coupling*.
-That gives you a well-defined place and method for storing -- *and replacing!* -- your application's configurable dependencies.
+*svcs* (pronounced *services*) gives you unified and ergonomic API for storing and retrieving objects to and from your web application's **request objects**.
+Additionally, it ensures that those objects get **cleaned up** when the request is done, offers hooks that make your application more **testable**, and offers you live **introspection** of their health.
 
-This documentation mostly talks in terms of web applications because they are the most common use case for dependency injection and service location.
+This documentation mostly talks in terms of web applications because they are the most common use-case for packages like this.
 However, *svcs* is useful for any application that can benefit from {term}`late binding` and being pluggable.
+The word *flexible* is part of the project's tagline for a reason!
+It's bound neither to request objects nor to web applications.
+
+---
+
+More formally: *svcs* is a {term}`service locator`.
+Service locators like *svcs*  allow you to configure and manage all your {term}`service`s in *one central place*, acquire them in a *consistent* way without worrying about *cleaning them up*, and thus achieve *loose coupling*.
+That gives you a well-defined place and method for storing -- *and replacing!* -- your application's configurable dependencies.
 
 :::{admonition} Terminology
 :class: tip
