@@ -54,6 +54,7 @@ docs = [
   "flask",
   "pyramid",
   "starlette",
+  "sqlalchemy",
 ]
 dev = ["svcs[tests,typing]", "tox>4", "httpx"]
 

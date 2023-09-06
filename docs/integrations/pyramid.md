@@ -83,6 +83,53 @@ A health endpoint could look like this:
 ```
 
 
+## Testing
+
+Assuming you have an application factory `your_app.make_app()`[^factory] that initializes and configures *svcs* using {func}`svcs.pyramid.init()`, you can use the following fixtures to get a [WebTest application](https://docs.pylonsproject.org/projects/pyramid/en/latest/quick_tutorial/functional_testing.html) and its registry for overrides:
+
+[^factory]: The one that returns {meth}`pyramid.config.Configurator.make_wsgi_app`.
+
+% skip: next
+
+```python
+from your_app import make_app
+
+import pytest
+import svcs
+import webtest
+
+@pytest.fixture
+def app():
+    app = make_app()
+
+    with svcs.pyramid.get_registry(app):
+        yield webtest.TestApp(app)
+
+
+@pytest.fixture
+def registry(app):
+    return svcs.pyramid.get_registry(app)
+```
+
+Now you can write a test like this:
+
+```python
+from sqlalchemy import Engine
+
+def test_broken_database(app, registry):
+    boom = Mock(spec_set=Engine)
+    boom.execute.side_effect = RuntimeError("Boom!")
+
+    registry.register_value(Engine, boom)  # ← override the database
+
+    resp = app.get("/some-url")
+
+    assert 500 == resp.status_code
+```
+
+Since {func}`~svcs.pyramid.init()` takes a *registry* keyword argument, you can also go the other way around and pass a (potentially pre-configured) {class}`svcs.Registry` *into* your application factory.
+
+
 ## Cleanup
 
 You can use {func}`svcs.pyramid.close_registry()` to close the registry that is attached to the {class}`pyramid.registry.Registry` of the config or app object that you pass as the only parameter.
