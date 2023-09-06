@@ -303,6 +303,11 @@ def index():
 .. autofunction:: init_app
 .. autofunction:: get_registry
 .. autofunction:: close_registry
+.. attribute:: registry
+
+   A :class:`werkzeug.local.LocalProxy` that transparently calls :func:`get_registry` on :obj:`flask.current_app`.
+
+   .. versionadded:: 23.21.0
 ```
 
 
