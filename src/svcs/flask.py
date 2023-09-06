@@ -41,6 +41,23 @@ def svcs_from(g: _AppCtxGlobals = g) -> Container:
     return con  # type: ignore[no-any-return]
 
 
+def get_registry(app: Flask | None = None) -> Registry:
+    """
+    Get the registry from *app* or :obj:`flask.current_app`.
+
+    Args:
+
+        app: If None, :obj:`flask.current_app` is used.
+
+    .. versionadded:: 23.21.0
+       *app* can be None, in which case :obj:`flask.current_app` is used.
+    """
+    if app is None:
+        app = current_app
+    return app.config[_KEY_REGISTRY]  # type: ignore[no-any-return]
+
+
+registry = cast(Registry, LocalProxy(get_registry))
 container = cast(Container, LocalProxy(svcs_from))
 
 FlaskAppT = TypeVar("FlaskAppT", bound=Flask)
@@ -56,13 +73,6 @@ def init_app(app: FlaskAppT, *, registry: Registry | None = None) -> FlaskAppT:
     app.teardown_appcontext(teardown)
 
     return app
-
-
-def get_registry(app: Flask) -> Registry:
-    """
-    Get the registry from *app*.
-    """
-    return app.config[_KEY_REGISTRY]  # type: ignore[no-any-return]
 
 
 def get_abstract(*svc_types: type) -> Any:
