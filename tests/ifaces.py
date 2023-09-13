@@ -4,7 +4,7 @@
 
 """
 Interfaces used throughout the tests. They're dataclasses so they have a
-predicatable repr.
+predictable repr.
 """
 
 import dataclasses
