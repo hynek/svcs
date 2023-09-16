@@ -33,7 +33,7 @@ tests = [
   "pytest",
   "pytest-asyncio",
   "sybil",
-  "typing-extensions; python_version<'3.10'",
+  "typing-extensions; python_version<'3.9'",
 ]
 typing = [
   "mypy>=1.4",

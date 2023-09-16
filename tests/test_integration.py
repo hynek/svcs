@@ -11,6 +11,7 @@ from contextlib import (
     asynccontextmanager,
     contextmanager,
 )
+from typing import NewType
 
 import pytest
 
@@ -21,7 +22,7 @@ from .fake_factories import (
     async_int_factory,
     async_str_gen_factory,
 )
-from .helpers import Annotated, TypeAlias, nop
+from .helpers import Annotated, nop
 from .ifaces import AnotherService, Interface, Service, YetAnotherService
 
 
@@ -65,8 +66,8 @@ def test_register_value_multiple(registry, container):
     assert [1, 2] == container.get(Service, AnotherService)
 
 
-S1: TypeAlias = Annotated[Interface, "s1"]
-S2: TypeAlias = Annotated[Interface, "s2"]
+S1 = Annotated[Interface, "s1"]
+S2 = NewType("S2", Interface)
 
 
 def test_get_annotated_multiple(registry, container):

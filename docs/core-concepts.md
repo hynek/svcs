@@ -39,7 +39,8 @@ But the types must be *hashable* because they're used as keys in a lookup dictio
 Sometimes, it makes sense to have multiple instances of the same type.
 For example, you might have multiple HTTP client pools or more than one database connection.
 
-You can achieve this by using a {any}`typing.Annotated` {any}`typing.TypeAlias` (or their backports in [*typing-extensions*](https://pypi.org/project/typing-extensions/)).
+You can achieve this by using either {any}`typing.Annotated` (Python 3.9+, or in [*typing-extensions*](https://pypi.org/project/typing-extensions/)) or by using {any}`typing.NewType`.
+You can also mix and match the two.
 For instance, if you need a primary and a secondary database connection:
 
 % invisible-code-block: python
@@ -48,23 +49,24 @@ For instance, if you need a primary and a secondary database connection:
 % secondary_url = "sqlite:///:memory:"
 
 ```python
+from typing import Annotated, NewType
+
 from sqlalchemy import Connection, create_engine
-from typing import Annotated, TypeAlias
 
 # Create the two connection engines
 primary_engine = create_engine(primary_url)
 secondary_engine = create_engine(secondary_url)
 
-# Create a type alias for each
-PrimaryConnection: TypeAlias = Annotated[Connection, "primary"]
-SecondaryConnection: TypeAlias = Annotated[Connection, "secondary"]
+# Create unique types for both with two different approaches
+PrimaryConnection = Annotated[Connection, "primary"]
+SecondaryConnection = NewType("SecondaryConnection", Connection)
 
 # Register the factories to the aliases
 registry.register_factory(PrimaryConnection, primary_engine.connect)
 registry.register_factory(SecondaryConnection, secondary_engine.connect)
 ```
 
-The type and content of the metadata (here: "primary" and "secondary") are not important to *svcs*, as long as the whole type alias is hashable.
+The type and content of the annotated metadata ("primary") are not important to *svcs*, as long as the whole type is hashable.
 
 
 ### Cleanup
