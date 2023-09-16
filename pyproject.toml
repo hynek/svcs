@@ -29,7 +29,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-tests = ["pytest", "pytest-asyncio", "sybil"]
+tests = [
+  "pytest",
+  "pytest-asyncio",
+  "sybil",
+  "typing-extensions; python_version<'3.10'",
+]
 typing = [
   "mypy>=1.4",
   "fastapi",
