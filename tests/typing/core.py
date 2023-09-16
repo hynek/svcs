@@ -5,9 +5,15 @@
 import contextlib
 import sys
 
-from typing import AsyncGenerator, Generator, Protocol
+from typing import AsyncGenerator, Generator, NewType, Protocol
 
 import svcs
+
+
+if sys.version_info >= (3, 9):
+    from typing import Annotated
+else:
+    from typing_extensions import Annotated
 
 
 reg = svcs.Registry()
@@ -130,3 +136,14 @@ if sys.version_info >= (3, 10):
 
         async with contextlib.aclosing(svcs.Registry()):
             ...
+
+
+# Multiple factories for same type:
+S1 = Annotated[str, "s1"]
+S2 = NewType("S2", str)
+
+reg.register_value(S1, "foo")
+reg.register_value(S2, "bar")
+
+s1: str = con.get(S1)
+s2: str = con.get(S2)
