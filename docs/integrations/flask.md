@@ -135,7 +135,7 @@ def create_app(config_filename):
             yield conn
 
     ping = text("SELECT 1")
-    svcs_flask.register_factory(
+    svcs.flask.register_factory(
         # The app argument makes it good for custom init_app() functions.
         app,
         Connection,
@@ -145,7 +145,7 @@ def create_app(config_filename):
     )
 
     # You also use svcs WITHIN factories:
-    svcs_flask.register_factory(
+    svcs.flask.register_factory(
         app, # <---
         AbstractRepository,
         # No cleanup, so we just return an object using a lambda
