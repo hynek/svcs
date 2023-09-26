@@ -95,7 +95,7 @@ You can also use a registry as an (async) context manager that (a)closes automat
 
 ## Containers
 
-A **{class}`svcs.Container`** uses a {class}`svcs.Registry` to lookup registered types and uses that information to create instances and to take care of their life cycles:
+A **{class}`svcs.Container`** uses a {class}`svcs.Registry` to lookup registered types and uses that information to create instances and to take care of their life cycles when you call its {meth}`~svcs.Container.get` or {meth}`~svcs.Container.aget` method:
 
 ```python
 >>> container = svcs.Container(registry)
@@ -116,6 +116,11 @@ True
 ```
 
 A container lives as long as you want the instances within to live -- for example, as long as a request lives.
+
+Our {doc}`integrations/index` offer a `svcs_from()` function to extract the container from the current environment, and a `get()` (and/or `aget()`) function that transparently gets the service from the current container for you.
+Depending on your web framework, you may have to pass the current request object as the first argument to `svcs_from()` / `get()` / `aget()`.
+
+---
 
 If a factory takes a first argument called `svcs_container` or the first argument (of any name) is annotated as being {class}`svcs.Container`, the current container instance is passed into the factory as the first *positional* argument allowing for recursive service acquisition:
 
