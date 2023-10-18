@@ -39,7 +39,7 @@ But the types must be *hashable* because they're used as keys in a lookup dictio
 Sometimes, it makes sense to have multiple instances of the same type.
 For example, you might have multiple HTTP client pools or more than one database connection.
 
-You can achieve this by using either {any}`typing.Annotated` (Python 3.9+, or in [*typing-extensions*](https://pypi.org/project/typing-extensions/)) or by using {any}`typing.NewType`.
+You can achieve this by using either {any}`typing.Annotated` (Python 3.9+, or in [*typing-extensions*](https://pypi.org/project/typing-extensions/)) or by using {keyword}`type` (Python 3.12+, use {any}`typing.NewType` on older versions).
 You can also mix and match the two.
 For instance, if you need a primary and a secondary database connection:
 
@@ -60,6 +60,8 @@ secondary_engine = create_engine(secondary_url)
 # Create unique types for both with two different approaches
 PrimaryConnection = Annotated[Connection, "primary"]
 SecondaryConnection = NewType("SecondaryConnection", Connection)
+# Or on Python 3.12:
+# type SecondaryConnection = Connection
 
 # Register the factories to the aliases
 registry.register_factory(PrimaryConnection, primary_engine.connect)
