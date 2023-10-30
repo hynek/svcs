@@ -14,6 +14,11 @@ If an item doesn't apply to your pull request, **check it anyway** to make it ap
 -->
 
 - [ ] Typos aside (please, always submit typo fixes!), I understand that this pull request may be **closed** in case there was **no [previous discussion](https://github.com/hynek/svcs/discussions/categories/ideas)**.
+- [ ] Do **not** open pull requests from your `main` branch – **use a separate branch**!
+
+  There's a ton of footguns waiting if you don't heed this warning. You can still go back to your project, create a branch from your main branch, push it, and open the pull request from the new branch.
+
+  This is not a pre-requisite for your your pull request to be accepted, but **you have been warned**.
 - [ ] Added **tests** for changed code.
     - The CI fails with less than 100% coverage.
 - [ ] **New APIs** are added to our typing tests at <https://github.com/hynek/svcs/blob/main/tests/typing/>.
