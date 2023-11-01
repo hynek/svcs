@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import inspect
 import logging
+import sys
 import warnings
 
 from collections.abc import Callable
@@ -28,6 +29,12 @@ from typing import Any, Awaitable, TypeVar, overload
 import attrs
 
 from .exceptions import ServiceNotFoundError
+
+
+if sys.version_info < (3, 11):
+    from typing_extensions import TypeVarTuple, Unpack
+else:
+    from typing import TypeVarTuple, Unpack
 
 
 log = logging.getLogger("svcs")
@@ -418,16 +425,8 @@ def _takes_container(factory: Callable) -> bool:
     return False
 
 
-T1 = TypeVar("T1")
-T2 = TypeVar("T2")
-T3 = TypeVar("T3")
-T4 = TypeVar("T4")
-T5 = TypeVar("T5")
-T6 = TypeVar("T6")
-T7 = TypeVar("T7")
-T8 = TypeVar("T8")
-T9 = TypeVar("T9")
-T10 = TypeVar("T10")
+T = TypeVar("T")
+Ts = TypeVarTuple("Ts")
 
 
 @attrs.define
@@ -642,117 +641,11 @@ class Container:
         return False, svc, rs.name, rs.enter
 
     @overload
-    def get(self, svc_type: type[T1], /) -> T1:
+    def get(self, svc_type: type[T], /) -> T:
         ...
 
     @overload
-    def get(
-        self, svc_type1: type[T1], svc_type2: type[T2], /
-    ) -> tuple[T1, T2]:
-        ...
-
-    @overload
-    def get(
-        self, svc_type1: type[T1], svc_type2: type[T2], svc_type3: type[T3], /
-    ) -> tuple[T1, T2, T3]:
-        ...
-
-    @overload
-    def get(
-        self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        /,
-    ) -> tuple[T1, T2, T3, T4]:
-        ...
-
-    @overload
-    def get(
-        self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        /,
-    ) -> tuple[T1, T2, T3, T4, T5]:
-        ...
-
-    @overload
-    def get(
-        self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        /,
-    ) -> tuple[T1, T2, T3, T4, T5, T6]:
-        ...
-
-    @overload
-    def get(
-        self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        svc_type7: type[T7],
-        /,
-    ) -> tuple[T1, T2, T3, T4, T5, T6, T7]:
-        ...
-
-    @overload
-    def get(
-        self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        svc_type7: type[T7],
-        svc_type8: type[T8],
-        /,
-    ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8]:
-        ...
-
-    @overload
-    def get(
-        self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        svc_type7: type[T7],
-        svc_type8: type[T8],
-        svc_type9: type[T9],
-        /,
-    ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9]:
-        ...
-
-    @overload
-    def get(
-        self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        svc_type7: type[T7],
-        svc_type8: type[T8],
-        svc_type9: type[T9],
-        svc_type10: type[T10],
-        /,
-    ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]:
+    def get(self, *svc_types: Unpack[Ts]) -> tuple[Unpack[Ts]]:
         ...
 
     def get(self, *svc_types: type) -> object:
@@ -793,117 +686,11 @@ class Container:
         return rv
 
     @overload
-    async def aget(self, svc_type: type[T1], /) -> T1:
+    async def aget(self, svc_type: type[T], /) -> T:
         ...
 
     @overload
-    async def aget(
-        self, svc_type1: type[T1], svc_type2: type[T2], /
-    ) -> tuple[T1, T2]:
-        ...
-
-    @overload
-    async def aget(
-        self, svc_type1: type[T1], svc_type2: type[T2], svc_type3: type[T3], /
-    ) -> tuple[T1, T2, T3]:
-        ...
-
-    @overload
-    async def aget(
-        self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        /,
-    ) -> tuple[T1, T2, T3, T4]:
-        ...
-
-    @overload
-    async def aget(
-        self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        /,
-    ) -> tuple[T1, T2, T3, T4, T5]:
-        ...
-
-    @overload
-    async def aget(
-        self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        /,
-    ) -> tuple[T1, T2, T3, T4, T5, T6]:
-        ...
-
-    @overload
-    async def aget(
-        self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        svc_type7: type[T7],
-        /,
-    ) -> tuple[T1, T2, T3, T4, T5, T6, T7]:
-        ...
-
-    @overload
-    async def aget(
-        self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        svc_type7: type[T7],
-        svc_type8: type[T8],
-        /,
-    ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8]:
-        ...
-
-    @overload
-    async def aget(
-        self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        svc_type7: type[T7],
-        svc_type8: type[T8],
-        svc_type9: type[T9],
-        /,
-    ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9]:
-        ...
-
-    @overload
-    async def aget(
-        self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        svc_type7: type[T7],
-        svc_type8: type[T8],
-        svc_type9: type[T9],
-        svc_type10: type[T10],
-        /,
-    ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]:
+    async def aget(self, *svc_types: Unpack[Ts]) -> tuple[Unpack[Ts]]:
         ...
 
     async def aget(self, *svc_types: type) -> object:

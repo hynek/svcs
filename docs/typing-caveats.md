@@ -33,9 +33,3 @@ disable_error_code = ["type-abstract"]
 ```
 
 ... or by calling Mypy with the `--disable-error-code=type-abstract` argument.
-
-
-## Multiple Services
-
-Another caveat is that it's necessary to define multiple return values for `get()` for every single arity.
-We've done it for up to **ten service types** which should be plenty.

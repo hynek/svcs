@@ -26,6 +26,7 @@ classifiers = [
 ]
 dependencies = [
   "attrs>=21.3.0", # attrs namespace
+  "typing-extensions; python_version<'3.11'",
 ]
 
 [project.optional-dependencies]
@@ -33,7 +34,6 @@ tests = [
   "pytest",
   "pytest-asyncio",
   "sybil",
-  "typing-extensions; python_version<'3.9'",
 ]
 typing = [
   "mypy>=1.4",
