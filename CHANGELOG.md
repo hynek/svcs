@@ -23,6 +23,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
   (The irony of shipping a backwards-incompatible change in the release directly following the adoption of a backwards-compatibility policy not lost on me.)
   [#50](https://github.com/hynek/svcs/discussions/50)
+  [#51](https://github.com/hynek/svcs/discussions/51)
 
 
 ### Added
