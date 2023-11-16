@@ -110,7 +110,7 @@ def register_value(
     svc_type: type,
     value: object,
     *,
-    enter: bool = True,
+    enter: bool = False,
     ping: Callable | None = None,
     on_registry_close: Callable | None = None,
 ) -> None:

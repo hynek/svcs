@@ -266,7 +266,7 @@ class Registry:
         svc_type: type,
         value: object,
         *,
-        enter: bool = True,
+        enter: bool = False,
         ping: Callable | None = None,
         on_registry_close: Callable | Awaitable | None = None,
     ) -> None:
@@ -280,6 +280,12 @@ class Registry:
                ping=ping,
                on_registry_close=on_registry_close
            )
+
+        Please note that, unlike with :meth:`register_factory`, entering
+        context  managers is **disabled** by default.
+
+        .. versionchanged:: 23.21.0
+           *enter* is now ``False`` by default.
         """
         rs = self._register_factory(
             svc_type,

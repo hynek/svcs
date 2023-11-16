@@ -154,3 +154,30 @@ class TestAIOHTTP:
         assert {"builtins.int": None} == json.loads(text)
 
         await server.aclose()
+
+    async def test_client_pool_register_value(self, app):
+        """
+        Since register_value has enter=False by default, we can use it to
+        register a singleton client pool.
+        """
+        registry = svcs.Registry()
+
+        global_session = ClientSession()
+        registry.register_value(
+            ClientSession,
+            global_session,
+            on_registry_close=global_session.close,
+        )
+
+        # Just use our own app for a GET request.
+        app.router.add_get("/", health_view)
+        server = await AppServer.start(app)
+
+        async with registry, svcs.Container(registry) as container:
+            sess = await container.aget(ClientSession)
+            async with sess.get(server.base_url) as resp:
+                assert 200 == resp.status
+
+        await server.aclose()
+
+        assert global_session.closed
