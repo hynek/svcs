@@ -155,7 +155,7 @@ If your integration has a function called `overwrite_(value|factory)()`, it will
 
 ### Cleanup
 
-If a factory returns a [context manager](https://docs.python.org/3/library/stdtypes.html#context-manager-types), it will be immediately entered and the instance will be added to the cleanup list (you can disable this behavior by passing `enter=False` to {meth}`~svcs.Registry.register_factory` and {meth}`~svcs.Registry.register_value`).
+If a factory returns a [context manager](https://docs.python.org/3/library/stdtypes.html#context-manager-types), it will be immediately entered and the instance will be added to the cleanup list (you can disable this behavior by passing `enter=False` to {meth}`~svcs.Registry.register_factory` and it's **off by default** for {meth}`~svcs.Registry.register_value`).
 If a factory is a [generator](https://docs.python.org/3/tutorial/classes.html#generators) that *yields* the instance instead of returning it, it will be wrapped in a context manager automatically.
 At the end, you run {meth}`svcs.Container.close()` and all context managers will be exited.
 You can use this to close files, return database connections to a pool, and so on.
