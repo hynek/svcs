@@ -31,6 +31,12 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 - Flask: `svcs.flask.registry` which is a `werkzeug.local.LocalProxy` for the currently active registry on `flask.current_app`.
 
 
+### Fixed
+
+- We've stopped rewriting the public names of our objects and `typing.get_type_hints()` now works on them as expected.
+  [#52](https://github.com/hynek/issues/pull/52)
+
+
 ## [23.20.0](https://github.com/hynek/svcs/compare/23.19.0...23.20.0) - 2023-09-05
 
 ### Added

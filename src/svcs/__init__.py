@@ -45,12 +45,3 @@ try:
     from . import starlette
 except ImportError:
     __all__ += ["starlette"]
-
-
-# Make nicer public names.
-__locals = locals()
-for __name in __all__:
-    if not __name.startswith("__") and not __name.islower():
-        __locals[__name].__module__ = "svcs"
-del __locals
-del __name  # pyright: ignore[reportUnboundVariable]

@@ -60,6 +60,7 @@ if "dev" in release:
 exclude_patterns = ["_build"]
 
 nitpick_ignore = [
+    *[("py:class", f"svcs._core.T{i}") for i in range(1, 11)],
     # Welcome, MkDocs projects. :(
     ("py:class", "FastAPI"),
     ("py:class", "Starlette"),
