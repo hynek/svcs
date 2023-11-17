@@ -35,6 +35,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 - We've stopped rewriting the public names of our objects and `typing.get_type_hints()` now works on them as expected for Python 3.10 and later.
   [#52](https://github.com/hynek/issues/pull/52)
+  [#53](https://github.com/hynek/issues/pull/53)
 
 
 ## [23.20.0](https://github.com/hynek/svcs/compare/23.19.0...23.20.0) - 2023-09-05
