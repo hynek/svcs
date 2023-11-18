@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 
+import importlib.util
+import sys
+
 from doctest import ELLIPSIS
 
 import pytest
@@ -65,3 +68,20 @@ def _container(registry):
 @pytest.fixture(name="close_me")
 def _close_me():
     return CloseMe()
+
+
+@pytest.fixture(name="create_module")
+def _create_module(tmp_path):
+    def wrapper(source):
+        module_name = "_svcs_testing_tmp_module"
+        module_path = tmp_path / f"{module_name}.py"
+        module_path.write_text(source)
+
+        spec = importlib.util.spec_from_file_location(module_name, module_path)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        spec.loader.exec_module(module)
+
+        return module
+
+    return wrapper

@@ -316,6 +316,51 @@ def diff_name():
     ...
 
 
+takes_containers_annotation_string_modules = (
+    """
+from __future__ import annotations
+
+from svcs import Container
+
+def factory(container: Container) -> int:
+    ...
+    """,
+    """
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from svcs import Container
+
+def factory(container: Container) -> int:
+    ...
+    """,
+    """
+def factory(container: "svcs.Container") -> int:
+    ...
+    """,
+    """
+from __future__ import annotations
+
+import svcs
+
+def factory(container: svcs.Container) -> int:
+    ...
+
+    """,
+    """
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import svcs
+
+def factory(container: svcs.Container) -> int:
+    ...
+    """,
+)
+
+
 class TestTakesContainer:
     @pytest.mark.parametrize(
         "factory",
@@ -347,16 +392,16 @@ class TestTakesContainer:
 
         assert svcs._core._takes_container(factory)
 
-    def test_annotation_str(self):
-        """
-        Return true if the first argument is annotated as `svcs.Container`
-        using a string.
-        """
+    @pytest.mark.parametrize(
+        "module_source", takes_containers_annotation_string_modules
+    )
+    def test_annotation_str(self, module_source, create_module):
+        """Return `True` if the first argument is annotated as `svcs.Container`
+        using a string."""
 
-        def factory(bar: "svcs.Container"):
-            ...
+        module = create_module(module_source)
 
-        assert svcs._core._takes_container(factory)
+        assert svcs._core._takes_container(module.factory)
 
     def test_catches_invalid_sigs(self):
         """
