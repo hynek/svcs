@@ -2,15 +2,15 @@
 
 ## Abstract Classes and PEP 544
 
-If you try to `get()` an abstract class like an `Protocol` or an *abstract base classes* you'll get a Mypy error like this:
+If you try to `get()` an abstract class like an `Protocol` or an *abstract base class* you'll get a Mypy error like this:
 
 ```text
 error: Only concrete class can be given where "type[P]" is expected  [type-abstract]
 ```
 
-Unfortunately it's [impossible](https://github.com/python/mypy/issues/4717) to type-hint `type[P]` when `P` is abstract as its forbidden by {pep}`544`.
+Unfortunately, it's [impossible](https://github.com/python/mypy/issues/4717) to type-hint `type[P]` when `P` is abstract because it's forbidden by {pep}`544`.
 
-As a stopgap, until we get something better in Python typing, *svcs* comes with `Container.get_abstract()` and `Container.aget_abstract()` that are type-hinted to return `Any`.
+As a stopgap, until we get something better in Python typing, *svcs* comes with `Container.get_abstract()` and `Container.aget_abstract()` that are type-hinted to return {obj}`~typing.Any`.
 Since `Any` disables any kind of type-checking, you have to use it like this:
 
 % skip: start
@@ -23,10 +23,16 @@ You can also create bespoke wrappers for your services:
 
 ```python
 def get_connection() -> Connection:
-    return svcs.flask.get(Connection)
+    return svcs.flask.get_abstract(Connection)
 ```
 
-Sadly, these are the best compromises to date.
+Finally, you can disable this error by adding the following line to your Mypy configuration:
+
+```toml
+disable_error_code = ["type-abstract"]
+```
+
+... or by calling Mypy with the `--disable-error-code=type-abstract` argument.
 
 
 ## Multiple Services

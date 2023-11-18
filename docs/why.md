@@ -4,7 +4,7 @@
 > Monkey patching is software bankruptcy.
 
 *svcs* (pronounced *services*) gives you unified and ergonomic API for storing and retrieving objects to and from your web application's **request objects**.
-Additionally, it ensures that those objects get **cleaned up** when the request is done, offers hooks that make your application more **testable**, and offers you live **introspection** of their health.
+Additionally, it ensures that those objects get **cleaned up** when the request is done, offers hooks that make your application more **testable**, and gives you live **introspection** of their health.
 
 This documentation mostly talks in terms of web applications because they are the most common use-case for packages like this.
 However, *svcs* is useful for any application that can benefit from {term}`late binding` and being pluggable.

@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [*Keep a Changelog*](https://keepachangelog.com/en/1.0.0/) and this project adheres to [*Calendar Versioning*](https://calver.org/).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project adheres to [Calendar Versioning](https://calver.org/).
 
 The **first number** of the version is the year.
 The **second number** is incremented with each release, starting at 1 for each year.
@@ -15,9 +15,27 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/23.20.0...HEAD)
 
+### Changed
+
+- **Backwards-Incompatible**: Since multiple people have been bit by the `enter=True` default for `Registry.register_value()`, and it's very early in *svcs* life, we're changing the default to `enter=False` for all versions of `register_value()`.
+
+  This means that you have to explicitly opt-in to context manager behavior which makes a lot more sense for singletons like a connection pools which are the most common candidates for registered values.
+
+  (The irony of shipping a backwards-incompatible change in the release directly following the adoption of a backwards-compatibility policy not lost on me.)
+  [#50](https://github.com/hynek/svcs/discussions/50)
+  [#51](https://github.com/hynek/svcs/discussions/51)
+
+
 ### Added
 
 - Flask: `svcs.flask.registry` which is a `werkzeug.local.LocalProxy` for the currently active registry on `flask.current_app`.
+
+
+### Fixed
+
+- We've stopped rewriting the public names of our objects and `typing.get_type_hints()` now works on them as expected for Python 3.10 and later.
+  [#52](https://github.com/hynek/issues/pull/52)
+  [#53](https://github.com/hynek/issues/pull/53)
 
 
 ## [23.20.0](https://github.com/hynek/svcs/compare/23.19.0...23.20.0) - 2023-09-05

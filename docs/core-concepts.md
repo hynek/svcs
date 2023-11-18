@@ -18,15 +18,15 @@ It is possible to register either factory callables or values:
 >>> import svcs
 >>> import uuid
 
->>> reg = svcs.Registry()
+>>> registry = svcs.Registry()
 
->>> reg.register_factory(uuid.UUID, uuid.uuid4)
->>> reg.register_value(str, "Hello World")
->>> uuid.UUID in reg
+>>> registry.register_factory(uuid.UUID, uuid.uuid4)
+>>> registry.register_value(str, "Hello World")
+>>> uuid.UUID in registry
 True
->>> str in reg
+>>> str in registry
 True
->>> int in reg
+>>> int in registry
 False
 ```
 
@@ -34,15 +34,56 @@ The values and return values of the factories don't have to be actual instances 
 But the types must be *hashable* because they're used as keys in a lookup dictionary.
 
 
+### Multiple Factories for the Same Type
+
+Sometimes, it makes sense to have multiple instances of the same type.
+For example, you might have multiple HTTP client pools or more than one database connection.
+
+You can achieve this by using either {any}`typing.Annotated` (Python 3.9+, or in [*typing-extensions*](https://pypi.org/project/typing-extensions/)) or by using {keyword}`type` (Python 3.12+, use {any}`typing.NewType` on older versions).
+You can also mix and match the two.
+For instance, if you need a primary and a secondary database connection:
+
+% invisible-code-block: python
+%
+% primary_url = "sqlite:///:memory:"
+% secondary_url = "sqlite:///:memory:"
+
+```python
+from typing import Annotated, NewType
+
+from sqlalchemy import Connection, create_engine
+
+# Create the two connection engines
+primary_engine = create_engine(primary_url)
+secondary_engine = create_engine(secondary_url)
+
+# Create unique types for both with two different approaches
+PrimaryConnection = Annotated[Connection, "primary"]
+SecondaryConnection = NewType("SecondaryConnection", Connection)
+# Or on Python 3.12:
+# type SecondaryConnection = Connection
+
+# Register the factories to the aliases
+registry.register_factory(PrimaryConnection, primary_engine.connect)
+registry.register_factory(SecondaryConnection, secondary_engine.connect)
+```
+
+The type and content of the annotated metadata ("primary") are not important to *svcs*, as long as the whole type is hashable.
+
+
 ### Cleanup
 
 It's possible to register a callback that is called when the *registry* is closed:
 
-% skip: next
+% invisible-code-block: python
+%
+% url = "sqlite:///:memory:"
 
 ```python
+engine = create_engine(url)
+
 registry.register_factory(
-    Connection, connection_factory, on_registry_close=engine.dispose
+    Connection, engine.connect, on_registry_close=engine.dispose
 )
 ```
 
@@ -56,10 +97,10 @@ You can also use a registry as an (async) context manager that (a)closes automat
 
 ## Containers
 
-A **{class}`svcs.Container`** uses a {class}`svcs.Registry` to lookup registered types and uses that information to create instances and to take care of their life cycles:
+A **{class}`svcs.Container`** uses a {class}`svcs.Registry` to lookup registered types and uses that information to create instances and to take care of their life cycles when you call its {meth}`~svcs.Container.get` or {meth}`~svcs.Container.aget` method:
 
 ```python
->>> container = svcs.Container(reg)
+>>> container = svcs.Container(registry)
 
 >>> uuid.UUID in container
 False
@@ -78,18 +119,23 @@ True
 
 A container lives as long as you want the instances within to live -- for example, as long as a request lives.
 
+Our {doc}`integrations/index` offer a `svcs_from()` function to extract the container from the current environment, and a `get()` (and/or `aget()`) function that transparently gets the service from the current container for you.
+Depending on your web framework, you may have to pass the current request object as the first argument to `svcs_from()` / `get()` / `aget()`.
+
+---
+
 If a factory takes a first argument called `svcs_container` or the first argument (of any name) is annotated as being {class}`svcs.Container`, the current container instance is passed into the factory as the first *positional* argument allowing for recursive service acquisition:
 
 ```python
->>> container = svcs.Container(reg)
+>>> container = svcs.Container(registry)
 
 # Let's make the UUID predictable for our test!
->>> reg.register_value(uuid.UUID, uuid.UUID('639c0a5c-8d93-4a67-8341-fe43367308a5'))
+>>> registry.register_value(uuid.UUID, uuid.UUID('639c0a5c-8d93-4a67-8341-fe43367308a5'))
 
 >>> def factory(svcs_container) -> str:
 ...     return svcs_container.get(uuid.UUID).hex  # get the UUID, then work on it
 
->>> reg.register_factory(str, factory)
+>>> registry.register_factory(str, factory)
 
 >>> container.get(str)
 '639c0a5c8d934a678341fe43367308a5'
@@ -109,7 +155,7 @@ If your integration has a function called `overwrite_(value|factory)()`, it will
 
 ### Cleanup
 
-If a factory returns a [context manager](https://docs.python.org/3/library/stdtypes.html#context-manager-types), it will be immediately entered and the instance will be added to the cleanup list (you can disable this behavior by passing `enter=False` to {meth}`~svcs.Registry.register_factory` and {meth}`~svcs.Registry.register_value`).
+If a factory returns a [context manager](https://docs.python.org/3/library/stdtypes.html#context-manager-types), it will be immediately entered and the instance will be added to the cleanup list (you can disable this behavior by passing `enter=False` to {meth}`~svcs.Registry.register_factory` and it's **off by default** for {meth}`~svcs.Registry.register_value`).
 If a factory is a [generator](https://docs.python.org/3/tutorial/classes.html#generators) that *yields* the instance instead of returning it, it will be wrapped in a context manager automatically.
 At the end, you run {meth}`svcs.Container.close()` and all context managers will be exited.
 You can use this to close files, return database connections to a pool, and so on.

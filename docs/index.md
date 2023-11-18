@@ -89,6 +89,7 @@ core-concepts
 integrations/index
 typing-caveats
 glossary
+credits
 ```
 
 ```{toctree}
@@ -101,11 +102,4 @@ Changelog <https://github.com/hynek/svcs/blob/main/CHANGELOG.md>
 Contributing <https://github.com/hynek/svcs/blob/main/.github/CONTRIBUTING.md>
 Security Policy <https://github.com/hynek/svcs/blob/main/.github/SECURITY.md>
 Funding <https://hynek.me/say-thanks/>
-```
-
-
-## Credits
-
-```{include} ../README.md
-:start-after: "## Credits"
 ```

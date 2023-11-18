@@ -11,6 +11,7 @@ from contextlib import (
     asynccontextmanager,
     contextmanager,
 )
+from typing import NewType
 
 import pytest
 
@@ -21,7 +22,7 @@ from .fake_factories import (
     async_int_factory,
     async_str_gen_factory,
 )
-from .helpers import nop
+from .helpers import Annotated, nop
 from .ifaces import AnotherService, Interface, Service, YetAnotherService
 
 
@@ -63,6 +64,22 @@ def test_register_value_multiple(registry, container):
 
     assert [1, 2] == container.get(Service, AnotherService)
     assert [1, 2] == container.get(Service, AnotherService)
+
+
+S1 = Annotated[Interface, "s1"]
+S2 = NewType("S2", Interface)
+
+
+def test_get_annotated_multiple(registry, container):
+    """
+    It's possible to register multiple factories for the same type using
+    Annotated TypeAliases.
+    """
+    registry.register_factory(S1, Service)
+    registry.register_factory(S2, AnotherService)
+
+    assert isinstance(container.get(S1), Service)
+    assert isinstance(container.get(S2), AnotherService)
 
 
 def test_get_not_found(container):
