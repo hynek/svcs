@@ -424,12 +424,12 @@ def _takes_container(factory: Callable) -> bool:
         raise TypeError(msg)
 
     ((name, p),) = tuple(sig.parameters.items())
-    annot = p.annotation
 
     return (
         name == "svcs_container"
-        or annot is Container
-        or annot == "svcs.Container"
+        or p.annotation is Container
+        or p.annotation == "svcs.Container"
+        or p.annotation == "Container"
     )
 
 
