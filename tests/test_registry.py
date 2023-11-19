@@ -4,8 +4,10 @@
 
 import contextlib
 import gc
+import importlib.util
 import inspect
 import logging
+import sys
 
 from unittest.mock import AsyncMock, Mock
 
@@ -22,6 +24,23 @@ needs_working_async_mock = pytest.mark.skipif(
     not inspect.iscoroutinefunction(AsyncMock()),
     reason="AsyncMock not working",
 )
+
+
+@pytest.fixture(name="create_module")
+def _create_module(tmp_path):
+    def wrapper(source):
+        module_name = "_svcs_testing_tmp_module"
+        module_path = tmp_path / f"{module_name}.py"
+        module_path.write_text(source)
+
+        spec = importlib.util.spec_from_file_location(module_name, module_path)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        spec.loader.exec_module(module)
+
+        return module
+
+    return wrapper
 
 
 class TestRegistry:
