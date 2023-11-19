@@ -396,8 +396,10 @@ class TestTakesContainer:
         "module_source", takes_containers_annotation_string_modules
     )
     def test_annotation_str(self, module_source, create_module):
-        """Return `True` if the first argument is annotated as `svcs.Container`
-        using a string."""
+        """
+        Return `True` if the first argument is annotated as `svcs.Container`
+        using a string.
+        """
 
         module = create_module(module_source)
 
