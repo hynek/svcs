@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-
 from doctest import ELLIPSIS
 
 import pytest
