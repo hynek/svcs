@@ -35,6 +35,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   You can now achieve that with `svcs.Container.register_local_factory()` and `svcs.Container.register_local_value()`.
   Once something local is registered, a registry is transparently created and it takes precedence over the global one when a service is requested.
   The local registry is closed together with the container.
+  [#56](https://github.com/hynek/issues/pull/56)
 
 - Flask: `svcs.flask.registry` which is a `werkzeug.local.LocalProxy` for the currently active registry on `flask.current_app`.
 

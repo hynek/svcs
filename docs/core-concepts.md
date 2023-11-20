@@ -195,7 +195,7 @@ Sometimes, you want to register a factory or value that's only valid within a co
 For example, you might want to register the current request object such that other services can use its metadata.
 
 This is where container-local registries come in.
-They are created implicitly by calling `svcs.Container.register_local_factory()` and `svcs.Container.register_local_value()`.
+They are created implicitly by calling {meth}`svcs.Container.register_local_factory()` and {meth}`svcs.Container.register_local_value()`.
 When looking up factories in a container, the local registry takes precedence over the global one, and it is closed along with the container:
 
 ```python
@@ -329,7 +329,7 @@ You can see that the datetime factory and the str value have both been registere
    :members: register_factory, register_value, close, aclose, __contains__
 
 .. autoclass:: Container()
-   :members: get, aget, get_abstract, aget_abstract, close, aclose, get_pings, __contains__
+   :members: get, aget, get_abstract, aget_abstract, register_local_factory, register_local_value, close, aclose, get_pings, __contains__
 
 .. autoclass:: ServicePing()
    :members: name, ping, aping, is_async
