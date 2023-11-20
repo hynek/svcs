@@ -28,6 +28,14 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ### Added
 
+- Container-local registries!
+  Sometimes it's useful to bind a value or factory only to a container.
+  For example, request metadata or authentication information.
+
+  You can now achieve that with `svcs.Container.register_local_factory()` and `svcs.Container.register_local_value()`.
+  Once something local is registered, a registry is transparently created and it takes precedence over the global one when a service is requested.
+  The local registry is closed together with the container.
+
 - Flask: `svcs.flask.registry` which is a `werkzeug.local.LocalProxy` for the currently active registry on `flask.current_app`.
 
 

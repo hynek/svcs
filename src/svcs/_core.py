@@ -14,6 +14,7 @@ from contextlib import (
     AbstractContextManager,
     asynccontextmanager,
     contextmanager,
+    suppress,
 )
 from inspect import (
     isasyncgenfunction,
@@ -468,17 +469,19 @@ class Container:
 
     Warns:
 
-        ResourceWarning: If a container with pending cleanups is
-            garbage-collected.
+        ResourceWarning:
+            If a container with pending cleanups is garbage-collected.
 
     Attributes:
 
-        registry: The :class:`Registry` instance that this container uses for
-           service type lookup.
+        registry:
+            The :class:`Registry` instance that this container uses for service
+            type lookup.
 
     """
 
     registry: Registry
+    _lazy_local_registry: Registry | None = None
     _instantiated: dict[type, object] = attrs.Factory(dict)
     _on_close: list[
         tuple[str, AbstractContextManager | AbstractAsyncContextManager]
@@ -563,6 +566,8 @@ class Container:
                     extra={"svcs_service_name": name},
                 )
 
+        if self._lazy_local_registry is not None:
+            self._lazy_local_registry.close()
         self._on_close.clear()
         self._instantiated.clear()
 
@@ -595,6 +600,8 @@ class Container:
                     extra={"svcs_service_name": name},
                 )
 
+        if self._lazy_local_registry is not None:
+            await self._lazy_local_registry.aclose()
         self._on_close.clear()
         self._instantiated.clear()
 
@@ -651,10 +658,62 @@ class Container:
         ) is not attrs.NOTHING:
             return True, svc, "", False
 
-        rs = self.registry.get_registered_service_for(svc_type)
+        rs = None
+        if self._lazy_local_registry is not None:
+            with suppress(ServiceNotFoundError):
+                rs = self._lazy_local_registry.get_registered_service_for(
+                    svc_type
+                )
+
+        if rs is None:
+            rs = self.registry.get_registered_service_for(svc_type)
+
         svc = rs.factory(self) if rs.takes_container else rs.factory()
 
         return False, svc, rs.name, rs.enter
+
+    def register_local_factory(
+        self,
+        svc_type: type,
+        factory: Callable,
+        *,
+        enter: bool = True,
+        ping: Callable | None = None,
+        on_registry_close: Callable | Awaitable | None = None,
+    ) -> None:
+        """
+        .. versionadded:: 23.21.0
+        """
+        if self._lazy_local_registry is None:
+            self._lazy_local_registry = Registry()
+
+        self._lazy_local_registry.register_factory(
+            svc_type=svc_type,
+            factory=factory,
+            enter=enter,
+            ping=ping,
+            on_registry_close=on_registry_close,
+        )
+
+    def register_local_value(
+        self,
+        svc_type: type,
+        value: object,
+        *,
+        enter: bool = False,
+        ping: Callable | None = None,
+        on_registry_close: Callable | Awaitable | None = None,
+    ) -> None:
+        """
+        .. versionadded:: 23.21.0
+        """
+        self.register_local_factory(
+            svc_type,
+            lambda: value,
+            enter=enter,
+            ping=ping,
+            on_registry_close=on_registry_close,
+        )
 
     @overload
     def get(self, svc_type: type[T1], /) -> T1:

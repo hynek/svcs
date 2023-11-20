@@ -166,11 +166,10 @@ You can also use containers as (async) context managers that (a)close automatica
 
 ```python
 >>> reg = svcs.Registry()
->>> def factory() -> str:
+>>> def clean_factory() -> str:
 ...     yield "Hello World"
 ...     print("Cleaned up!")
->>> reg.register_factory(str, factory)
-
+>>> reg.register_factory(str, clean_factory)
 >>> with svcs.Container(reg) as con:
 ...     _ = con.get(str)
 Cleaned up!
@@ -185,6 +184,58 @@ The key idea is that your business code doesn't have to care about cleaning up s
 That makes testing even easier because the business code makes fewer assumptions about the object it's getting.
 
 *svcs* will raise a {class}`ResourceWarning` if a container with pending cleanups is garbage-collected.
+
+
+### Container-Local Registries
+
+::: {versionadded} 23.21.0
+:::
+
+Sometimes, you want to register a factory or value that's only valid within a container.
+For example, you might want to register the current request object such that other services can use its metadata.
+
+This is where container-local registries come in.
+They are created implicitly by calling `svcs.Container.register_local_factory()` and `svcs.Container.register_local_value()`.
+When looking up factories in a container, the local registry takes precedence over the global one, and it is closed along with the container:
+
+```python
+>>> container = svcs.Container(registry)
+>>> registry.register_value(str, "Hello World!")
+>>> container.register_local_value(str, "Goodbye Cruel World!")
+>>> container.get(str)
+'Goodbye Cruel World!'
+>>> container.close()  # closes both container & its local registry
+>>> registry.close()   # closes the global registry
+```
+
+::: {warning}
+Nothing is going to stop you from letting your global factories depend on local ones.
+
+For example, you could define your database connection like this:
+
+% skip: next
+
+```python
+registry.register_factory(
+    Database,
+    lambda svcs_container: Database.for_user(svcs_container.get(User))
+)
+```
+
+And then, somewhere in a middleware, define a local factory for the `User` type using something like:
+
+% skip: next
+
+```python
+container.register_local_value(User, current_user)
+```
+
+However, then you have to be very careful around the caching of created services.
+If your application requests a `Database` instance before you register the local `User` factory, the `Database` instance will either crash or be created with the wrong user (for example, if you defined a stub/fallback user in the global registry).
+
+It is safer and easier to reason about your code if you keep the dependency arrows point from the local registry to the global one.
+:::
+
 
 (health)=
 
