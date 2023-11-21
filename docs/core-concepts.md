@@ -150,6 +150,7 @@ In this case make sure to reset it by calling {meth}`svcs.Container.close` on it
 Closing a container is idempotent and it's safe to use it again afterwards.
 
 If your integration has a function called `overwrite_(value|factory)()`, it will do all of that for you.
+Of course, you can also use {ref}`local-registries`.
 :::
 
 
@@ -166,11 +167,10 @@ You can also use containers as (async) context managers that (a)close automatica
 
 ```python
 >>> reg = svcs.Registry()
->>> def factory() -> str:
+>>> def clean_factory() -> str:
 ...     yield "Hello World"
 ...     print("Cleaned up!")
->>> reg.register_factory(str, factory)
-
+>>> reg.register_factory(str, clean_factory)
 >>> with svcs.Container(reg) as con:
 ...     _ = con.get(str)
 Cleaned up!
@@ -185,6 +185,87 @@ The key idea is that your business code doesn't have to care about cleaning up s
 That makes testing even easier because the business code makes fewer assumptions about the object it's getting.
 
 *svcs* will raise a {class}`ResourceWarning` if a container with pending cleanups is garbage-collected.
+
+(local-registries)=
+
+### Container-Local Registries
+
+::: {versionadded} 23.21.0
+:::
+
+Sometimes, you want to register a factory or value that's only valid within a container.
+For example, you might want to register a factory that depends on data from a request object.
+Per-request factories, if you will.
+
+This is where container-local registries come in.
+They are created implicitly by calling {meth}`svcs.Container.register_local_factory()` and {meth}`svcs.Container.register_local_value()`.
+When looking up factories in a container, the local registry takes precedence over the global one, and it is closed along with the container:
+
+```python
+>>> container = svcs.Container(registry)
+>>> registry.register_value(str, "Hello World!")
+>>> container.register_local_value(str, "Goodbye Cruel World!")
+>>> container.get(str)
+'Goodbye Cruel World!'
+>>> container.close()  # closes both container & its local registry
+>>> registry.close()   # closes the global registry
+```
+
+::: {warning}
+Nothing is going to stop you from letting your global factories depend on local ones -- similarly to template subclassing.
+
+For example, you could define your database connection like this:
+
+```python
+from sqlalchemy import text
+
+def connect_and_set_user(svcs_container):
+    user_id = svcs_container.get(User).user_id
+    with engine.connect() as conn:
+        conn.execute(text("SET user = :id", {"id": user_id}))
+
+        yield conn
+
+registry.register_factory(Connection, connect_and_set_user)
+```
+
+And then, somewhere in a middleware, define a local factory for the `Request` type using something like:
+
+```python
+def middleware(request):
+    container.register_local_value(User, User(request.user_id, ...))
+```
+
+**However**, then you have to be very careful around the caching of created services.
+If your application requests a `Connection` instance before you register the local `Request` factory, the `Connection` factory will either crash or be created with the wrong user (for example, if you defined a stub/fallback user in the global registry).
+
+It is safer and easier to reason about your code if you keep the dependency arrows point from the local registry to the global one:
+
+% skip: next -- Python 3.12
+
+```python
+# The global connection factory that creates and cleans up vanilla
+# connections.
+registry.register_factory(Connection, engine.connect)
+
+# Create a type alias with an idiomatic name.
+type ConnectionWithUserID = Connection
+
+def middleware(request):
+    def set_user_id(svcs_container):
+        conn = svcs_container.get(Connection)
+        conn.execute(text("SET user = :id", {"id": user_id}))
+
+        return conn
+
+    # Use a factory to keep the service lazy. If the view never asks for a
+    # connection, we never connect -- or set a user.
+    container.register_local_factory(ConnectionWithUserID, set_user_id)
+```
+
+Now the type name expresses the purpose of the object and it doesn't matter if there's already a non-user-aware `Connection` in the global registry.
+:::
+
 
 (health)=
 
@@ -278,7 +359,7 @@ You can see that the datetime factory and the str value have both been registere
    :members: register_factory, register_value, close, aclose, __contains__
 
 .. autoclass:: Container()
-   :members: get, aget, get_abstract, aget_abstract, close, aclose, get_pings, __contains__
+   :members: get, aget, get_abstract, aget_abstract, register_local_factory, register_local_value, close, aclose, get_pings, __contains__
 
 .. autoclass:: ServicePing()
    :members: name, ping, aping, is_async

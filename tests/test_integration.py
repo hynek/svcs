@@ -22,7 +22,7 @@ from .fake_factories import (
     async_int_factory,
     async_str_gen_factory,
 )
-from .helpers import Annotated, nop
+from .helpers import Annotated, CloseMe, nop
 from .ifaces import AnotherService, Interface, Service, YetAnotherService
 
 
@@ -258,6 +258,43 @@ def test_get_on_async_factory_raises_type_error(
         ) == recwarn.pop().message.args
 
 
+def test_local_value_overrides_global_value(registry, container):
+    """
+    If a container registers a local value, it takes precedence of the global
+    registry. The local registry is created lazily and closed when the
+    container is closed.
+    """
+    registry.register_value(int, 1)
+
+    assert container._lazy_local_registry is None
+
+    cm = CloseMe()
+    container.register_local_value(int, 2, on_registry_close=cm.close)
+
+    assert container._lazy_local_registry._on_close
+    assert 2 == container.get(int)
+
+    container.close()
+
+    assert not container._lazy_local_registry._on_close
+    assert cm.is_closed
+
+
+def test_local_registry_is_lazy_but_only_once(container):
+    """
+    The local registry is created on first use and then kept using.
+    """
+    assert container._lazy_local_registry is None
+
+    container.register_local_value(int, 1)
+
+    reg = container._lazy_local_registry
+
+    container.register_local_value(int, 2)
+
+    assert reg is container._lazy_local_registry
+
+
 @pytest.mark.asyncio()
 class TestAsync:
     async def test_async_factory(self, registry, container):
@@ -476,3 +513,21 @@ class TestAsync:
         assert 1 == i
 
         await container.aclose()
+
+    async def test_local_factory_overrides_global_factory(
+        self, registry, container
+    ):
+        """
+        A container-local factory takes precedence over a global one. An
+        aclosed container also acloses the registry.
+        """
+        cm = CloseMe()
+        container.register_local_factory(
+            int, async_int_factory, on_registry_close=cm.aclose
+        )
+        registry.register_value(int, 23)
+
+        async with container:
+            assert 42 == await container.aget(int)
+
+        assert cm.is_aclosed
