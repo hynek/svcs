@@ -259,10 +259,7 @@ def middleware(request):
 
     # Use a factory to keep the service lazy. If the view never asks for a
     # connection, we never connect -- or set a user.
-    container.register_local_factory(
-        ConnectionWithUserID,
-        set_user_id,
-    )
+    container.register_local_factory(ConnectionWithUserID, set_user_id)
 ```
 
 Now the type name expresses the purpose of the object and it doesn't matter if there's already a non-user-aware `Connection` in the global registry.
