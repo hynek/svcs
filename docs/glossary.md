@@ -215,15 +215,24 @@ IoC
     See {term}`Inversion of Control`.
 
 Inversion of Control
-    Inversion of Control is a complicated name for the simple idea of **lower-level** code (frameworks, data access layers, and so on) **invoking** our **higher-level** code: the business logic we care about.
+    Inversion of Control (IoC) describes the concept of *your* code being invoked by someone else -- usually based on some kind of configuration.
 
-    That's why it's sometimes called the *Hollywood Principle*: "Don't call us, we'll call you."
+    That's why it's sometimes called the *Hollywood Principle*:
+    "Don't call us, we'll call you."
 
-    A critical consequence of that is that the *framework* can now take control of the services and make them available to the business logic it calls.
-    Usually, using {term}`dependency injection` or a {term}`service locator`.
+    From the perspective of the user, this usually means that third-party *lower-level* code (socket listeners, web frameworks, [object observers](https://refactoring.guru/design-patterns/observer)) invokes your *higher-level* code (business logic).
+
+    A service locator like *svcs* is an example for IoC, because you tell it how to create services by defining a factory for a type and *svcs* will then invoke that factory when the user asks for a service of said type.
+
+    ::: {note}
+    Weirdly, of all the glossary entries, this one is the most controversial.
+    We’ve tried to keep it as general as possible while ensuring it remains useful, but it is impossible to cover everyone’s pet understanding of the concept.
+    It has been rewritten several times, and we think this will have to do now.
+
+    Please refer to the linked sources to get an idea of the various facets of the concept.
+    :::
 
     ::: {seealso}
-
     - [*InversionOfControl*](https://martinfowler.com/bliki/InversionOfControl.html) by Martin Fowler.
 
     - [*What is Inversion of Control and Why Does it Matter?*](https://seddonym.me/2019/04/15/inversion-of-control/)
@@ -231,7 +240,6 @@ Inversion of Control
     - [*Three Techniques for Inverting Control, in Python*](https://seddonym.me/2019/08/03/ioc-techniques/)
 
     - [*Hoist Your I/O*](https://www.youtube.com/watch?v=PBQN62oUnN8) -- a 2015 talk by Brandon Rhodes.
-
     :::
 
 
