@@ -283,7 +283,7 @@ class Registry:
            )
 
         Please note that, unlike with :meth:`register_factory`, entering
-        context  managers is **disabled** by default.
+        context managers is **disabled** by default.
 
         .. versionchanged:: 23.21.0
            *enter* is now ``False`` by default.
@@ -682,6 +682,14 @@ class Container:
         on_registry_close: Callable | Awaitable | None = None,
     ) -> None:
         """
+        Same as :meth:`svcs.Registry.register_factory()`, but registers the
+        factory only for this container.
+
+        A temporary :class:`svcs.Registry` is transparently created and closed
+        together with the container the local factory has been registered on.
+
+        .. seealso:: :ref:`local-registries`
+
         .. versionadded:: 23.21.0
         """
         if self._lazy_local_registry is None:
@@ -705,6 +713,21 @@ class Container:
         on_registry_close: Callable | Awaitable | None = None,
     ) -> None:
         """
+        Syntactic sugar for::
+
+           register_local_factory(
+               svc_type,
+               lambda: value,
+               enter=enter,
+               ping=ping,
+               on_registry_close=on_registry_close
+           )
+
+        Please note that, unlike with :meth:`register_local_factory`, entering
+        context managers is **disabled** by default.
+
+        .. seealso:: :ref:`local-registries`
+
         .. versionadded:: 23.21.0
         """
         self.register_local_factory(

@@ -185,6 +185,7 @@ That makes testing even easier because the business code makes fewer assumptions
 
 *svcs* will raise a {class}`ResourceWarning` if a container with pending cleanups is garbage-collected.
 
+(local-registries)=
 
 ### Container-Local Registries
 
