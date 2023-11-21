@@ -685,8 +685,8 @@ class Container:
         Same as :meth:`svcs.Registry.register_factory()`, but registers the
         factory only for this container.
 
-        A temporary :class:`svcs.Registry` is transparently created and closed
-        together with the container the local factory has been registered on.
+        A temporary :class:`svcs.Registry` is transparently created -- and
+        closed together with the container it belongs to.
 
         .. seealso:: :ref:`local-registries`
 

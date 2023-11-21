@@ -215,41 +215,57 @@ Nothing is going to stop you from letting your global factories depend on local 
 
 For example, you could define your database connection like this:
 
-% skip: start
-
 ```python
-registry.register_factory(
-    Database,
-    lambda svcs_container: Database.for_user(svcs_container.get(User))
-)
+from sqlalchemy import text
+
+def connect_and_set_user(svcs_container):
+    user_id = svcs_container.get(User).user_id
+    with engine.connect() as conn:
+        conn.execute(text("SET user = :id", {"id": user_id}))
+
+        yield conn
+
+registry.register_factory(Connection, connect_and_set_user)
 ```
 
-And then, somewhere in a middleware, define a local factory for the `User` type using something like:
+And then, somewhere in a middleware, define a local factory for the `Request` type using something like:
 
 ```python
-container.register_local_value(User, current_user)
+def middleware(request):
+    container.register_local_value(User, User(request.user_id, ...))
 ```
 
 However, then you have to be very careful around the caching of created services.
-If your application requests a `Database` instance before you register the local `User` factory, the `Database` instance will either crash or be created with the wrong user (for example, if you defined a stub/fallback user in the global registry).
+If your application requests a `Connection` instance before you register the local `Request` factory, the `Connection` factory will either crash or be created with the wrong user (for example, if you defined a stub/fallback user in the global registry).
 
 It is safer and easier to reason about your code if you keep the dependency arrows point from the local registry to the global one:
 
+% skip: next -- Python 3.12
+
 ```python
-type ConnectionWithTenant = Connection
+# The global connection factory that creates and cleans up vanilla
+# connections.
+registry.register_factory(Connection, engine.connect)
+
+# Create a type alias with an idiomatic name.
+type ConnectionWithUserID = Connection
 
 def middleware(request):
+    def set_user_id(svcs_container):
+        conn = svcs_container.get(Connection)
+        conn.execute(text("SET user = :id", {"id": user_id}))
+
+        return conn
+
+    # Use a factory to keep the service lazy. If the view never asks for a
+    # connection, we never connect -- or set a user.
     container.register_local_factory(
-        ConnectionWithTenant,
-        lambda svcs_container: svcs_container.get(Connection).attach_tenant_id(
-            request.tenant_id
-        )
+        ConnectionWithUserID,
+        set_user_id,
     )
 ```
 
-Now the type name expresses the purpose of the object and it doesn't matter if a previous middleware already asked for a `Connection` instance.
-
-% skip: end
+Now the type name expresses the purpose of the object and it doesn't matter if there's already a non-user-aware `Connection` in the global registry.
 :::
 
 
