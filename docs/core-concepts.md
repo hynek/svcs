@@ -194,7 +194,8 @@ That makes testing even easier because the business code makes fewer assumptions
 :::
 
 Sometimes, you want to register a factory or value that's only valid within a container.
-For example, you might want to register the current request object such that other services can use its metadata.
+For example, you might want to register a factory that depends on data from a request object.
+Per-request factories, if you will.
 
 This is where container-local registries come in.
 They are created implicitly by calling {meth}`svcs.Container.register_local_factory()` and {meth}`svcs.Container.register_local_value()`.
@@ -211,7 +212,7 @@ When looking up factories in a container, the local registry takes precedence ov
 ```
 
 ::: {warning}
-Nothing is going to stop you from letting your global factories depend on local ones.
+Nothing is going to stop you from letting your global factories depend on local ones -- similarly to template subclassing.
 
 For example, you could define your database connection like this:
 
@@ -235,7 +236,7 @@ def middleware(request):
     container.register_local_value(User, User(request.user_id, ...))
 ```
 
-However, then you have to be very careful around the caching of created services.
+**However**, then you have to be very careful around the caching of created services.
 If your application requests a `Connection` instance before you register the local `Request` factory, the `Connection` factory will either crash or be created with the wrong user (for example, if you defined a stub/fallback user in the global registry).
 
 It is safer and easier to reason about your code if you keep the dependency arrows point from the local registry to the global one:
