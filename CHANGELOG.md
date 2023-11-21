@@ -19,7 +19,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 - **Backwards-Incompatible**: Since multiple people have been bit by the `enter=True` default for `Registry.register_value()`, and it's very early in *svcs* life, we're changing the default to `enter=False` for all versions of `register_value()`.
 
-  This means that you have to explicitly opt-in to context manager behavior which makes a lot more sense for singletons like a connection pools which are the most common candidates for registered values.
+  This means that you have to explicitly opt-in to context manager behavior which makes a lot more sense for singletons like connection pools which are the most common candidates for registered values.
 
   (The irony of shipping a backwards-incompatible change in the release directly following the adoption of a backwards-compatibility policy not lost on me.)
   [#50](https://github.com/hynek/svcs/discussions/50)
