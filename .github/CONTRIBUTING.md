@@ -75,15 +75,20 @@ You will find the built documentation in `docs/_build/html`.
   We use the `"""`-on-separate-lines style for docstrings with [Napoleon]-style API documentation:
 
   ```python
-  def func(x: str) -> str:
+  def func(x: str, y: int) -> str:
       """
       Do something.
 
-      Parameters:
-        x: A very important parameter.
+      Arguments:
+          x: A very important argument.
+
+          y:
+            Another very important argument, but its description is so long
+            that it doesn't fit on one line. So we start the whole block on a
+            fresh new line to keep the block together.
 
       Returns:
-        The result of doing something.
+          The result of doing something.
       """
   ```
 

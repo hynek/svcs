@@ -137,8 +137,8 @@ class Registry:
 
     Warns:
 
-        ResourceWarning: If a registry with pending cleanups is
-            garbage-collected.
+        ResourceWarning:
+            If a registry with pending cleanups is garbage-collected.
     """
 
     _services: dict[type, RegisteredService] = attrs.Factory(dict)
@@ -211,14 +211,15 @@ class Registry:
         *on_registry_close* callbacks are run all together when the registry is
         closed.
 
-        Args:
+        Arguments:
             svc_type: The type of the service to register.
 
-            factory: A callable that is used to instantiated *svc_type* if
-                asked. If it's a generator or a context manager, a cleanup is
-                registered after instantiation.
+            factory:
+                A callable that is used to instantiated *svc_type* if asked. If
+                it's a generator or a context manager, a cleanup is registered
+                after instantiation.
 
-                Can also be an async callable/generator/context manager..
+                Can also be an async callable/generator/context manager.
 
                 If *factory* takes a first argument called ``svcs_container``
                 or the first argument (of any name) is annotated as being
@@ -226,17 +227,20 @@ class Registry:
                 instantiating the service is passed into the factory as the
                 first positional argument.
 
-            enter: Whether to enter context managers if one is returned by
+            enter:
+                Whether to enter context managers if one is returned by
                  *factory*. Usually you want that, but there are occasions --
                  like database transaction managers -- that you want to enter
                  manually.
 
-            ping: A callable that marks the service as having a health check.
+            ping:
+                A callable that marks the service as having a health check.
 
                 .. seealso::
                     :meth:`Container.get_pings` and :class:`ServicePing`.
 
-            on_registry_close: A callable that is called when the
+            on_registry_close:
+                A callable that is called when the
                 :meth:`svcs.Registry.close()` method is called.
 
                 Can also be an async callable or an
@@ -541,7 +545,6 @@ class Container:
         Errors are logged at warning level, but otherwise ignored.
 
         .. hint::
-
             The Container can be used again after this. Closing it is an
             idempotent way to reset it.
         """
@@ -581,7 +584,6 @@ class Container:
         use this.
 
         .. hint::
-
             The Container can be used again after this. Closing it is an
             idempotent way to reset it.
         """

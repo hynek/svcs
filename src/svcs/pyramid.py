@@ -39,7 +39,6 @@ def svcs_from(request: Request | None = None) -> svcs.Container:
     Get the current container either from *request* or from thread locals.
 
     Arguments:
-
         request: If None, thread locals are used.
     """
     if request is None:
@@ -75,16 +74,19 @@ def init(
 
     .. _Tween: https://docs.pylonsproject.org/projects/pyramid/en/main/glossary.html#term-tween
 
-    Args:
+    Arguments:
         config: Pyramid configurator object.
 
-        registry: A custom *svcs* registry to use. If None, a new one is created.
+        registry:
+            A custom *svcs* registry to use. If None, a new one is created.
 
-        tween_under: Passed unchanged to
-            :meth:`pyramid.config.Configurator.add_tween()` as *under*.
+        tween_under:
+            Passed unchanged to :meth:`pyramid.config.Configurator.add_tween()`
+            as *under*.
 
-        tween_over: Passed unchanged to
-            :meth:`pyramid.config.Configurator.add_tween()` as *over*.
+        tween_over:
+            Passed unchanged to :meth:`pyramid.config.Configurator.add_tween()`
+            as *over*.
     """
     config.registry[_KEY_REGISTRY] = registry or svcs.Registry()
 
@@ -163,7 +165,7 @@ def close_registry(rh: PyramidRegistryHaver) -> None:
 
     Ideal for :func:`atexit.register()` handlers.
 
-    Parameters:
+    Arguments:
         rh: An object that carries a :class:`pyramid.registry.Registry`.
     """
     with suppress(KeyError):
