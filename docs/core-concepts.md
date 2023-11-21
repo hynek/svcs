@@ -150,6 +150,7 @@ In this case make sure to reset it by calling {meth}`svcs.Container.close` on it
 Closing a container is idempotent and it's safe to use it again afterwards.
 
 If your integration has a function called `overwrite_(value|factory)()`, it will do all of that for you.
+Of course, you can also use {ref}`local-registries`.
 :::
 
 
@@ -214,7 +215,7 @@ Nothing is going to stop you from letting your global factories depend on local 
 
 For example, you could define your database connection like this:
 
-% skip: next
+% skip: start
 
 ```python
 registry.register_factory(
@@ -225,8 +226,6 @@ registry.register_factory(
 
 And then, somewhere in a middleware, define a local factory for the `User` type using something like:
 
-% skip: next
-
 ```python
 container.register_local_value(User, current_user)
 ```
@@ -234,7 +233,23 @@ container.register_local_value(User, current_user)
 However, then you have to be very careful around the caching of created services.
 If your application requests a `Database` instance before you register the local `User` factory, the `Database` instance will either crash or be created with the wrong user (for example, if you defined a stub/fallback user in the global registry).
 
-It is safer and easier to reason about your code if you keep the dependency arrows point from the local registry to the global one.
+It is safer and easier to reason about your code if you keep the dependency arrows point from the local registry to the global one:
+
+```python
+type ConnectionWithTenant = Connection
+
+def middleware(request):
+    container.register_local_factory(
+        ConnectionWithTenant,
+        lambda svcs_container: svcs_container.get(Connection).attach_tenant_id(
+            request.tenant_id
+        )
+    )
+```
+
+Now the type name expresses the purpose of the object and it doesn't matter if a previous middleware already asked for a `Connection` instance.
+
+% skip: end
 :::
 
 
