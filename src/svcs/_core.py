@@ -235,9 +235,9 @@ class Registry:
 
             enter:
                 Whether to enter context managers if one is returned by
-                 *factory*. Usually you want that, but there are occasions --
-                 like database transaction managers -- that you want to enter
-                 manually.
+                *factory*. Usually you want that, but there are occasions --
+                like database transaction managers -- that you want to enter
+                manually.
 
             ping:
                 A callable that marks the service as having a health check.

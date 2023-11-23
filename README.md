@@ -50,9 +50,7 @@ The goal is to minimize the code for acquiring pluggable services to:
 <!-- end index -->
 <!-- end benefits -->
 
-<!--
-; skip: next
--->
+<!-- skip: next -->
 
 ```python
 from svcs.your_framework import svcs_from
