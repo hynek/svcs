@@ -94,6 +94,10 @@ reg.register_value(str, str, ping=lambda: None)
 
 con = svcs.Container(reg)
 
+# Local registries
+con.register_local_factory(int, factory_with_cleanup)
+con.register_local_value(int, 42)
+
 # The type checker believes whatever we tell it.
 o1: object = con.get(object)
 o2: int = con.get(int)
