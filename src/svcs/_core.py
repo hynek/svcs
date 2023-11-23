@@ -227,6 +227,12 @@ class Registry:
                 instantiating the service is passed into the factory as the
                 first positional argument.
 
+                .. note::
+
+                    Generally speaking, given the churn and edgecases in the
+                    typing ecosystem, we recommend using the name route to
+                    detect the container argument because it's most reliable.
+
             enter:
                 Whether to enter context managers if one is returned by
                  *factory*. Usually you want that, but there are occasions --
