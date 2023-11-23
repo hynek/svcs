@@ -18,6 +18,9 @@
   <a href="LICENSE">
     <img alt="PyPI - License" src="https://img.shields.io/pypi/l/svcs">
   </a>
+  <a href="https://www.bestpractices.dev/projects/8115">
+    <img src="https://www.bestpractices.dev/projects/8115/badge">
+  </a>
   <a href="https://pypi.org/project/svcs/">
     <img alt="PyPI" src="https://img.shields.io/pypi/v/svcs">
   </a>
