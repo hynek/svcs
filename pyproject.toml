@@ -32,7 +32,7 @@ dependencies = [
 tests = [
   "pytest",
   "pytest-asyncio",
-  "sybil",
+  "sybil>=6",
   "typing-extensions; python_version<'3.9'",
 ]
 typing = [
