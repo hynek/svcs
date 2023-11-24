@@ -15,6 +15,11 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/23.21.0...HEAD)
 
+### Fixed
+
+- AIOHTTP: The registry is now stored using `aiohttp.web.AppKey`s on the application.
+  This is an implementation detail and shouldn't matter, but it fixes a warning on AIOHTTP 3.9 and later.
+
 
 ## [23.21.0](https://github.com/hynek/svcs/compare/23.20.0...23.21.0) - 2023-11-21
 

@@ -28,18 +28,29 @@ from ._core import (
 )
 
 
+try:
+    _AIOHTTP_KEY_REGISTRY = web.AppKey(_KEY_REGISTRY, svcs.Registry)
+except (
+    AttributeError
+):  # pragma: no cover -- not adding a tox env for aiohttp<3.9
+    _AIOHTTP_KEY_REGISTRY = _KEY_REGISTRY  # type: ignore[assignment]
+
+# No equivalent of AppKey for Requests, yet?
+_AIOHTTP_KEY_CONTAINER = _KEY_CONTAINER
+
+
 def svcs_from(request: web.Request) -> svcs.Container:
     """
     Get the current container from *request*.
     """
-    return request[_KEY_CONTAINER]  # type: ignore[no-any-return]
+    return request[_AIOHTTP_KEY_CONTAINER]  # type: ignore[no-any-return]
 
 
 def get_registry(app: web.Application) -> svcs.Registry:
     """
     Get the registry from *app*.
     """
-    return app[_KEY_REGISTRY]  # type: ignore[no-any-return]
+    return app[_AIOHTTP_KEY_REGISTRY]
 
 
 def init_app(
@@ -54,7 +65,7 @@ def init_app(
     Inserts the *svcs* middleware at *middleware_pos* which is 0 by default, so
     you can use :func:`svcs_from` and :func:`aget` in other middlewares.
     """
-    app[_KEY_REGISTRY] = registry or svcs.Registry()
+    app[_AIOHTTP_KEY_REGISTRY] = registry or svcs.Registry()
     app.middlewares.insert(middleware_pos, svcs_middleware)
     app.on_cleanup.append(aclose_registry)
 
@@ -65,8 +76,8 @@ def init_app(
 async def svcs_middleware(
     request: web.Request, handler: Callable
 ) -> web.Response:
-    async with svcs.Container(request.app[_KEY_REGISTRY]) as container:
-        request[_KEY_CONTAINER] = container
+    async with svcs.Container(request.app[_AIOHTTP_KEY_REGISTRY]) as container:
+        request[_AIOHTTP_KEY_CONTAINER] = container
 
         return await handler(request)  # type: ignore[no-any-return]
 
