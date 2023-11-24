@@ -108,7 +108,6 @@ jobs:
           # Report again and fail if under 100%.
           python -Im coverage report --fail-under=100
 
-
       - name: Upload HTML report if check failed.
         uses: actions/upload-artifact@v3
         with:
