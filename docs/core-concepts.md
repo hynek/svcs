@@ -241,9 +241,6 @@ If your application requests a `Connection` instance before you register the loc
 
 It is safer and easier to reason about your code if you keep the dependency arrows point from the local registry to the global one:
 
-% Skip because Python 3.12 syntax and we can't build on it yet.
-% skip: next
-
 ```python
 # The global connection factory that creates and cleans up vanilla
 # connections.
