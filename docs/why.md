@@ -60,7 +60,7 @@ You set it up like this:
 ```python
 import atexit
 
-from sqlalchemy import Connection, create_engine
+from sqlalchemy import Connection, create_engine, text
 
 ...
 

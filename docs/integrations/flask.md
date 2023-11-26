@@ -39,7 +39,7 @@ At the same time, it registers a {meth}`~flask.Flask.teardown_appcontext` handle
 
 
 If you need to replace the database connection with a mock in tests, the canonical way is using {obj}`flask.appcontext_pushed`.
-In pytest it could look like this:
+In *pytest* it could look like this:
 
 ```python
 from contextlib import contextmanager
