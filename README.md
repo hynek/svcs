@@ -78,7 +78,11 @@ It only forwards the type you have asked for to the type checker.
 If you don't use a type checker, that information is ignored without any runtime overhead.
 <!-- end typing -->
 
-Read on in [*Why?*](https://svcs.hynek.me/en/latest/why.html) if you're intrigued!
+Read on in [*Why?*](https://svcs.hynek.me/en/latest/why.html) or watch this short video if you're intrigued:
+
+<center>
+  <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/d1elMD9WgpA?si=O1u02uxLQ5ancivX" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+</center>
 
 
 ## Project Links
