@@ -65,9 +65,9 @@ jobs:
             -f py$(echo ${{ matrix.python-version }} | tr -d .)-tests
 
       - name: Upload coverage data
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: coverage-data
+          name: coverage-data-${{ matrix.python-version }}
           path: .coverage.*
           if-no-files-found: ignore
 
@@ -91,9 +91,10 @@ jobs:
           python-version-file: .python-version-default
 
       - name: Download coverage data
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: coverage-data
+          pattern: coverage-data-*
+          merge-multiple: true
 
       - name: Combine coverage and fail if it's <100%.
         run: |
@@ -109,7 +110,7 @@ jobs:
           python -Im coverage report --fail-under=100
 
       - name: Upload HTML report if check failed.
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: html-report
           path: htmlcov
