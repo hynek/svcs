@@ -125,11 +125,9 @@ addopts = ["-ra", "--strict-markers", "--strict-config"]
 xfail_strict = true
 filterwarnings = [
   "once::Warning",
-  "ignore::DeprecationWarning:importlib:",
   "ignore:'cgi' is deprecated:DeprecationWarning:webob.compat:",
   "ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning:pkg_resources:",
   "ignore:pkg_resources is deprecated:DeprecationWarning:pyramid.asset:",
-  "ignore:ast.Str is deprecated:DeprecationWarning:sybil.document",
 ]
 
 
