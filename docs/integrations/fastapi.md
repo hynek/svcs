@@ -108,7 +108,7 @@ If you initialize the application with a lifespan as shown above, and use the {f
 ```{eval-rst}
 .. autoclass:: svcs.fastapi.lifespan(lifespan)
 
-   .. seealso:: :ref:`fastapi-init`
+.. seealso:: :ref:`fastapi-init`
 ```
 
 
@@ -118,4 +118,6 @@ If you initialize the application with a lifespan as shown above, and use the {f
 .. autofunction:: svcs.fastapi.container
 
 .. autoclass:: svcs.fastapi.DepContainer
+
+.. seealso:: :ref:`fastapi-get`
 ```

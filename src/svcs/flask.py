@@ -45,7 +45,7 @@ def get_registry(app: Flask | None = None) -> Registry:
     """
     Get the registry from *app* or :obj:`flask.current_app`.
 
-    Arguments:
+    Args:
         app: If None, :obj:`flask.current_app` is used.
 
     .. versionadded:: 23.21.0
@@ -140,7 +140,7 @@ def overwrite_factory(
 
     Afterwards resets the instantiation cache on ``g``.
 
-    See also:
+    See Also:
         - :meth:`svcs.Registry.register_factory()`
         - :meth:`svcs.Container.close()`
     """
@@ -169,7 +169,7 @@ def overwrite_value(
 
     Afterwards resets the instantiation cache on ``g``.
 
-    See also:
+    See Also:
         - :meth:`svcs.Registry.register_factory()`
         - :meth:`svcs.Container.close()`
     """
@@ -188,7 +188,7 @@ def get_pings() -> list[ServicePing]:
     """
     See :meth:`svcs.Container.get_pings()`.
 
-    See also:
+    See Also:
         :ref:`flask-health`
     """
     return svcs_from(g).get_pings()

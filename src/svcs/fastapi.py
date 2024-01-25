@@ -36,7 +36,7 @@ class lifespan:  # noqa: N801
 
     Async generators are automatically wrapped into an async context manager.
 
-    Arguments:
+    Args:
         lifespan: The lifespan function to make *svcs*-aware.
     """
 
@@ -80,9 +80,6 @@ async def container(request: Request) -> AsyncGenerator[svcs.Container, None]:
 
     Yields:
         A :class:`svcs.Container` that is cleaned up after the request.
-
-    See also:
-        :ref:`fastapi-get`
     """
     async with svcs.Container(getattr(request.state, _KEY_REGISTRY)) as cont:
         yield cont

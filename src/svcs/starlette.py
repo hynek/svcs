@@ -51,7 +51,7 @@ class lifespan:  # noqa: N801
 
     Async generators are automatically wrapped into an async context manager.
 
-    Arguments:
+    Args:
         lifespan: The lifespan function to make *svcs*-aware.
     """
 
@@ -114,7 +114,8 @@ def get_pings(request: Request) -> list[svcs.ServicePing]:
     Same as :meth:`svcs.Container.get_pings`, but uses the container from
     *request*.
 
-    .. seealso:: :ref:`aiohttp-health`
+    See Also:
+        :ref:`aiohttp-health`
     """
     return svcs_from(request).get_pings()
 

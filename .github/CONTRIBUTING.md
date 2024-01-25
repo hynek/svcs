@@ -79,7 +79,7 @@ You will find the built documentation in `docs/_build/html`.
       """
       Do something.
 
-      Arguments:
+      Args:
           x: A very important argument.
 
           y:

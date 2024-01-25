@@ -80,7 +80,7 @@ class ServicePing:
 
         is_async: Whether the service needs to be pinged using :meth:`aping`.
 
-    See also:
+    See Also:
         :ref:`health`
     """
 
@@ -136,7 +136,6 @@ class Registry:
     ``async with`` is also supported.
 
     Warns:
-
         ResourceWarning:
             If a registry with pending cleanups is garbage-collected.
     """
@@ -211,7 +210,7 @@ class Registry:
         *on_registry_close* callbacks are run all together when the registry is
         closed.
 
-        Arguments:
+        Args:
             svc_type: The type of the service to register.
 
             factory:
@@ -227,8 +226,7 @@ class Registry:
                 instantiating the service is passed into the factory as the
                 first positional argument.
 
-                .. note::
-
+                Note:
                     Generally speaking, given the churn and edgecases in the
                     typing ecosystem, we recommend using the name route to
                     detect the container argument because it's most reliable.
@@ -242,7 +240,7 @@ class Registry:
             ping:
                 A callable that marks the service as having a health check.
 
-                .. seealso::
+                See Also:
                     :meth:`Container.get_pings` and :class:`ServicePing`.
 
             on_registry_close:
@@ -478,12 +476,10 @@ class Container:
         Cleaned up!
 
     Warns:
-
         ResourceWarning:
             If a container with pending cleanups is garbage-collected.
 
     Attributes:
-
         registry:
             The :class:`Registry` instance that this container uses for service
             type lookup.
@@ -550,7 +546,7 @@ class Container:
 
         Errors are logged at warning level, but otherwise ignored.
 
-        .. hint::
+        Hint:
             The Container can be used again after this. Closing it is an
             idempotent way to reset it.
         """
@@ -589,8 +585,8 @@ class Container:
         Also works with synchronous services, so in an async application, just
         use this.
 
-        .. hint::
-            The Container can be used again after this. Closing it is an
+        Hint:
+            The container can be used again after this. Closing it is an
             idempotent way to reset it.
         """
         for name, cm in reversed(self._on_close):
@@ -696,7 +692,8 @@ class Container:
         A temporary :class:`svcs.Registry` is transparently created -- and
         closed together with the container it belongs to.
 
-        .. seealso:: :ref:`local-registries`
+        See Also:
+            :ref:`local-registries`
 
         .. versionadded:: 23.21.0
         """
@@ -734,7 +731,8 @@ class Container:
         Please note that, unlike with :meth:`register_local_factory`, entering
         context managers is **disabled** by default.
 
-        .. seealso:: :ref:`local-registries`
+        See Also:
+            :ref:`local-registries`
 
         .. versionadded:: 23.21.0
         """

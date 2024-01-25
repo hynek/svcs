@@ -38,7 +38,7 @@ def svcs_from(request: Request | None = None) -> svcs.Container:
     """
     Get the current container either from *request* or from thread locals.
 
-    Arguments:
+    Args:
         request: If None, thread locals are used.
     """
     if request is None:
@@ -51,7 +51,7 @@ def get_registry(rh: PyramidRegistryHaver | None = None) -> svcs.Registry:
     """
     Get the registry from *rh* or thread locals.
 
-    Arguments:
+    Args:
         rh: If None, thread locals are used.
     """
     registry = rh.registry if rh else get_current_registry()
@@ -74,7 +74,7 @@ def init(
 
     .. _Tween: https://docs.pylonsproject.org/projects/pyramid/en/main/glossary.html#term-tween
 
-    Arguments:
+    Args:
         config: Pyramid configurator object.
 
         registry:
@@ -165,7 +165,7 @@ def close_registry(rh: PyramidRegistryHaver) -> None:
 
     Ideal for :func:`atexit.register()` handlers.
 
-    Arguments:
+    Args:
         rh: An object that carries a :class:`pyramid.registry.Registry`.
     """
     with suppress(KeyError):
@@ -186,7 +186,8 @@ def get_pings(request: Request) -> list[svcs.ServicePing]:
     """
     Like :meth:`svcs.Container.get_pings()`, but uses container on *request*.
 
-    .. seealso:: :ref:`pyramid-health`
+    See Also:
+        :ref:`pyramid-health`
     """
     return svcs_from(request).get_pings()
 
