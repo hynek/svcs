@@ -49,7 +49,9 @@ jobs:
         with:
           name: Packages
           path: dist
-      - run: tar xf dist/*.tar.gz --strip-components=1  # needed for config files
+      - run: |
+          tar xf dist/*.tar.gz --strip-components=1
+          rm -rf src
       - uses: actions/setup-python@v5
         with:
           cache: pip
@@ -170,7 +172,7 @@ jobs:
         with:
           name: Packages
           path: dist
-      - run: tar xf dist/*.tar.gz --strip-components=1  # needed for config files
+      - run: tar xf dist/*.tar.gz --strip-components=1
 
       - uses: actions/setup-python@v5
         with:
@@ -200,9 +202,9 @@ jobs:
       - run: python -Ic 'import svcs.flask'
       - run: python -Ic 'import svcs.pyramid'
 
-  # Ensure everything required is passing for branch protection.
   required-checks-pass:
     if: always()
+    name: Ensure everything required is passing for branch protection.
 
     needs:
       - coverage
