@@ -160,7 +160,7 @@ jobs:
           python -Im venv .venv
           .venv/bin/python -Im pip install .[typing]
           echo "$PWD/.venv/bin" >> $GITHUB_PATH
-      - uses: jakebailey/pyright-action@v1
+      - uses: jakebailey/pyright-action@v2
 
   docs:
     name: Build docs & run doctests
