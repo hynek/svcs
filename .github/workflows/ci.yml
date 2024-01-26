@@ -29,7 +29,7 @@ jobs:
       - uses: hynek/build-and-inspect-python-package@v2
 
   tests:
-    name: Tests & Mypy on ${{ matrix.python-version }}
+    name: Tests & Mypy API on ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     needs: build-package
 
@@ -119,7 +119,7 @@ jobs:
         if: ${{ failure() }}
 
   mypy-pkg:
-    name: Mypy
+    name: Mypy Codebase
     runs-on: ubuntu-latest
     needs: build-package
 
@@ -129,7 +129,7 @@ jobs:
         with:
           name: Packages
           path: dist
-      - run: tar xf dist/*.tar.gz --strip-components=1  # needed for config files
+      - run: tar xf dist/*.tar.gz --strip-components=1
       - uses: actions/setup-python@v5
         with:
           cache: pip
@@ -140,7 +140,7 @@ jobs:
       - run: python -Im tox run -e mypy-pkg
 
   pyright:
-    name: Pyright
+    name: Pyright Codebase
     runs-on: ubuntu-latest
     needs: build-package
 
@@ -150,7 +150,7 @@ jobs:
         with:
           name: Packages
           path: dist
-      - run: tar xf dist/*.tar.gz --strip-components=1  # needed for config files
+      - run: tar xf dist/*.tar.gz --strip-components=1
       - uses: actions/setup-python@v5
         with:
           cache: pip
