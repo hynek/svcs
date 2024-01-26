@@ -214,20 +214,17 @@ def close_registry(app: Flask) -> None:
 
 
 @overload
-def get(svc_type: type[T1], /) -> T1:
-    ...
+def get(svc_type: type[T1], /) -> T1: ...
 
 
 @overload
-def get(svc_type1: type[T1], svc_type2: type[T2], /) -> tuple[T1, T2]:
-    ...
+def get(svc_type1: type[T1], svc_type2: type[T2], /) -> tuple[T1, T2]: ...
 
 
 @overload
 def get(
     svc_type1: type[T1], svc_type2: type[T2], svc_type3: type[T3], /
-) -> tuple[T1, T2, T3]:
-    ...
+) -> tuple[T1, T2, T3]: ...
 
 
 @overload
@@ -237,8 +234,7 @@ def get(
     svc_type3: type[T3],
     svc_type4: type[T4],
     /,
-) -> tuple[T1, T2, T3, T4]:
-    ...
+) -> tuple[T1, T2, T3, T4]: ...
 
 
 @overload
@@ -249,8 +245,7 @@ def get(
     svc_type4: type[T4],
     svc_type5: type[T5],
     /,
-) -> tuple[T1, T2, T3, T4, T5]:
-    ...
+) -> tuple[T1, T2, T3, T4, T5]: ...
 
 
 @overload
@@ -262,8 +257,7 @@ def get(
     svc_type5: type[T5],
     svc_type6: type[T6],
     /,
-) -> tuple[T1, T2, T3, T4, T5, T6]:
-    ...
+) -> tuple[T1, T2, T3, T4, T5, T6]: ...
 
 
 @overload
@@ -276,8 +270,7 @@ def get(
     svc_type6: type[T6],
     svc_type7: type[T7],
     /,
-) -> tuple[T1, T2, T3, T4, T5, T6, T7]:
-    ...
+) -> tuple[T1, T2, T3, T4, T5, T6, T7]: ...
 
 
 @overload
@@ -291,8 +284,7 @@ def get(
     svc_type7: type[T7],
     svc_type8: type[T8],
     /,
-) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8]:
-    ...
+) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8]: ...
 
 
 @overload
@@ -307,8 +299,7 @@ def get(
     svc_type8: type[T8],
     svc_type9: type[T9],
     /,
-) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9]:
-    ...
+) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9]: ...
 
 
 @overload
@@ -324,8 +315,7 @@ def get(
     svc_type9: type[T9],
     svc_type10: type[T10],
     /,
-) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]:
-    ...
+) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]: ...
 
 
 def get(*svc_types: type) -> object:

@@ -143,8 +143,7 @@ class TestAIOHTTP:
         """
         app.router.add_get("/", health_view)
 
-        async def aping(_):
-            ...
+        async def aping(_): ...
 
         svcs.aiohttp.register_factory(app, int, async_int_factory, ping=aping)
 

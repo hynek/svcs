@@ -118,8 +118,7 @@ a, b, c, d, e, f, g, h, i, j = con.get(
 
 
 class P(Protocol):
-    def m(self) -> None:
-        ...
+    def m(self) -> None: ...
 
 
 p: P = con.get_abstract(P)

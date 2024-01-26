@@ -132,8 +132,7 @@ class TestRegistry:
         Calling close raises a warning if there are async cleanups.
         """
 
-        async def callback():
-            ...
+        async def callback(): ...
 
         registry.register_factory(Service, Service, on_registry_close=callback)
 
@@ -323,16 +322,13 @@ class TestRegisteredService:
         assert "tests.ifaces.Service" == rs.name
 
 
-def wrong_annotation(foo: svcs.Registry) -> int:
-    ...
+def wrong_annotation(foo: svcs.Registry) -> int: ...
 
 
-def no_args():
-    ...
+def no_args(): ...
 
 
-def diff_name():
-    ...
+def diff_name(): ...
 
 
 takes_containers_annotation_string_modules = (
@@ -396,8 +392,7 @@ class TestTakesContainer:
         Return True if the name is `svcs_container`.
         """
 
-        def factory(svcs_container):
-            ...
+        def factory(svcs_container): ...
 
         assert svcs._core._takes_container(factory)
 
@@ -406,8 +401,7 @@ class TestTakesContainer:
         Return true if the first argument is annotated as `svcs.Container`.
         """
 
-        def factory(foo: svcs.Container):
-            ...
+        def factory(foo: svcs.Container): ...
 
         assert svcs._core._takes_container(factory)
 
@@ -429,8 +423,7 @@ class TestTakesContainer:
         If the factory takes more than one parameter, raise an TypeError.
         """
 
-        def factory(foo, bar):
-            ...
+        def factory(foo, bar): ...
 
         with pytest.raises(
             TypeError, match="Factories must take 0 or 1 parameters."
@@ -443,8 +436,7 @@ class TestTakesContainer:
         """
 
         class Factory:
-            def __call__(self, svcs_container):
-                ...
+            def __call__(self, svcs_container): ...
 
         assert svcs._core._takes_container(Factory())
 

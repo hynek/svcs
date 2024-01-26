@@ -42,8 +42,7 @@ request = Request()
 
 
 class P(Protocol):
-    def m(self) -> None:
-        ...
+    def m(self) -> None: ...
 
 
 async def func() -> None:

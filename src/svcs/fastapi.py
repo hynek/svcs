@@ -40,17 +40,20 @@ class lifespan:  # noqa: N801
         lifespan: The lifespan function to make *svcs*-aware.
     """
 
-    _lifespan: Callable[
-        [FastAPI, svcs.Registry],
-        contextlib.AbstractAsyncContextManager[dict[str, object]],
-    ] | Callable[
-        [FastAPI, svcs.Registry],
-        contextlib.AbstractAsyncContextManager[None],
-    ] | Callable[
-        [FastAPI, svcs.Registry], AsyncGenerator[dict[str, object], None]
-    ] | Callable[
-        [FastAPI, svcs.Registry], AsyncGenerator[None, None]
-    ]
+    _lifespan: (
+        Callable[
+            [FastAPI, svcs.Registry],
+            contextlib.AbstractAsyncContextManager[dict[str, object]],
+        ]
+        | Callable[
+            [FastAPI, svcs.Registry],
+            contextlib.AbstractAsyncContextManager[None],
+        ]
+        | Callable[
+            [FastAPI, svcs.Registry], AsyncGenerator[dict[str, object], None]
+        ]
+        | Callable[[FastAPI, svcs.Registry], AsyncGenerator[None, None]]
+    )
     _state: dict[str, object] = attrs.field(factory=dict)
     registry: svcs.Registry = attrs.field(factory=svcs.Registry)
 

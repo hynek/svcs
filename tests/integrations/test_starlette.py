@@ -116,8 +116,7 @@ async def test_get_pings(registry, container):
     Our get_pings returns registered pings.
     """
 
-    async def aping(_):
-        ...
+    async def aping(_): ...
 
     async def aboom(_):
         raise ValueError("boom")
