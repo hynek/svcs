@@ -15,7 +15,7 @@ config = {"db_url": os.environ.get("DB_URL", "sqlite:///:memory:")}
 class Database:
     @classmethod
     async def connect(cls, db_url: str) -> Database:
-        ...
+        # ...
         return Database()
 
     async def get_user(self, user_id: int) -> dict[str, str]:
