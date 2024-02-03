@@ -57,7 +57,7 @@ Service Layer
 
             domain_model.check_if_can_add_user_to_org(org, user)
 
-            unit_of_work.orgs.add_user(org_id, user_id)
+            unit_of_work.organizations.add_user(org_id, user_id)
             mail_q.send_welcome_mail(user.email, user.name, org.name)
 
             unit_of_work.commit()
