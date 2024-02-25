@@ -35,7 +35,7 @@ def svcs_from(g: _AppCtxGlobals = g) -> Container:
     Get the current container from *g*.
     """
     if (con := g.get(_KEY_CONTAINER, None)) is None:
-        con = Container(current_app.config[_KEY_REGISTRY])
+        con = Container(current_app.extensions[_KEY_REGISTRY])
         setattr(g, _KEY_CONTAINER, con)
 
     return con  # type: ignore[no-any-return]
@@ -53,7 +53,7 @@ def get_registry(app: Flask | None = None) -> Registry:
     """
     if app is None:
         app = current_app
-    return app.config[_KEY_REGISTRY]  # type: ignore[no-any-return]
+    return app.extensions[_KEY_REGISTRY]  # type: ignore[no-any-return]
 
 
 registry = cast(Registry, LocalProxy(get_registry))
@@ -68,7 +68,7 @@ def init_app(app: FlaskAppT, *, registry: Registry | None = None) -> FlaskAppT:
 
     Creates a registry for you if you don't provide one.
     """
-    app.config[_KEY_REGISTRY] = registry or Registry()
+    app.extensions[_KEY_REGISTRY] = registry or Registry()
     app.teardown_appcontext(teardown)
 
     return app
@@ -95,7 +95,7 @@ def register_factory(
     Same as :meth:`svcs.Registry.register_factory()`, but uses registry on
     *app* that has been put there by :func:`init_app()`.
     """
-    app.config[_KEY_REGISTRY].register_factory(
+    app.extensions[_KEY_REGISTRY].register_factory(
         svc_type,
         factory,
         enter=enter,
@@ -117,7 +117,7 @@ def register_value(
     Same as :meth:`svcs.Registry.register_value()`, but uses registry on *app*
     that has been put there by :func:`init_app()`.
     """
-    app.config[_KEY_REGISTRY].register_value(
+    app.extensions[_KEY_REGISTRY].register_value(
         svc_type,
         value,
         enter=enter,
@@ -209,7 +209,7 @@ def close_registry(app: Flask) -> None:
     """
     Close the registry on *app*, if present.
     """
-    if reg := app.config.pop(_KEY_REGISTRY, None):
+    if reg := app.extensions.pop(_KEY_REGISTRY, None):
         reg.close()
 
 

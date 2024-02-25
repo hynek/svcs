@@ -313,7 +313,7 @@ Now, you can point your monitoring tool of choice -- like Prometheus's [Blackbox
 
 While *svcs*'s core is entirely agnostic on how you use the registry and the container, all our {doc}`integrations/index` follow the same life cycle:
 
-- The {class}`svcs.Registry` objects live on **application-scoped** objects like {attr}`flask.Flask.config`.
+- The {class}`svcs.Registry` objects live on **application-scoped** objects like {attr}`flask.Flask.extensions`.
 - The {class}`svcs.Container` objects live on **request-scoped** objects like {data}`flask.g`.
 
 You're free to structure your own integrations as you want, though.

@@ -15,6 +15,14 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/24.1.0...HEAD)
 
+### Changed
+
+- In the flask integration, the `Registry` is now stored on `app.extensions`, not `app.config`. 
+  This is an implementation detail.
+  If you are directly accessing the registry via `app.config`, this is a breaking change, though you should ideally move to `svcs.flask.registry` anyway.
+  [#71](https://github.com/hynek/svcs/discussions/71)
+  [#72](https://github.com/hynek/svcs/issues/72)
+  [#73](https://github.com/hynek/svcs/pull/73)
 
 ## [24.1.0](https://github.com/hynek/svcs/compare/23.21.0...24.1.0) - 2024-01-25
 
