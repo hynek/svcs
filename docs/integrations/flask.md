@@ -1,6 +1,6 @@
 # Flask
 
-*svcs*'s [Flask](https://flask.palletsprojects.com/) integration uses the {attr}`flask.Flask.config` object to store the {class}`svcs.Registry` and the {obj}`~flask.g` object to store the {class}`svcs.Container`.
+*svcs*'s [Flask](https://flask.palletsprojects.com/) integration uses the {attr}`flask.Flask.extensions` object to store the {class}`svcs.Registry` and the {obj}`~flask.g` object to store the {class}`svcs.Container`.
 It also installs a {meth}`flask.Flask.teardown_appcontext` handler to close the container when the request is done.
 
 ---
