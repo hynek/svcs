@@ -621,40 +621,41 @@ class Container:
         Returns:
             A list of services that have registered a ping callable.
         """
-        global_svcs = {
-            tp: self.registry.get_registered_service_for(tp)
-            for tp in self.registry
-        }
-        local_svcs = (
-            {
-                tp: self._lazy_local_registry.get_registered_service_for(tp)
-                for tp in self._lazy_local_registry
-            }
-            if self._lazy_local_registry is not None
-            else {}
-        )
-
-        svc_types = set(global_svcs.keys())
-        svc_types.update(local_svcs.keys())
-
         pings = []
-        for tp in svc_types:
-            rs = None
-            if tp in local_svcs and local_svcs[tp].ping:
-                rs = local_svcs[tp]
-            elif tp in global_svcs and global_svcs[tp].ping:
-                rs = global_svcs[tp]
-            if rs is None:
-                continue
-            pings.append(
-                ServicePing(
-                    rs.name,
-                    iscoroutinefunction(rs.ping),
-                    rs.svc_type,
-                    rs.ping,
-                    self,
-                )
+        registered_local_svc_types = set()
+        if self._lazy_local_registry is not None:
+            svcs = (
+                self._lazy_local_registry.get_registered_service_for(tp)
+                for tp in self._lazy_local_registry
             )
+            for rs in svcs:
+                if rs.ping is not None and rs.svc_type:
+                    pings.append(
+                        ServicePing(
+                            rs.name,
+                            iscoroutinefunction(rs.ping),
+                            rs.svc_type,
+                            rs.ping,
+                            self,
+                        )
+                    )
+                    registered_local_svc_types.add(rs.svc_type)
+        svcs = (
+            self.registry.get_registered_service_for(tp)
+            for tp in self.registry
+        )
+        pings.extend(
+            ServicePing(
+                rs.name,
+                iscoroutinefunction(rs.ping),
+                rs.svc_type,
+                rs.ping,
+                self,
+            )
+            for rs in svcs
+            if rs.ping is not None
+            and rs.svc_type not in registered_local_svc_types
+        )
         return pings
 
     def get_abstract(self, *svc_types: type) -> Any:
