@@ -629,7 +629,7 @@ class Container:
                 for tp in self._lazy_local_registry
             )
             for rs in svcs:
-                if rs.ping is not None and rs.svc_type:
+                if rs.ping is not None:
                     pings.append(
                         ServicePing(
                             rs.name,
