@@ -24,6 +24,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   [#72](https://github.com/hynek/svcs/issues/72)
   [#73](https://github.com/hynek/svcs/pull/73)
 
+
 ## [24.1.0](https://github.com/hynek/svcs/compare/23.21.0...24.1.0) - 2024-01-25
 
 ### Fixed
