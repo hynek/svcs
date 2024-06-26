@@ -61,6 +61,8 @@ exclude_patterns = ["_build"]
 
 nitpick_ignore = [
     *[("py:class", f"svcs._core.T{i}") for i in range(1, 11)],
+    # This only fails in CI!?
+    *[("py:class", f"T{i}") for i in range(1, 11)],
     # Welcome, MkDocs projects. :(
     ("py:class", "FastAPI"),
     ("py:class", "Starlette"),
