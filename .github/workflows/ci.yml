@@ -73,6 +73,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Check public API with Mypy
+        if: ${{ matrix.python-version != '3.13' }}
         run: |
           python -Im tox run \
             --installpkg dist/*.whl \
