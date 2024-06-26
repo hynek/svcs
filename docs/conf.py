@@ -84,7 +84,7 @@ autodoc_typehints_description_target = "documented"
 html_theme = "furo"
 # None of the options work, so we disable the button completely.
 html_theme_options = {
-    "top_of_page_button": None,
+    "top_of_page_buttons": [],
     "sidebar_hide_name": True,
     "light_css_variables": {
         "font-stack": "Inter,sans-serif",
