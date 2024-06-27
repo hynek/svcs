@@ -10,12 +10,6 @@ from typing import AsyncGenerator, Generator, NewType, Protocol
 import svcs
 
 
-if sys.version_info >= (3, 9):
-    from typing import Annotated
-else:
-    from typing_extensions import Annotated
-
-
 reg = svcs.Registry()
 con = svcs.Container(reg)
 
@@ -142,7 +136,7 @@ if sys.version_info >= (3, 10):
 
 
 # Multiple factories for same type:
-S1 = Annotated[str, "s1"]
+S1 = NewType("S1", str)
 S2 = NewType("S2", str)
 
 reg.register_value(S1, "foo")

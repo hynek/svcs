@@ -161,6 +161,7 @@ whitelist-regex = ["test_.*"]
 
 [tool.mypy]
 strict = true
+pretty = true
 
 show_error_codes = true
 enable_error_code = ["ignore-without-code"]
@@ -194,7 +195,9 @@ ignore = [
   "conftest.py",
   "docs",
   "src/svcs/pyramid.py",
-  "tests",
+  # Excluding tests and allowing tests/typing (like in Mypy) doesn't work.
+  "tests/*.py",
+  "tests/integrations",
   "tests/typing/pyramid.py",
 ]
 
