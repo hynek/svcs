@@ -129,6 +129,8 @@ filterwarnings = [
   "ignore:'cgi' is deprecated:DeprecationWarning:webob.compat:",
   "ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning:pkg_resources:",
   "ignore:pkg_resources is deprecated:DeprecationWarning:pyramid.asset:",
+  # Bug in Starlette 0.37.2: https://github.com/encode/starlette/discussions/2603
+  "ignore:Unclosed <MemoryObject(Send|Receive)Stream>:ResourceWarning:anyio.streams.memory",
 ]
 
 
