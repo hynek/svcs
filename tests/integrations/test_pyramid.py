@@ -42,7 +42,9 @@ def _app(config):
 
 @pytest.fixture(name="client")
 def _client(app):
-    return httpx.Client(app=app, base_url="http://example.com/")
+    return httpx.Client(
+        transport=httpx.WSGITransport(app=app), base_url="http://example.com/"
+    )
 
 
 @pytest.fixture(name="rh", params=(0, 1))
