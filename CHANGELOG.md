@@ -25,6 +25,12 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   [#73](https://github.com/hynek/svcs/pull/73)
 
 
+### Fixed
+
+- `Container.aget()` now also enters and exists synchronous context managers.
+  [#93](https://github.com/hynek/svcs/pull/93)
+
+
 ## [24.1.0](https://github.com/hynek/svcs/compare/23.21.0...24.1.0) - 2024-01-25
 
 ### Fixed
