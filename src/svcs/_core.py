@@ -1009,11 +1009,11 @@ class Container:
             if enter and isinstance(svc, AbstractAsyncContextManager):
                 self._on_close.append((name, svc))
                 svc = await svc.__aenter__()
-            elif isawaitable(svc):
-                svc = await svc
             elif enter and isinstance(svc, AbstractContextManager):
                 self._on_close.append((name, svc))
                 svc = svc.__enter__()
+            elif isawaitable(svc):
+                svc = await svc
 
             self._instantiated[svc_type] = svc
 
