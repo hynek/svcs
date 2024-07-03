@@ -16,7 +16,7 @@ But don't be afraid to open half-finished PRs and ask questions if something is 
   Please submit as many fixes for typos and grammar bloopers as you can!
 - Try to limit each pull request to *one* change only.
 - Since we squash on merge, it's up to you how you handle updates to the main branch.
-  Whether you prefer to rebase on main or merge `main` into your branch, do whatever is more comfortable for you.
+  Whether you prefer to rebase on `main` or merge `main` into your branch, do whatever is more comfortable for you.
 - *Always* add tests and docs for your code.
   This is a hard rule; patches with missing tests or documentation won't be merged.
 - Consider updating [CHANGELOG.md][changelog] to reflect the changes as observed by people using this library.
@@ -38,10 +38,19 @@ If you're using [*direnv*](https://direnv.net), you can automate the creation of
 layout python python$(cat .python-version-default)
 ```
 
+or, if you like [*uv*](https://github.com/astral-sh/uv):
+
+```bash
+test -d .venv || uv venv --python python$(cat .python-version-default)
+. .venv/bin/activate
+```
+
+Next, **fork** the repository on GitHub and **clone** it using one of the alternatives that you can copy-paste by pressing the big green button labeled `<> Code`.
+
 You can now install the package with its development dependencies into the virtual environment:
 
 ```console
-$ pip install -e .[dev]
+$ pip install -e .[dev]  # or `uv pip install -e .[dev]`
 ```
 
 This will also install [*tox*] for you.
@@ -49,7 +58,7 @@ This will also install [*tox*] for you.
 Now you can run the test suite:
 
 ```console
-$ python -m pytest
+$ python -Im pytest
 ```
 
 For documentation, you can use:
@@ -58,7 +67,7 @@ For documentation, you can use:
 $ tox run -e docs-watch
 ```
 
-This will build the documentation, and then watch for changes and rebuild it whenever you save a file.
+This will build the documentation, watch for changes, and rebuild it whenever you save a file.
 
 To just build the documentation and run doctests, use:
 
@@ -130,6 +139,8 @@ You will find the built documentation in `docs/_build/html`.
 - If you start a new section, add two blank lines before and one blank line after the header except if two headers follow immediately after each other:
 
   ```markdown
+  # Main Header
+
   Last line of previous section.
 
 
@@ -140,22 +151,56 @@ You will find the built documentation in `docs/_build/html`.
   First line of new section.
   ```
 
-- If your change is interesting to end-users, add an entry to the [changelog].
-  Use [semantic newlines], and add a link to your pull request:
+
+### Changelog
+
+If your change is interesting to end-users, there needs to be an entry in our [changelog], so they can learn about it.
+
+- The changelog follows the [*Keep a Changelog*](https://keepachangelog.com/en/1.0.0/) standard.
+  Add the best-fitting section if it's missing for the current release.
+  We use the following order: `Security`, `Removed`, `Deprecated`, `Added`, `Changed`, `Fixed`.
+
+- As with other docs, please use [semantic newlines] in the changelog.
+
+- Make the last line a link to your pull request.
+  You probably have to open it first to know the number.
+
+- Leave an empty line between entries, so it doesn't look like a wall of text.
+
+- Wrap symbols like modules, functions, or classes into backticks, so they are rendered in a `monospace font`.
+
+- Wrap arguments into asterisks so they are italicized like in API documentation:
+  `Added new argument *an_argument*.`
+
+- If you mention functions or methods, add parentheses at the end of their names:
+  `svcs.func()` or `svcs.Class.method()`.
+  This makes the changelog a lot more readable.
+
+- Prefer simple past tense or constructions with "now".
+  In the Added section, you can leave out the "Added" prefix.
+
+  For example:
 
   ```markdown
-  - Added `svcs.func()` that does foo.
+  ### Added
+
+  - `svcs.func()` that does foo.
     It's pretty cool.
     [#1](https://github.com/hynek/svcs/pull/1)
+
+
+  ### Fixed
+
   - `svcs.func()` now doesn't crash the Large Hadron Collider anymore.
     That was a nasty bug!
     [#2](https://github.com/hynek/svcs/pull/2)
   ```
 
----
 
-Again, this list is mainly to help you to get started by codifying tribal knowledge and expectations.
-If something is unclear, feel free to ask for help!
+## See You on GitHub!
+
+Again, this whole file is mainly to help you to get started by codifying tribal knowledge and expectations to save you time and turnarounds.
+It is **not** meant to be a barrier to entry, so don't be afraid to open half-finished PRs and ask questions if something is unclear!
 
 Please note that this project is released with a Contributor [Code of Conduct].
 By participating in this project you agree to abide by its terms.
