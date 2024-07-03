@@ -1,16 +1,17 @@
 # Contributing Guide
 
+> [!IMPORTANT]
+> This document is mainly to help you to get started by codifying tribal knowledge and expectations and make it more accessible to everyone.
+> But don't be afraid to open half-finished PRs and ask questions if something is unclear!
+
+
+## Workflow
+
 > [!WARNING]
 > Before starting to work on **feature** pull requests, **please** discuss your idea with us on the [Ideas board](https://github.com/hynek/svcs/discussions/categories/ideas) to save you time and effort!
 
 First off, thank you for considering contributing!
 It's people like *you* who make it is such a great tool for everyone.
-
-This document is mainly to help you to get started by codifying tribal knowledge and expectations and make it more accessible to everyone.
-But don't be afraid to open half-finished PRs and ask questions if something is unclear!
-
-
-## Workflow
 
 - No contribution is too small!
   Please submit as many fixes for typos and grammar bloopers as you can!
