@@ -168,7 +168,7 @@ pretty = true
 show_error_codes = true
 enable_error_code = ["ignore-without-code"]
 
-allow_any_generics = true
+disallow_any_generics = false
 
 [[tool.mypy.overrides]]
 module = "pyramid.*"
@@ -189,7 +189,7 @@ ignore_errors = false
 [[tool.mypy.overrides]]
 module = "health_check_pyramid"
 
-allow_untyped_decorators = true
+disallow_untyped_decorators = false
 
 
 [tool.pyright]
