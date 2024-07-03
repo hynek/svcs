@@ -16,7 +16,7 @@ It's people like *you* who make it is such a great tool for everyone.
 - No contribution is too small!
   Please submit as many fixes for typos and grammar bloopers as you can!
 - Try to limit each pull request to *one* change only.
-- Since we squash on merge, it's up to you how you handle updates to the main branch.
+- Since we squash on merge, it's up to you how you handle updates to the `main` branch.
   Whether you prefer to rebase on `main` or merge `main` into your branch, do whatever is more comfortable for you.
 - *Always* add tests and docs for your code.
   This is a hard rule; patches with missing tests or documentation won't be merged.
@@ -170,7 +170,7 @@ If your change is interesting to end-users, there needs to be an entry in our [c
 
 - Wrap symbols like modules, functions, or classes into backticks, so they are rendered in a `monospace font`.
 
-- Wrap arguments into asterisks so they are italicized like in API documentation:
+- Wrap arguments into asterisks so they are *italicized* like in API documentation:
   `Added new argument *an_argument*.`
 
 - If you mention functions or methods, add parentheses at the end of their names:
@@ -178,9 +178,7 @@ If your change is interesting to end-users, there needs to be an entry in our [c
   This makes the changelog a lot more readable.
 
 - Prefer simple past tense or constructions with "now".
-  In the Added section, you can leave out the "Added" prefix.
-
-  For example:
+  In the `Added` section, you can leave out the "Added" prefix:
 
   ```markdown
   ### Added
