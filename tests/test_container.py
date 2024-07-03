@@ -109,6 +109,26 @@ class TestContainer:
             "Container was garbage-collected with pending cleanups.",
         ) == recwarn.list[0].message.args
 
+    @pytest.mark.asyncio()
+    async def test_aget_enters_sync_contextmanagers(self, container):
+        """
+        aget enters (and exits) synchronous context managers.
+        """
+        is_closed = False
+
+        def factory():
+            yield 42
+
+            nonlocal is_closed
+            is_closed = True
+
+        container.registry.register_factory(int, factory)
+
+        async with container:
+            assert 42 == await container.aget(int)
+
+        assert is_closed
+
 
 class TestServicePing:
     def test_ping(self, registry, container, close_me):

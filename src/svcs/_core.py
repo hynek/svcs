@@ -995,6 +995,9 @@ class Container:
 
         Also works with synchronous services, so in an async application, just
         use this.
+
+        .. versionchanged:: 24.2.0
+           Synchronous context managers are now entered/exited, too.
         """
         rv = []
         for svc_type in svc_types:
@@ -1006,6 +1009,9 @@ class Container:
             if enter and isinstance(svc, AbstractAsyncContextManager):
                 self._on_close.append((name, svc))
                 svc = await svc.__aenter__()
+            elif enter and isinstance(svc, AbstractContextManager):
+                self._on_close.append((name, svc))
+                svc = svc.__enter__()
             elif isawaitable(svc):
                 svc = await svc
 
