@@ -434,11 +434,10 @@ def _takes_container(factory: Callable) -> bool:
 
     ((name, p),) = tuple(sig.parameters.items())
 
-    return (
-        name == "svcs_container"
-        or p.annotation is Container
-        or p.annotation == "svcs.Container"
-        or p.annotation == "Container"
+    return name == "svcs_container" or p.annotation in (
+        Container,
+        "svcs.Container",
+        "Container",
     )
 
 
