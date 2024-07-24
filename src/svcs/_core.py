@@ -360,7 +360,7 @@ class Registry:
 
             try:
                 log.debug("closing %r", name)
-                oc()  # type: ignore[operator]
+                oc()
                 log.debug("closed %r", name)
             except Exception:  # noqa: BLE001
                 log.warning(
@@ -393,7 +393,7 @@ class Registry:
                     log.debug("async closed %r", name)
                 else:
                     log.debug("closing %r", name)
-                    oc()  # type: ignore[operator]
+                    oc()
                     log.debug("closed %r", name)
             except Exception:  # noqa: BLE001, PERF203
                 log.warning(
