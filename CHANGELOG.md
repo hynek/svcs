@@ -61,7 +61,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   You can now achieve that with `svcs.Container.register_local_factory()` and `svcs.Container.register_local_value()`.
   Once something local is registered, a registry is transparently created and it takes precedence over the global one when a service is requested.
   The local registry is closed together with the container.
-  [#56](https://github.com/hynek/issues/pull/56)
+  [#56](https://github.com/hynek/svcs/pull/56)
 
 - Flask: `svcs.flask.registry` which is a `werkzeug.local.LocalProxy` for the currently active registry on `flask.current_app`.
 
@@ -69,11 +69,11 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 ### Fixed
 
 - We've stopped rewriting the public names of our objects and `typing.get_type_hints()` now works on them as expected for Python 3.10 and later.
-  [#52](https://github.com/hynek/issues/pull/52)
-  [#53](https://github.com/hynek/issues/pull/53)
+  [#52](https://github.com/hynek/svcs/issues/52)
+  [#53](https://github.com/hynek/svcs/pull/53)
 
 - The detection of container arguments in `svcs.Registry()` when using string-based type annotations is more robust now.
-  [#55](https://github.com/hynek/issues/pull/55)
+  [#55](https://github.com/hynek/svcs/pull/55)
 
 
 ## [23.20.0](https://github.com/hynek/svcs/compare/23.19.0...23.20.0) - 2023-09-05
