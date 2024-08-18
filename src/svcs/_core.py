@@ -92,15 +92,15 @@ class ServicePing:
 
     def ping(self) -> None:
         """
-        Instantiate the service, schedule its cleanup, and call its ping
-        method.
+        Acquire the service, schedule its cleanup, and call its ping callable
+        with the acquired service as its only argument.
         """
         svc: Any = self._container.get(self._svc_type)
         self._ping(svc)
 
     async def aping(self) -> None:
         """
-        Same as :meth:`ping` but instantiate and/or ping asynchronously, if
+        Same as :meth:`ping` but acquire and/or ping asynchronously, if
         necessary.
 
         Also works with synchronous services, so in an async application, just

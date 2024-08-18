@@ -101,7 +101,7 @@ For instance, you could free a database connection pool in an {mod}`atexit` hand
 This liberates you from keeping track of registered services yourself.
 You can also use a registry as an (async) context manager that (a)closes automatically on exit.
 
-*svcs* will raise a {class}`ResourceWarning` if a registry with pending cleanups is garbage-collected.
+*svcs* will raise a {class}`ResourceWarning` when a registry with pending cleanups is garbage-collected.
 
 
 ## Containers
@@ -280,7 +280,7 @@ Now the type name expresses the purpose of the object and it doesn't matter if t
 
 Each registered service may have a `ping` callable that you can use for health checks.
 You can request all pingable registered services with {meth}`svcs.Container.get_pings()`.
-This returns a list of {class}`svcs.ServicePing` objects that currently have a name property to identify the ping and a {meth}`~svcs.ServicePing.ping()` method that instantiates the service, adds it to the cleanup list, and runs the ping.
+This returns a list of {class}`svcs.ServicePing` objects that have a name property to identify the ping and a {meth}`~svcs.ServicePing.ping()` method that acquires the service, adds it to the cleanup list, and runs the ping with the acquired service as its only argument.
 
 If you have async services (factory or ping callable), you can use {meth}`~svcs.ServicePing.aping()` instead.
 `aping()` works with sync services, too, so you can use it universally in async code.
