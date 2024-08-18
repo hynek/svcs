@@ -85,7 +85,7 @@ def _app(registry):
     return svcs.aiohttp.init_app(Application(), registry=registry)
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 class TestAIOHTTP:
     async def test_aclose_registry_ok(self, app, close_me):
         """

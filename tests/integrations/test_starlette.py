@@ -24,7 +24,7 @@ except ImportError:
     pytest.skip("Starlette not installed", allow_module_level=True)
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 @pytest.mark.parametrize("yield_something", [True, False])
 @pytest.mark.parametrize("cm", [True, False])
 async def test_integration(yield_something, cm):
@@ -110,7 +110,7 @@ async def healthy(request):
     )
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_get_pings(registry, container):
     """
     Our get_pings returns registered pings.

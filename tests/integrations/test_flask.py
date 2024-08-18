@@ -151,7 +151,7 @@ class TestFlask:
             ping._svc_type for ping in svcs.flask.get_pings()
         ]
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_teardown_warns_on_async_on_close(self, container):
         """
         teardown() warns if there are async cleanups.

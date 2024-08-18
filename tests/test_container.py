@@ -26,7 +26,7 @@ class TestContainer:
         """
         assert [] == container.get_pings()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_repr(self, registry, container):
         """
         The repr counts correctly.
@@ -74,7 +74,7 @@ class TestContainer:
 
         assert close_me.is_closed
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_async_context_manager(self, container, close_me):
         """
         The container is also an async context manager that acloses on exit.
@@ -109,7 +109,7 @@ class TestContainer:
             "Container was garbage-collected with pending cleanups.",
         ) == recwarn.list[0].message.args
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_aget_enters_sync_contextmanagers(self, container):
         """
         aget enters (and exits) synchronous context managers.

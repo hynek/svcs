@@ -70,7 +70,7 @@ class TestRegistry:
         with cm():
             ...
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_async_generators_become_context_managers(self, registry):
         """
         If a generator-based factory is passed, it's automatically wrapped with
@@ -198,7 +198,7 @@ class TestRegistry:
 
         orc.assert_called_once_with()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_async_context_manager(self, close_me):
         """
         The registry is also an async context manager that acloses on exit.
@@ -220,7 +220,7 @@ class TestRegistry:
         not hasattr(contextlib, "aclosing"),
         reason="Hasn't contextlib.aclosing()",
     )
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_async_empty_close(self, registry):
         """
         Asynchronously closing an empty registry does nothing.
@@ -230,7 +230,7 @@ class TestRegistry:
         async with svcs.Registry():
             ...
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @needs_working_async_mock
     async def test_aclose_mixed(self, registry):
         """
@@ -252,7 +252,7 @@ class TestRegistry:
 
         async_close.assert_awaited_once()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @needs_working_async_mock
     async def test_aclose_logs_failures(self, registry, caplog):
         """
