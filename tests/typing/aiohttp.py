@@ -2,7 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-from typing import Generator, Protocol
+from collections.abc import Generator
+from typing import Protocol
 
 from aiohttp.web import Application, Request
 

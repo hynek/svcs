@@ -8,7 +8,7 @@ import inspect
 import logging
 import warnings
 
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from contextlib import (
     AbstractAsyncContextManager,
     AbstractContextManager,
@@ -24,7 +24,7 @@ from inspect import (
     isgeneratorfunction,
 )
 from types import TracebackType
-from typing import Any, Awaitable, TypeVar, overload
+from typing import Any, TypeVar, overload
 
 import attrs
 

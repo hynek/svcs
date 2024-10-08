@@ -5,7 +5,8 @@
 import contextlib
 import sys
 
-from typing import AsyncGenerator, Generator, NewType, Protocol
+from collections.abc import AsyncGenerator, Generator
+from typing import NewType, Protocol
 
 import svcs
 

@@ -15,6 +15,16 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/24.1.0...HEAD)
 
+### Added
+
+- Python 3.13 support.
+
+
+### Removed
+
+- Python 3.8 support.
+
+
 ### Changed
 
 - Flask: The registry is now stored on `app.extensions`, not `app.config`.

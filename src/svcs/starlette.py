@@ -7,7 +7,8 @@ from __future__ import annotations
 import contextlib
 import inspect
 
-from typing import Any, AsyncGenerator, Callable, overload
+from collections.abc import AsyncGenerator
+from typing import Any, Callable, overload
 
 import attrs
 

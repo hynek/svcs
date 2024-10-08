@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
