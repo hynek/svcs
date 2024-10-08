@@ -11,15 +11,15 @@ async def healthy(request: Request) -> JSONResponse:
     Ping all external services.
     """
     ok: list[str] = []
-    failing: list[dict[str, str]] = []
+    failing: dict[str, str] = {}
     code = 200
 
-    for svc in svcs.starlette.get_pings(request):
+    for svc in svcs.flask.get_pings():
         try:
-            await svc.aping()
+            svc.ping()
             ok.append(svc.name)
         except Exception as e:
-            failing.append({svc.name: repr(e)})
+            failing[svc.name] = repr(e)
             code = 500
 
     return JSONResponse(

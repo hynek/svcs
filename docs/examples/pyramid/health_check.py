@@ -15,15 +15,15 @@ def healthy_view(request: Request) -> Response:
     Ping all external services.
     """
     ok: list[str] = []
-    failing: list[dict[str, str]] = []
+    failing: dict[str, str] = {}
     status = 200
 
-    for svc in svcs.pyramid.get_pings(request):
+    for svc in svcs.flask.get_pings():
         try:
             svc.ping()
             ok.append(svc.name)
         except Exception as e:
-            failing.append({svc.name: repr(e)})
+            failing[svc.name] = repr(e)
             status = 500
 
     return Response(
