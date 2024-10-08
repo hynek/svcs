@@ -13,9 +13,9 @@ async def healthy_view(request: Request) -> Response:
     failing: dict[str, str] = {}
     code = 200
 
-    for svc in svcs.flask.get_pings():
+    for svc in svcs.aiohttp.get_pings(request):
         try:
-            svc.ping()
+            await svc.aping()
             ok.append(svc.name)
         except Exception as e:
             failing[svc.name] = repr(e)

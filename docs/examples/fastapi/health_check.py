@@ -18,9 +18,9 @@ async def healthy(services: svcs.fastapi.DepContainer) -> JSONResponse:
     failing: dict[str, str] = {}
     code = 200
 
-    for svc in svcs.flask.get_pings():
+    for svc in services.get_pings():
         try:
-            svc.ping()
+            await svc.aping()
             ok.append(svc.name)
         except Exception as e:
             failing[svc.name] = repr(e)

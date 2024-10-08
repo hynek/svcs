@@ -18,7 +18,7 @@ def healthy_view(request: Request) -> Response:
     failing: dict[str, str] = {}
     status = 200
 
-    for svc in svcs.flask.get_pings():
+    for svc in svcs.pyramid.get_pings(request):
         try:
             svc.ping()
             ok.append(svc.name)
