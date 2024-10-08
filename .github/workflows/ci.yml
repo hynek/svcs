@@ -30,6 +30,8 @@ jobs:
         id: baipp
 
     outputs:
+      # Used to define the matrix for tests below. The value is based on
+      # packaging metadata (trove classifiers).
       python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
 
   tests:
@@ -40,6 +42,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Created by the build-and-inspect-python-package action above.
         python-version: ${{ fromJson(needs.build-package.outputs.python-versions) }}
 
     steps:
@@ -53,17 +56,15 @@ jobs:
           rm -rf src
       - uses: actions/setup-python@v5
         with:
-          cache: pip
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
-
-      - run: python -Im pip install tox
+      - uses: hynek/setup-cached-uv@v2
 
       - name: Run tests
-        run: |
-          python -Im tox run \
-            --installpkg dist/*.whl \
-            -f py$(echo ${{ matrix.python-version }} | tr -d .)-tests
+        run: >
+          uvx --with tox-uv tox run
+          --installpkg dist/*.whl
+          -f py$(echo ${{ matrix.python-version }} | tr -d .)-tests
 
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
@@ -74,10 +75,10 @@ jobs:
           if-no-files-found: ignore
 
       - name: Check public API with Mypy
-        run: |
-          python -Im tox run \
-            --installpkg dist/*.whl \
-            -e py$(echo ${{ matrix.python-version }} | tr -d .)-mypy
+        run: >
+          uvx --with tox-uv tox run
+          --installpkg dist/*.whl
+          -e py$(echo ${{ matrix.python-version }} | tr -d .)-mypy
 
   coverage:
     name: Ensure 100% test coverage
@@ -89,8 +90,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          cache: pip
           python-version-file: .python-version-default
+      - uses: hynek/setup-cached-uv@v2
 
       - name: Download coverage data
         uses: actions/download-artifact@v4
@@ -100,16 +101,16 @@ jobs:
 
       - name: Combine coverage and fail if it's <100%.
         run: |
-          python -Im pip install --upgrade coverage[toml]
+          uv tool install coverage[toml]
 
-          python -Im coverage combine
-          python -Im coverage html --skip-covered --skip-empty
+          coverage combine
+          coverage html --skip-covered --skip-empty
 
           # Report and write to summary.
-          python -Im coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
+          coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
 
           # Report again and fail if under 100%.
-          python -Im coverage report --fail-under=100
+          coverage report --fail-under=100
 
       - name: Upload HTML report if check failed.
         uses: actions/upload-artifact@v4
@@ -132,12 +133,10 @@ jobs:
       - run: tar xf dist/*.tar.gz --strip-components=1
       - uses: actions/setup-python@v5
         with:
-          cache: pip
           python-version-file: .python-version-default
+      - uses: hynek/setup-cached-uv@v2
 
-      - run: python -Im pip install tox
-
-      - run: python -Im tox run -e mypy-pkg
+      - run: uvx --with tox-uv tox run -e mypy-pkg
 
   pyright:
     name: Pyright Codebase
@@ -153,12 +152,12 @@ jobs:
       - run: tar xf dist/*.tar.gz --strip-components=1
       - uses: actions/setup-python@v5
         with:
-          cache: pip
           python-version-file: .python-version-default
+      - uses: hynek/setup-cached-uv@v2
 
       - run: |
-          python -Im venv .venv
-          .venv/bin/python -Im pip install .[typing]
+          uv venv
+          uv pip install .[typing]
           echo "$PWD/.venv/bin" >> $GITHUB_PATH
       - uses: jakebailey/pyright-action@v2
 
@@ -173,15 +172,13 @@ jobs:
           name: Packages
           path: dist
       - run: tar xf dist/*.tar.gz --strip-components=1
-
       - uses: actions/setup-python@v5
         with:
           # Keep in sync with tox.ini/docs & .readthedocs.yaml
           python-version: "3.12"
-          cache: pip
-      - run: python -Im pip install tox
+      - uses: hynek/setup-cached-uv@v2
 
-      - run: python -Im tox run -e docs
+      - run: uvx --with tox-uv tox run -e docs
 
   install-dev:
     name: Verify dev env
