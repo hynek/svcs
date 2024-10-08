@@ -29,8 +29,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-tests = ["pytest", "pytest-asyncio", "sybil>=6"]
-typing = ["mypy>=1.4", "fastapi", "flask", "starlette", "aiohttp", "pyramid"]
 docs = [
   "sphinx>=7.2.2",
   "sphinx-design",
@@ -41,6 +39,7 @@ docs = [
   "furo>=2023.8.17",
   "sybil",
   "pytest",
+  "pytest-asyncio",
   "httpx",
   "aiohttp",
   "fastapi",
@@ -49,6 +48,8 @@ docs = [
   "starlette",
   "sqlalchemy",
 ]
+tests = ["pytest", "pytest-asyncio", "sybil>=6"]
+typing = ["mypy>=1.4", "fastapi", "flask", "starlette", "aiohttp", "pyramid"]
 dev = ["svcs[tests,typing]", "tox>4", "httpx"]
 
 [project.urls]
@@ -126,6 +127,7 @@ filterwarnings = [
   # Bug in Starlette 0.37.2: https://github.com/encode/starlette/discussions/2603
   "ignore:Unclosed <MemoryObject(Send|Receive)Stream>:ResourceWarning:anyio.streams.memory",
 ]
+asyncio_default_fixture_loop_scope = "function"
 
 
 [tool.coverage.run]
