@@ -24,6 +24,16 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Typing :: Typed",
 ]
+keywords = [
+  "service locator",
+  "dependency injection",
+  "inversion of control",
+  "flask",
+  "starlette",
+  "pyramid",
+  "fastapi",
+  "aiohttp",
+]
 dependencies = [
   "attrs>=21.3.0", # attrs namespace
 ]
