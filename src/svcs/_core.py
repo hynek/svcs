@@ -1011,8 +1011,20 @@ class Container:
             elif enter and isinstance(svc, AbstractContextManager):
                 self._on_close.append((name, svc))
                 svc = svc.__enter__()
+            # _lookup() doesn't handle async factories, so we have to live with
+            # some repetition.
             elif isawaitable(svc):
+                # Execute the factory. Until now, we've only created the
+                # awaitable.
                 svc = await svc
+
+                # Factory returned a contextmanager.
+                if enter and isinstance(svc, AbstractAsyncContextManager):
+                    self._on_close.append((name, svc))
+                    svc = await svc.__aenter__()
+                elif enter and isinstance(svc, AbstractContextManager):
+                    self._on_close.append((name, svc))
+                    svc = svc.__enter__()
 
             self._instantiated[svc_type] = svc
 

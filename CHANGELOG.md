@@ -40,6 +40,9 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 - `Container.aget()` now also enters and exits synchronous context managers.
   [#93](https://github.com/hynek/svcs/pull/93)
 
+- `Container.aget()` now also enters and exits context managers that are returned by async factories.
+  [#105](https://github.com/hynek/svcs/pull/105)
+
 
 ## [24.1.0](https://github.com/hynek/svcs/compare/23.21.0...24.1.0) - 2024-01-25
 
