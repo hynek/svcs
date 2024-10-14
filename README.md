@@ -80,6 +80,7 @@ Read on in [*Why?*](https://svcs.hynek.me/en/latest/why.html) or watch this shor
 - [**Documentation**](https://svcs.hynek.me)
 - [**Changelog**](https://github.com/hynek/svcs/blob/main/CHANGELOG.md)
 - [**Funding**](https://hynek.me/say-thanks/)
+- [**Third-party extensions**](https://github.com/hynek/svcs/wiki/Third%E2%80%90party-Extensions)
 
 <!-- end pypi -->
 

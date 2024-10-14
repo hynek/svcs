@@ -15,7 +15,8 @@ pyramid
 starlette
 ```
 
-But it's also straight-forward to [write your own](custom.md)!
+If your framework is missing, check out our [wiki page listing third-party extensions](https://github.com/hynek/svcs/wiki/Third%E2%80%90party-Extensions).
+If it's missing there too, it's straight-forward to [write your own](custom.md) (and then add to the wiki!).
 
 ```{toctree}
 :hidden:

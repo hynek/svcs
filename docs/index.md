@@ -102,4 +102,5 @@ Changelog <https://github.com/hynek/svcs/blob/main/CHANGELOG.md>
 Contributing <https://github.com/hynek/svcs/blob/main/.github/CONTRIBUTING.md>
 Security Policy <https://github.com/hynek/svcs/blob/main/.github/SECURITY.md>
 Funding <https://hynek.me/say-thanks/>
+Third-party Extensions <https://github.com/hynek/svcs/wiki/Third%E2%80%90party-Extensions>
 ```
