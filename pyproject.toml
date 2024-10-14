@@ -231,7 +231,6 @@ ignore = [
   "INP001",  # sometimes we want Python files outside of packages
   "ISC001",  # conflicts with formatter
   "PLR0913", # yes, many arguments, but most have defaults
-  "PLR2004", # numbers are sometimes fine
   "PYI034",  # We're not adding typing_extensions just for Self.
   "SLF001",  # private members are accessed by friendly functions
   "TCH",     # TYPE_CHECKING blocks break autodocs
@@ -239,20 +238,16 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "**/test_*" = [
-  "S101",   # assert
-  "SIM300", # Yoda rocks in asserts
-  "PT005",  # we always add underscores and explicit names
-  "PT011",  # broad is fine
-  "TRY002", # stock exceptions are fine in tests
-  "EM101",  # no need for exception msg hygiene in tests
+  "EM101",   # no need for exception msg hygiene in tests
+  "PLR2004", # numbers are fine in tests
+  "PT011",   # broad is fine
+  "S101",    # assert
+  "SIM300",  # Yoda rocks in asserts
+  "TRY002",  # stock exceptions are fine in tests
 ]
 
 "tests/typing/*" = [
   "F841", # unused variables are fine in type checks
-]
-
-"conftest.py" = [
-  "PT005", # we always add underscores and explicit names
 ]
 
 "docs/examples/*" = ["PERF203", "BLE001"]
