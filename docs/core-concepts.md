@@ -363,13 +363,15 @@ You can see that the datetime factory and the str value have both been registere
 .. module:: svcs
 
 .. autoclass:: Registry()
-   :members: register_factory, register_value, close, aclose, __contains__
+   :members: register_factory, register_value, close, aclose, __contains__, __iter__
 
 .. autoclass:: Container()
    :members: get, aget, get_abstract, aget_abstract, register_local_factory, register_local_value, close, aclose, get_pings, __contains__
 
 .. autoclass:: ServicePing()
    :members: name, ping, aping, is_async
+
+.. autoclass:: RegisteredService()
 
 .. autoclass:: svcs.exceptions.ServiceNotFoundError
 ```

@@ -19,6 +19,9 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 - Python 3.13 support.
 
+- `svcs.Registry` now implements an `__iter__` method that allows to iterate over its registered services.
+  [#106](https://github.com/hynek/svcs/pull/106)
+
 
 ### Removed
 
