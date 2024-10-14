@@ -150,9 +150,7 @@ source = ["src", ".tox/py*/**/site-packages"]
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
-exclude_lines = [
-  "no cov",
-  "if __name__ == .__main__.:",
+exclude_also = [
   # Typing-related
   "if TYPE_CHECKING:",
   ": +\\.\\.\\.$",
