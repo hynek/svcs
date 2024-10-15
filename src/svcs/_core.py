@@ -8,7 +8,7 @@ import inspect
 import logging
 import warnings
 
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Iterator
 from contextlib import (
     AbstractAsyncContextManager,
     AbstractContextManager,
@@ -48,6 +48,26 @@ _KEY_CONTAINER = "svcs_container"
 
 @attrs.frozen
 class RegisteredService:
+    """
+    A recipe for creating a service.
+
+    .. warning::
+
+        Strictly read-only.
+
+    Attributes:
+        svc_type: The type under which the type has been registered.
+
+        factory: Callable that creates the service.
+
+        takes_container:
+            Whether the factory takes a container as its first argument.
+
+        enter: Whether context managers returned by the factory are entered.
+
+        ping: See :ref:`health`.
+    """
+
     svc_type: type
     factory: Callable = attrs.field(hash=False)
     takes_container: bool
@@ -160,6 +180,15 @@ class Registry:
             False
         """
         return svc_type in self._services
+
+    def __iter__(self) -> Iterator[RegisteredService]:
+        """
+        Returns:
+            An iterator over registered services.
+
+        .. versionadded:: 24.2.0
+        """
+        return iter(self._services.values())
 
     def __enter__(self) -> Registry:
         return self

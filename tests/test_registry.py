@@ -281,6 +281,20 @@ class TestRegistry:
         assert Service in registry
         assert AnotherService not in registry
 
+    def test_iterate(self, registry):
+        """
+        It's possible to iterate over the registered services.
+        """
+        registry.register_factory(Service, Service)
+        registry.register_factory(AnotherService, AnotherService)
+
+        assert {
+            svcs.RegisteredService(Service, Service, False, True, None),
+            svcs.RegisteredService(
+                AnotherService, AnotherService, False, True, None
+            ),
+        } == {rs for rs in registry}  # noqa: C416 -- explicit on purpose
+
     def test_gc_warning(self, recwarn):
         """
         If a registry is gc'ed with pending cleanups, a warning is raised.
