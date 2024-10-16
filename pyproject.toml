@@ -38,7 +38,7 @@ dependencies = [
   "attrs>=21.3.0", # attrs namespace
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 docs = [
   "sphinx>=7.2.2",
   "sphinx-design",
