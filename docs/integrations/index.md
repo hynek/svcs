@@ -18,6 +18,10 @@ starlette
 If your framework is missing, check out our [wiki page listing third-party extensions](https://github.com/hynek/svcs/wiki/Third%E2%80%90party-Extensions).
 If it's missing there too, it's straight-forward to [write your own](custom.md) (and then add to the wiki!).
 
+## Community-Driven Extensions
+
+In addition to the official integrations, there are also community-driven extensions available. One notable example is the Django support provided by the community via [django-svcs](https://github.com/django-svcs/django-svcs/).
+
 ```{toctree}
 :hidden:
 custom
