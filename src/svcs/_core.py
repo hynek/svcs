@@ -279,6 +279,9 @@ class Registry:
                 Can also be an async callable or an
                 :class:`collections.abc.Awaitable`; then
                 :meth:`svcs.Registry.aclose()` must be called.
+
+        .. versionchanged:: 24.2.0
+            *factory* now may take any amount of arguments and they are ignored.
         """
         rs = self._register_factory(
             svc_type,
@@ -454,14 +457,10 @@ def _takes_container(factory: Callable) -> bool:
         except Exception:  # noqa: BLE001
             return False
 
-    if not sig.parameters:
-        return False
-
-    if len(sig.parameters) != 1:
-        msg = "Factories must take 0 or 1 parameters."
-        raise TypeError(msg)
-
-    ((name, p),) = tuple(sig.parameters.items())
+    try:
+        (name, p) = next(iter(sig.parameters.items()))
+    except StopIteration:
+        return False  # 0 arguments
 
     return name == "svcs_container" or p.annotation in (
         Container,
