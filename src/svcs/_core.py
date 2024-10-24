@@ -441,14 +441,14 @@ def _takes_container(factory: Callable) -> bool:
     Return True if *factory* takes a svcs.Container as its first argument.
     """
     try:
-        # Provide the locals so that `eval_str` will work even if the user places the `Container`
-        # under a `if TYPE_CHECKING` block
+        # Provide the locals so that `eval_str` will work even if the user
+        # places the `Container` under a `if TYPE_CHECKING` block.
         sig = inspect.signature(
             factory, locals={"Container": Container}, eval_str=True
         )
     except Exception:  # noqa: BLE001
-        # Retry without `eval_str` since if the annotation is "svcs.Container" the eval
-        # will fail due to it not finding the `svcs` module
+        # Retry without `eval_str` since if the annotation is "svcs.Container"
+        # the eval will fail due to it not finding the `svcs` module
         try:
             sig = inspect.signature(factory)
         except Exception:  # noqa: BLE001
