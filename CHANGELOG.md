@@ -39,6 +39,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 - `Registry.register_factory()` is now more lenient regarding the arguments of the factory.
   It only looks at the first argument (if present) and ignores the rest.
+  [#110](https://github.com/hynek/svcs/pull/110)
 
 
 ### Fixed
