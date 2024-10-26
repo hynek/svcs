@@ -136,7 +136,9 @@ jobs:
           python-version-file: .python-version-default
       - uses: hynek/setup-cached-uv@v2
 
-      - run: uvx --with tox-uv tox run -e mypy-pkg
+      - run: >
+          uvx --with tox-uv
+          tox run -e mypy-pkg
 
   pyright:
     name: Pyright Codebase
@@ -178,7 +180,9 @@ jobs:
           python-version: "3.12"
       - uses: hynek/setup-cached-uv@v2
 
-      - run: uvx --with tox-uv tox run -e docs
+      - run: >
+          uvx --with tox-uv
+          tox run -e docs
 
   install-dev:
     name: Verify dev env
