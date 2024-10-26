@@ -201,8 +201,7 @@ jobs:
       - run: python -Im pip install -e .[dev]
       - run: python -Ic 'import svcs'
       - run: python -Ic 'import svcs.flask'
-      # XXX: Pyramid is currently broken on 3.13.
-      # - run: python -Ic 'import svcs.pyramid'
+      - run: python -Ic 'import svcs.pyramid'
 
   required-checks-pass:
     if: always()

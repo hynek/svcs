@@ -131,6 +131,9 @@ addopts = ["-ra", "--strict-markers", "--strict-config"]
 xfail_strict = true
 filterwarnings = [
   "once::Warning",
+  # pkg_resources.declare_namespace('zope')
+  "ignore::DeprecationWarning:pkg_resources",
+  "ignore:pkg_resources is deprecated:DeprecationWarning:pyramid.asset",
   # Silence warning that we're testing for but can't capture..
   "ignore: coroutine method 'aclose' of 'TestFlask.test_teardown_warns_on_async_on_close.*:RuntimeWarning:",
   # Bug in Starlette 0.37.2: https://github.com/encode/starlette/discussions/2603
