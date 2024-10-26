@@ -432,17 +432,14 @@ class TestTakesContainer:
 
         assert svcs._core._takes_container(module.factory)
 
-    def test_catches_invalid_sigs(self):
+    def test_ignores_invalid_sigs(self):
         """
-        If the factory takes more than one parameter, raise an TypeError.
+        If the first parameter is anything but what we handle, ignore it.
         """
 
         def factory(foo, bar): ...
 
-        with pytest.raises(
-            TypeError, match="Factories must take 0 or 1 parameters."
-        ):
-            svcs._core._takes_container(factory)
+        assert not svcs._core._takes_container(factory)
 
     def test_call_works(self):
         """
