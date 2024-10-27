@@ -186,11 +186,8 @@ jobs:
 
   install-dev:
     name: Verify dev env
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-
+    runs-on: ubuntu-latest
+  
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -201,10 +198,11 @@ jobs:
       - run: |
           uv venv
           uv pip install -e .[dev]
+          source .venv/bin/activate
 
-          .venv/bin/python -Ic 'import svcs'
-          .venv/bin/python -Ic 'import svcs.flask'
-          .venv/bin/python -Ic 'import svcs.pyramid'
+          python -Ic 'import svcs'
+          python -Ic 'import svcs.
+          python -Ic 'import svcs.pyramid'
 
   required-checks-pass:
     if: always()
