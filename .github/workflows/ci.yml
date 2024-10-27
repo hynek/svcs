@@ -195,8 +195,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          cache: pip
           python-version-file: .python-version-default
+      - uses: hynek/setup-cached-uv@v2
 
       - run: |
           uv venv
