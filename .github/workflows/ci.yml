@@ -201,7 +201,7 @@ jobs:
           source .venv/bin/activate
 
           python -Ic 'import svcs'
-          python -Ic 'import svcs.
+          python -Ic 'import svcs.flask'
           python -Ic 'import svcs.pyramid'
 
   required-checks-pass:
