@@ -10,26 +10,26 @@ on:
       - published
   workflow_dispatch:
 
-permissions:
-  attestations: write
-  contents: read
-  id-token: write
 
 env:
   FORCE_COLOR: "1" # Make tools pretty.
   PIP_DISABLE_PIP_VERSION_CHECK: "1"
   PIP_NO_PYTHON_VERSION_WARNING: "1"
 
+
 jobs:
   # Always build & lint package.
   build-package:
     name: Build & verify package
     runs-on: ubuntu-latest
+    permissions:
+      attestations: write
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - uses: hynek/build-and-inspect-python-package@v2
         with:
@@ -42,6 +42,10 @@ jobs:
     if: github.repository_owner == 'hynek' && github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: build-package
+
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - name: Download packages built by build-and-inspect-python-package
