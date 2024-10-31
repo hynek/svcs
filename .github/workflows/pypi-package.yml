@@ -11,12 +11,6 @@ on:
   workflow_dispatch:
 
 
-env:
-  FORCE_COLOR: "1" # Make tools pretty.
-  PIP_DISABLE_PIP_VERSION_CHECK: "1"
-  PIP_NO_PYTHON_VERSION_WARNING: "1"
-
-
 jobs:
   # Always build & lint package.
   build-package:
@@ -35,6 +29,7 @@ jobs:
       - uses: hynek/build-and-inspect-python-package@v2
         with:
           attest-build-provenance-github: 'true'
+
 
   # Upload to Test PyPI on every commit on main.
   release-test-pypi:
@@ -58,6 +53,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
+
 
   # Upload to real PyPI on GitHub Releases.
   release-pypi:

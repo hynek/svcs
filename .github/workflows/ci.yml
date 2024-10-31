@@ -35,6 +35,7 @@ jobs:
       # packaging metadata (trove classifiers).
       python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
 
+
   tests:
     name: Tests & Mypy API on ${{ matrix.python-version }}
     runs-on: ubuntu-latest
@@ -84,6 +85,7 @@ jobs:
           --installpkg dist/*.whl
           -e py${PYTHON//./}-mypy
 
+
   coverage:
     name: Ensure 100% test coverage
     runs-on: ubuntu-latest
@@ -124,6 +126,7 @@ jobs:
           name: html-report
           path: htmlcov
         if: ${{ failure() }}
+
 
   mypy-pkg:
     name: Mypy Codebase
@@ -169,6 +172,7 @@ jobs:
           echo "$PWD/.venv/bin" >> $GITHUB_PATH
       - uses: jakebailey/pyright-action@v2
 
+
   docs:
     name: Build docs & run doctests
     needs: build-package
@@ -189,6 +193,7 @@ jobs:
       - run: >
           uvx --with tox-uv
           tox run -e docs
+
 
   install-dev:
     name: Verify dev env
@@ -211,6 +216,7 @@ jobs:
           python -Ic 'import svcs'
           python -Ic 'import svcs.flask'
           python -Ic 'import svcs.pyramid'
+
 
   required-checks-pass:
     if: always()
