@@ -47,6 +47,7 @@ jobs:
 
     permissions:
       contents: read
+      id-token: write
 
     steps:
       - name: Download packages built by build-and-inspect-python-package
@@ -67,6 +68,10 @@ jobs:
     if: github.repository_owner == 'hynek' && github.event.action == 'published'
     runs-on: ubuntu-latest
     needs: build-package
+
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - name: Download packages built by build-and-inspect-python-package
