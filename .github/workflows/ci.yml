@@ -63,11 +63,11 @@ jobs:
 
       - name: Run tests
         env:
-          PYTHON: ${{ format('py{0}', format(matrix.python-version, '', '.')) }}
+          PYTHON: ${{ matrix.python-version }}
         run: >
           uvx --with tox-uv tox run
           --installpkg dist/*.whl
-          -f $PYTHON-tests
+          -f py$(echo $PYTHON | tr -d .)-tests
 
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
@@ -83,7 +83,7 @@ jobs:
         run: >
           uvx --with tox-uv tox run
           --installpkg dist/*.whl
-          -e $PYTHON-mypy
+          -e py$(echo $PYTHON | tr -d .)-mypy
 
   coverage:
     name: Ensure 100% test coverage
