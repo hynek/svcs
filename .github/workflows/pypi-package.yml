@@ -25,6 +25,7 @@ jobs:
     permissions:
       contents: read
       attestations: write
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -46,7 +47,6 @@ jobs:
 
     permissions:
       contents: read
-      id-token: write
 
     steps:
       - name: Download packages built by build-and-inspect-python-package
