@@ -67,7 +67,7 @@ jobs:
         run: >
           uvx --with tox-uv tox run
           --installpkg dist/*.whl
-          -f py$(echo $PYTHON | tr -d .)-tests
+          -f py${PYTHON//./}-tests
 
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
@@ -83,7 +83,7 @@ jobs:
         run: >
           uvx --with tox-uv tox run
           --installpkg dist/*.whl
-          -e py$(echo $PYTHON | tr -d .)-mypy
+          -e py${PYTHON//./}-mypy
 
   coverage:
     name: Ensure 100% test coverage
