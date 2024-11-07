@@ -541,7 +541,7 @@ class Container:
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
-        self.close()
+        self.close(exc_type, exc_val, exc_tb)
 
     async def __aenter__(self) -> Container:
         return self
@@ -552,7 +552,7 @@ class Container:
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
-        await self.aclose()
+        await self.aclose(exc_type, exc_val, exc_tb)
 
     def __del__(self) -> None:
         """
@@ -565,7 +565,12 @@ class Container:
                 stacklevel=1,
             )
 
-    def close(self) -> None:
+    def close(
+        self,
+        exc_type: type[BaseException] | None = None,
+        exc_val: BaseException | None = None,
+        exc_tb: TracebackType | None = None,
+    ) -> None:
         """
         Run all registered *synchronous* cleanups.
 
@@ -589,7 +594,7 @@ class Container:
                     )
                     continue
 
-                cm.__exit__(None, None, None)
+                cm.__exit__(exc_type, exc_val, exc_tb)
             except Exception:  # noqa: BLE001
                 log.warning(
                     "Container clean up failed for %r.",
@@ -603,7 +608,12 @@ class Container:
         self._on_close.clear()
         self._instantiated.clear()
 
-    async def aclose(self) -> None:
+    async def aclose(
+        self,
+        exc_type: type[BaseException] | None = None,
+        exc_val: BaseException | None = None,
+        exc_tb: TracebackType | None = None,
+    ) -> None:
         """
         Run *all* registered cleanups -- synchronous **and** asynchronous.
 
@@ -619,9 +629,9 @@ class Container:
         for name, cm in reversed(self._on_close):
             try:
                 if isinstance(cm, AbstractContextManager):
-                    cm.__exit__(None, None, None)
+                    cm.__exit__(exc_type, exc_val, exc_tb)
                 else:
-                    await cm.__aexit__(None, None, None)
+                    await cm.__aexit__(exc_type, exc_val, exc_tb)
 
             except Exception:  # noqa: BLE001, PERF203
                 log.warning(
