@@ -85,7 +85,7 @@ class RegisteredService:
             f"factory={self.factory}, "
             f"takes_container={self.takes_container}, "
             f"enter={self.enter}, "
-            f"has_ping={ self.ping is not None}"
+            f"has_ping={self.ping is not None}"
             ")>"
         )
 
