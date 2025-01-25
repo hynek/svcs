@@ -186,7 +186,7 @@ class Registry:
         Returns:
             An iterator over registered services.
 
-        .. versionadded:: 24.2.0
+        .. versionadded:: 25.1.0
         """
         return iter(self._services.values())
 
@@ -280,7 +280,7 @@ class Registry:
                 :class:`collections.abc.Awaitable`; then
                 :meth:`svcs.Registry.aclose()` must be called.
 
-        .. versionchanged:: 24.2.0
+        .. versionchanged:: 25.1.0
             *factory* now may take any amount of arguments and they are ignored.
         """
         rs = self._register_factory(
@@ -1023,7 +1023,7 @@ class Container:
         Also works with synchronous services, so in an async application, just
         use this.
 
-        .. versionchanged:: 24.2.0
+        .. versionchanged:: 25.1.0
            Synchronous context managers are now entered/exited, too.
         """
         rv = []
