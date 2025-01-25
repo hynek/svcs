@@ -128,7 +128,7 @@ $ tox run -e docs-doctests
   Please note that unlike everything else, the API docstrings are still reStructuredText.
 
 - If you add or change public APIs, tag the docstring using `..  versionadded:: 24.1.0 WHAT` or `..  versionchanged:: 24.1.0 WHAT`.
-  We follow CalVer, so the next version will be the current with with the middle number incremented (for example, `24.1.0` -> `24.2.0`).
+  We follow [Calendar Versioning](https://calver.org/), so the next version will be the current with with the middle number incremented (for example, `24.1.0` -> `24.2.0`).
 
 - We use [Ruff](https://ruff.rs/) to sort our imports and format our code with a line length of 79 characters.
   As long as you run our full *tox* suite before committing, or install our [*pre-commit*](https://pre-commit.com/) hooks (ideally you'll do both -- see [*Local Development Environment*](#local-development-environment) above), you won't have to spend any time on formatting your code at all.
@@ -146,7 +146,7 @@ $ tox run -e docs-doctests
   assert "foo" == x._a_private_attribute
   ```
 
-- You can run  the test suite runs with all (optional) dependencies against all supported Python versions just as it will in our CI by running `tox`.
+- You can run the test suite runs with all (optional) dependencies against all supported Python versions just as it will in our CI by running `tox`.
 
 - Write [good test docstrings](https://jml.io/test-docstrings/).
 
