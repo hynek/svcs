@@ -13,7 +13,6 @@
 
 <p align="center">
   <a href="https://svcs.hynek.me"><img alt="Documentation at ReadTheDocs" src="https://img.shields.io/badge/Docs-Read%20The%20Docs-black"></a>
-  <a href="LICENSE"><img alt="PyPI - License" src="https://img.shields.io/pypi/l/svcs"></a>
   <a href="https://www.bestpractices.dev/projects/8115"><img src="https://www.bestpractices.dev/projects/8115/badge"></a>
   <a href="https://pypi.org/project/svcs/"><img alt="PyPI" src="https://img.shields.io/pypi/v/svcs"></a>
   <a href="https://pypi.org/project/svcs/"><img alt="PyPI - Supported Python versions" src="https://img.shields.io/pypi/pyversions/svcs.svg"></a>
