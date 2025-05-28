@@ -8,20 +8,16 @@ from contextlib import asynccontextmanager
 
 import pytest
 
+from starlette.applications import Starlette
+from starlette.middleware import Middleware
+from starlette.responses import JSONResponse
+from starlette.routing import Route
+from starlette.testclient import TestClient
+
 import svcs
 
 from tests.fake_factories import async_bool_cm_factory, async_int_factory
 from tests.helpers import CloseMe
-
-
-try:
-    from starlette.applications import Starlette
-    from starlette.middleware import Middleware
-    from starlette.responses import JSONResponse
-    from starlette.routing import Route
-    from starlette.testclient import TestClient
-except ImportError:
-    pytest.skip("Starlette not installed", allow_module_level=True)
 
 
 @pytest.mark.asyncio
