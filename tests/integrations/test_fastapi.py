@@ -8,16 +8,12 @@ from contextlib import asynccontextmanager
 
 import pytest
 
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+
 import svcs
 
 from tests.helpers import CloseMe
-
-
-try:
-    from fastapi import FastAPI
-    from fastapi.testclient import TestClient
-except ImportError:
-    pytest.skip("FastAPI not installed", allow_module_level=True)
 
 
 @pytest.mark.asyncio

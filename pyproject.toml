@@ -22,6 +22,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Typing :: Typed",
 ]
 keywords = [
@@ -59,7 +60,7 @@ docs = [
   "sqlalchemy",
 ]
 tests = ["pytest", "pytest-asyncio", "sybil>=6"]
-typing = ["mypy>=1.4", "fastapi", "flask", "starlette", "aiohttp", "pyramid"]
+typing = ["mypy>=1.4", "fastapi; python_version < '3.14'", "flask", "starlette", "aiohttp", "pyramid"]
 dev = ["svcs[tests,typing]", "tox>4", "tox-uv", "httpx"]
 
 [project.urls]

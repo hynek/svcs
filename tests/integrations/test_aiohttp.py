@@ -9,25 +9,21 @@ import json
 import attrs
 import pytest
 
+from aiohttp import ClientSession
+from aiohttp.web import (
+    Application,
+    AppRunner,
+    Request,
+    Response,
+    TCPSite,
+    json_response,
+)
+from yarl import URL
+
 import svcs
 
 from tests.fake_factories import async_int_factory
 from tests.ifaces import Service
-
-
-try:
-    from aiohttp import ClientSession
-    from aiohttp.web import (
-        Application,
-        AppRunner,
-        Request,
-        Response,
-        TCPSite,
-        json_response,
-    )
-    from yarl import URL
-except ImportError:
-    pytest.skip("AIOHTTP not installed", allow_module_level=True)
 
 
 @attrs.define
