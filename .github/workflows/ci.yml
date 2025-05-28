@@ -168,7 +168,7 @@ jobs:
 
       - run: |
           uv venv
-          uv pip install .[typing]
+          uv pip install . --group typing
           echo "$PWD/.venv/bin" >> $GITHUB_PATH
       - uses: jakebailey/pyright-action@v2
 
@@ -208,7 +208,7 @@ jobs:
 
       - run: |
           uv venv
-          uv pip install -e .[dev]
+          uv pip install -e . --group dev
           source .venv/bin/activate
 
           python -Ic 'import svcs'

@@ -65,10 +65,10 @@ test -d .venv || uv venv --python python$(cat .python-version-default)
 >   Yes, you can work on `main` in your fork and submit pull requests.
 >   But this will *inevitably* lead to you not being able to synchronize your fork with upstream and having to start over.
 
-Change into the newly created directory and after activating a virtual environment, install an editable version of this project along with its tests requirements:
+Change into the newly created directory and after activating a virtual environment, install an editable version of this project along with its tests requirements (requires Pip 25.1 or *uv* 0.4.27 or later that added support for [dependency groups](https://peps.python.org/pep-0735/)):
 
 ```console
-$ pip install -e .[dev]  # or `uv pip install -e .[dev]`
+$ pip install -e . --group dev  # or `uv pip install -e . --group dev`
 ```
 
 This will also install *tox* for you.
