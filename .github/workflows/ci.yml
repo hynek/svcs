@@ -166,11 +166,9 @@ jobs:
           python-version-file: .python-version-default
       - uses: hynek/setup-cached-uv@v2
 
-      - run: |
-          uv venv
-          uv pip install . --group typing
-          echo "$PWD/.venv/bin" >> $GITHUB_PATH
-      - uses: jakebailey/pyright-action@b5d50e5cde6547546a5c4ac92e416a8c2c1a1dfe  # v2.3.2
+      - run: >
+          uvx --with tox-uv
+          tox run -e mypy-pkg
 
 
   docs:
