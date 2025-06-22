@@ -75,8 +75,10 @@ registry.register_factory(SecondaryConnection, secondary_engine.connect)
 The type and content of the annotated metadata ("secondary") are not important to *svcs*, as long as the whole type is hashable.
 
 ::: {note}
-The {pep}`695` {keyword}`type` keyword is currently not widely supported and therefore not supported by *svcs*.
-This will hopefully change in the future.
+- The {pep}`695` {keyword}`type` keyword is currently not widely supported and therefore not supported by *svcs*.
+  This will hopefully change in the future.
+- As of Pyright 1.1.402, the NewType approach [doesn't pass the type checker anymore](https://github.com/microsoft/pyright/discussions/10596).
+  Unless a better solution is found earlier, it looks like such kind of functionality won't work until {pep}`747` has passed and is widely implemented.
 :::
 
 
