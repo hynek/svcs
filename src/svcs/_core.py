@@ -66,6 +66,8 @@ class RegisteredService:
         enter: Whether context managers returned by the factory are entered.
 
         ping: See :ref:`health`.
+
+        suppress_context_exit: Whether to suppress errors raised in the context in exiting registered factories.
     """
 
     svc_type: type
@@ -73,6 +75,7 @@ class RegisteredService:
     takes_container: bool
     enter: bool
     ping: Callable | None = attrs.field(hash=False)
+    suppress_context_exit: bool
 
     @property
     def name(self) -> str:
@@ -85,7 +88,8 @@ class RegisteredService:
             f"factory={self.factory}, "
             f"takes_container={self.takes_container}, "
             f"enter={self.enter}, "
-            f"has_ping={self.ping is not None}"
+            f"has_ping={self.ping is not None}, "
+            f"suppress_context_exit={self.suppress_context_exit}"
             ")>"
         )
 
@@ -161,7 +165,9 @@ class Registry:
     """
 
     _services: dict[type, RegisteredService] = attrs.Factory(dict)
-    _on_close: list[tuple[str, Callable | Awaitable]] = attrs.Factory(list)
+    _on_close: list[tuple[RegisteredService, Callable | Awaitable]] = (
+        attrs.Factory(list)
+    )
 
     def __repr__(self) -> str:
         return f"<svcs.Registry(num_services={len(self._services)})>"
@@ -231,6 +237,7 @@ class Registry:
         enter: bool = True,
         ping: Callable | None = None,
         on_registry_close: Callable | Awaitable | None = None,
+        suppress_context_exit: bool = True,
     ) -> None:
         """
         Register *factory* to be used when asked for a *svc_type*.
@@ -280,6 +287,9 @@ class Registry:
                 :class:`collections.abc.Awaitable`; then
                 :meth:`svcs.Registry.aclose()` must be called.
 
+            suppress_context_exit:
+                Whether to suppress errors raised in the context in exiting registered factories.
+
         .. versionchanged:: 25.1.0
             *factory* now may take any amount of arguments and they are ignored.
         """
@@ -289,6 +299,7 @@ class Registry:
             enter=enter,
             ping=ping,
             on_registry_close=on_registry_close,
+            suppress_context_exit=suppress_context_exit,
         )
 
         log.debug(
@@ -310,6 +321,7 @@ class Registry:
         enter: bool = False,
         ping: Callable | None = None,
         on_registry_close: Callable | Awaitable | None = None,
+        suppress_context_exit: bool = True,
     ) -> None:
         """
         Syntactic sugar for::
@@ -319,7 +331,8 @@ class Registry:
                lambda: value,
                enter=enter,
                ping=ping,
-               on_registry_close=on_registry_close
+               on_registry_close=on_registry_close,
+               suppress_context_exit=suppress_context_exit
            )
 
         Please note that, unlike with :meth:`register_factory`, entering
@@ -334,6 +347,7 @@ class Registry:
             enter=enter,
             ping=ping,
             on_registry_close=on_registry_close,
+            suppress_context_exit=suppress_context_exit,
         )
 
         log.debug(
@@ -351,6 +365,7 @@ class Registry:
         enter: bool,
         ping: Callable | None,
         on_registry_close: Callable | Awaitable | None = None,
+        suppress_context_exit: bool = True,
     ) -> RegisteredService:
         if isgeneratorfunction(factory):
             factory = contextmanager(factory)
@@ -358,11 +373,16 @@ class Registry:
             factory = asynccontextmanager(factory)
 
         rs = RegisteredService(
-            svc_type, factory, _takes_container(factory), enter, ping
+            svc_type,
+            factory,
+            _takes_container(factory),
+            enter,
+            ping,
+            suppress_context_exit,
         )
         self._services[svc_type] = rs
         if on_registry_close is not None:
-            self._on_close.append((rs.name, on_registry_close))
+            self._on_close.append((rs, on_registry_close))
         return rs
 
     def get_registered_service_for(self, svc_type: type) -> RegisteredService:
@@ -379,10 +399,10 @@ class Registry:
 
         Errors are logged at warning level, but otherwise ignored.
         """
-        for name, oc in reversed(self._on_close):
+        for rs, oc in reversed(self._on_close):
             if iscoroutinefunction(oc) or isawaitable(oc):
                 warnings.warn(
-                    f"Skipped async cleanup for {name!r}. "
+                    f"Skipped async cleanup for {rs.name!r}. "
                     "Use aclose() instead.",
                     # stacklevel doesn't matter here; it's coming from a
                     # framework.
@@ -391,15 +411,15 @@ class Registry:
                 continue
 
             try:
-                log.debug("closing %r", name)
+                log.debug("closing %r", rs.name)
                 oc()
-                log.debug("closed %r", name)
+                log.debug("closed %r", rs.name)
             except Exception:  # noqa: BLE001
                 log.warning(
                     "Registry's on_registry_close callback failed for %r.",
-                    name,
+                    rs.name,
                     exc_info=True,
-                    extra={"svcs_service_name": name},
+                    extra={"svcs_service_name": rs.name},
                 )
 
         self._services.clear()
@@ -414,25 +434,25 @@ class Registry:
         Also works with synchronous services, so in an async application, just
         use this.
         """
-        for name, oc in reversed(self._on_close):
+        for rs, oc in reversed(self._on_close):
             try:
                 if iscoroutinefunction(oc):
                     oc = oc()  # noqa: PLW2901
 
                 if isawaitable(oc):
-                    log.debug("async closing %r", name)
+                    log.debug("async closing %r", rs.name)
                     await oc
-                    log.debug("async closed %r", name)
+                    log.debug("async closed %r", rs.name)
                 else:
-                    log.debug("closing %r", name)
+                    log.debug("closing %r", rs.name)
                     oc()
-                    log.debug("closed %r", name)
+                    log.debug("closed %r", rs.name)
             except Exception:  # noqa: BLE001, PERF203
                 log.warning(
                     "Registry's on_registry_close callback failed for %r.",
-                    name,
+                    rs.name,
                     exc_info=True,
-                    extra={"svcs_service_name": name},
+                    extra={"svcs_service_name": rs.name},
                 )
 
         self._services.clear()
@@ -515,9 +535,14 @@ class Container:
 
     registry: Registry
     _lazy_local_registry: Registry | None = None
-    _instantiated: dict[type, object] = attrs.Factory(dict)
+    _instantiated: dict[type, tuple[object, RegisteredService]] = (
+        attrs.Factory(dict)
+    )
     _on_close: list[
-        tuple[str, AbstractContextManager | AbstractAsyncContextManager]
+        tuple[
+            RegisteredService,
+            AbstractContextManager | AbstractAsyncContextManager,
+        ]
     ] = attrs.Factory(list)
 
     def __repr__(self) -> str:
@@ -541,7 +566,7 @@ class Container:
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
-        self.close()
+        self.close(exc_type, exc_val, exc_tb)
 
     async def __aenter__(self) -> Container:
         return self
@@ -552,7 +577,7 @@ class Container:
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
-        await self.aclose()
+        await self.aclose(exc_type, exc_val, exc_tb)
 
     def __del__(self) -> None:
         """
@@ -565,7 +590,12 @@ class Container:
                 stacklevel=1,
             )
 
-    def close(self) -> None:
+    def close(
+        self,
+        exc_type: type[BaseException] | None = None,
+        exc_val: BaseException | None = None,
+        exc_tb: TracebackType | None = None,
+    ) -> None:
         """
         Run all registered *synchronous* cleanups.
 
@@ -577,25 +607,27 @@ class Container:
             The Container can be used again after this. Closing it is an
             idempotent way to reset it.
         """
-        for name, cm in reversed(self._on_close):
+        for rs, cm in reversed(self._on_close):
             try:
                 if isinstance(cm, AbstractAsyncContextManager):
                     warnings.warn(
-                        f"Skipped async cleanup for {name!r}. "
+                        f"Skipped async cleanup for {rs.name!r}. "
                         "Use aclose() instead.",
                         # stacklevel doesn't matter here; it's coming from a
                         # framework.
                         stacklevel=1,
                     )
                     continue
-
-                cm.__exit__(None, None, None)
+                if rs.suppress_context_exit:
+                    cm.__exit__(None, None, None)
+                else:
+                    cm.__exit__(exc_type, exc_val, exc_tb)
             except Exception:  # noqa: BLE001
                 log.warning(
                     "Container clean up failed for %r.",
-                    name,
+                    rs.name,
                     exc_info=True,
-                    extra={"svcs_service_name": name},
+                    extra={"svcs_service_name": rs.name},
                 )
 
         if self._lazy_local_registry is not None:
@@ -603,7 +635,12 @@ class Container:
         self._on_close.clear()
         self._instantiated.clear()
 
-    async def aclose(self) -> None:
+    async def aclose(
+        self,
+        exc_type: type[BaseException] | None = None,
+        exc_val: BaseException | None = None,
+        exc_tb: TracebackType | None = None,
+    ) -> None:
         """
         Run *all* registered cleanups -- synchronous **and** asynchronous.
 
@@ -616,19 +653,24 @@ class Container:
             The container can be used again after this. Closing it is an
             idempotent way to reset it.
         """
-        for name, cm in reversed(self._on_close):
+        for rs, cm in reversed(self._on_close):
             try:
                 if isinstance(cm, AbstractContextManager):
-                    cm.__exit__(None, None, None)
-                else:
+                    if rs.suppress_context_exit:
+                        cm.__exit__(None, None, None)
+                    else:
+                        cm.__exit__(exc_type, exc_val, exc_tb)
+                elif rs.suppress_context_exit:
                     await cm.__aexit__(None, None, None)
+                else:
+                    await cm.__aexit__(exc_type, exc_val, exc_tb)
 
             except Exception:  # noqa: BLE001, PERF203
                 log.warning(
                     "Container clean up failed for %r.",
-                    name,
+                    rs.name,
                     exc_info=True,
-                    extra={"svcs_service_name": name},
+                    extra={"svcs_service_name": rs.name},
                 )
 
         if self._lazy_local_registry is not None:
@@ -677,19 +719,20 @@ class Container:
         """
         return await self.aget(*svc_types)
 
-    def _lookup(self, svc_type: type) -> tuple[bool, object, str, bool]:
+    def _lookup(
+        self, svc_type: type
+    ) -> tuple[bool, object, RegisteredService]:
         """
         Look up svc_type first in our cache, then in the registry.
 
         If it's cached, only the first two items of the returned tupled are
         meaningful.
         """
-        if (
-            svc := self._instantiated.get(svc_type, attrs.NOTHING)
-        ) is not attrs.NOTHING:
-            return True, svc, "", False
+        rs: RegisteredService | None = None
+        if cached_data := self._instantiated.get(svc_type):
+            svc, rs = cached_data
+            return True, svc, rs
 
-        rs = None
         if self._lazy_local_registry is not None:
             with suppress(ServiceNotFoundError):
                 rs = self._lazy_local_registry.get_registered_service_for(
@@ -700,8 +743,7 @@ class Container:
             rs = self.registry.get_registered_service_for(svc_type)
 
         svc = rs.factory(self) if rs.takes_container else rs.factory()
-
-        return False, svc, rs.name, rs.enter
+        return False, svc, rs
 
     def register_local_factory(
         self,
@@ -888,7 +930,7 @@ class Container:
         """
         rv = []
         for svc_type in svc_types:
-            cached, svc, name, enter = self._lookup(svc_type)
+            cached, svc, rs = self._lookup(svc_type)
             if cached:
                 rv.append(svc)
                 continue
@@ -899,11 +941,11 @@ class Container:
                 msg = "Use `aget()` for async factories."
                 raise TypeError(msg)
 
-            if enter and isinstance(svc, AbstractContextManager):
-                self._on_close.append((name, svc))
+            if rs.enter and isinstance(svc, AbstractContextManager):
+                self._on_close.append((rs, svc))
                 svc = svc.__enter__()
 
-            self._instantiated[svc_type] = svc
+            self._instantiated[svc_type] = (svc, rs)
 
             rv.append(svc)
 
@@ -1028,16 +1070,16 @@ class Container:
         """
         rv = []
         for svc_type in svc_types:
-            cached, svc, name, enter = self._lookup(svc_type)
+            cached, svc, rs = self._lookup(svc_type)
             if cached:
                 rv.append(svc)
                 continue
 
-            if enter and isinstance(svc, AbstractAsyncContextManager):
-                self._on_close.append((name, svc))
+            if rs.enter and isinstance(svc, AbstractAsyncContextManager):
+                self._on_close.append((rs, svc))
                 svc = await svc.__aenter__()
-            elif enter and isinstance(svc, AbstractContextManager):
-                self._on_close.append((name, svc))
+            elif rs.enter and isinstance(svc, AbstractContextManager):
+                self._on_close.append((rs, svc))
                 svc = svc.__enter__()
             # _lookup() doesn't handle async factories, so we have to live with
             # some repetition.
@@ -1047,14 +1089,14 @@ class Container:
                 svc = await svc
 
                 # Factory returned a contextmanager.
-                if enter and isinstance(svc, AbstractAsyncContextManager):
-                    self._on_close.append((name, svc))
+                if rs.enter and isinstance(svc, AbstractAsyncContextManager):
+                    self._on_close.append((rs, svc))
                     svc = await svc.__aenter__()
-                elif enter and isinstance(svc, AbstractContextManager):
-                    self._on_close.append((name, svc))
+                elif rs.enter and isinstance(svc, AbstractContextManager):
+                    self._on_close.append((rs, svc))
                     svc = svc.__enter__()
 
-            self._instantiated[svc_type] = svc
+            self._instantiated[svc_type] = (svc, rs)
 
             rv.append(svc)
 

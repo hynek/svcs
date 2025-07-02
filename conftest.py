@@ -56,7 +56,7 @@ def _svc():
 
 @pytest.fixture(name="rs")
 def _rs(svc):
-    return svcs.RegisteredService(Service, Service, False, True, None)
+    return svcs.RegisteredService(Service, Service, False, True, None, True)
 
 
 @pytest.fixture(name="registry")
