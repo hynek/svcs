@@ -67,7 +67,7 @@ def init_app(
     """
     app[_AIOHTTP_KEY_REGISTRY] = registry or svcs.Registry()
     app.middlewares.insert(middleware_pos, svcs_middleware)
-    app.on_cleanup.append(aclose_registry)
+    app.on_cleanup.append(aclose_registry)  # type: ignore[arg-type]
 
     return app
 
