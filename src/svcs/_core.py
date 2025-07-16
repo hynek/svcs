@@ -93,6 +93,36 @@ class RegisteredService:
             ")>"
         )
 
+    def close(
+        self,
+        cm: AbstractContextManager,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        """
+        Close the context manager *cm* with the given exception information.
+        """
+        if self.suppress_context_exit:
+            cm.__exit__(None, None, None)
+        else:
+            cm.__exit__(exc_type, exc_val, exc_tb)
+
+    async def aclose(
+        self,
+        cm: AbstractAsyncContextManager,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        """
+        Close the async context manager *cm* with the given exception information.
+        """
+        if self.suppress_context_exit:
+            await cm.__aexit__(None, None, None)
+        else:
+            await cm.__aexit__(exc_type, exc_val, exc_tb)
+
 
 @attrs.frozen
 class ServicePing:
@@ -618,10 +648,7 @@ class Container:
                         stacklevel=1,
                     )
                     continue
-                if rs.suppress_context_exit:
-                    cm.__exit__(None, None, None)
-                else:
-                    cm.__exit__(exc_type, exc_val, exc_tb)
+                rs.close(cm, exc_type, exc_val, exc_tb)
             except Exception:  # noqa: BLE001
                 log.warning(
                     "Container clean up failed for %r.",
@@ -656,14 +683,9 @@ class Container:
         for rs, cm in reversed(self._on_close):
             try:
                 if isinstance(cm, AbstractContextManager):
-                    if rs.suppress_context_exit:
-                        cm.__exit__(None, None, None)
-                    else:
-                        cm.__exit__(exc_type, exc_val, exc_tb)
-                elif rs.suppress_context_exit:
-                    await cm.__aexit__(None, None, None)
+                    rs.close(cm, exc_type, exc_val, exc_tb)
                 else:
-                    await cm.__aexit__(exc_type, exc_val, exc_tb)
+                    await rs.aclose(cm, exc_type, exc_val, exc_tb)
 
             except Exception:  # noqa: BLE001, PERF203
                 log.warning(
