@@ -158,7 +158,7 @@ class TestFlask:
 
         await container.aget(Service)
 
-        with pytest.warns(UserWarning) as wi:
+        with pytest.warns(UserWarning) as wi:  # noqa: PT030
             teardown(None)
 
         w = wi.pop()
