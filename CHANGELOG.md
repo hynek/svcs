@@ -15,6 +15,11 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/25.1.0...HEAD)
 
+### Added
+
+- New `suppress_context_exit` method on `RegisteredService` to control if errors in context of the container should be suppressed.
+  [#129](https://github.com/hynek/svcs/pull/129)
+
 
 ## [25.1.0](https://github.com/hynek/svcs/compare/24.1.0...25.1.0) - 2025-01-25
 

@@ -319,6 +319,9 @@ class Registry:
 
             suppress_context_exit:
                 Whether to suppress errors raised in the context in exiting registered factories.
+                By default, it is True to avoid propagating factory errors to main code.
+                In such case errors are only logged at warning level.
+                Set it to False to have control over error propagation.
 
         .. versionchanged:: 25.1.0
             *factory* now may take any amount of arguments and they are ignored.
