@@ -182,87 +182,70 @@ class TestContainer:
 
     def test_suppress_context_exit_suppress(self, container, close_me):
         """
-        The default behaviour, even if exception is raised, the factory is cleaned up.
+        By default, if an error in the synchronous container context is raised,
+        it's suppressed and the factory's clean up is ran as if nothing
+        happened.
         """
 
         def factory():
             yield 42
             close_me.close()
 
-        container.registry.register_factory(
-            int, factory, suppress_context_exit=True
-        )
+        container.registry.register_factory(int, factory)
 
-        with pytest.raises(ValueError), container:  # noqa: PT012
+        with pytest.raises(ValueError), container:
             assert 42 == container.get(int)
             raise ValueError
 
         assert close_me.is_closed
-
-    def test_suppress_context_exit_no_suppress(self, container, close_me):
-        """
-        Disabled suppress_context_exit, so the factory is not cleaned up. Exception stack is passed through.
-        """
-
-        def factory():
-            yield 42
-            close_me.close()  # pragma: no cover
-
-        container.registry.register_factory(
-            int, factory, suppress_context_exit=False
-        )
-
-        with pytest.raises(ValueError), container:  # noqa: PT012
-            assert 42 == container.get(int)
-            raise ValueError
-
-        assert not close_me.is_closed
 
     def test_suppress_context_exit_no_suppress_handled(
         self, container, close_me, caplog
     ):
         """
-        Disabled suppress_context_exit, so the factory is not cleaned up. Exception stack is passed through and handled in the factory.
+        If suppress_context_exit is False, the error is propagated into the
+        factory. The factory can still handle the error and clean up. The error
+        bubbles out of the container context.
         """
-
-        capture_log = Mock()
+        captured = False
 
         def factory():
+            nonlocal captured
+
             try:
                 yield 42
             except ValueError:
-                capture_log("Exception handled in factory")
-            finally:
-                close_me.close()
+                captured = True
+
+            close_me.close()
 
         container.registry.register_factory(
             int, factory, suppress_context_exit=False
         )
 
-        with pytest.raises(ValueError), container:  # noqa: PT012
+        with pytest.raises(ValueError), container:
             assert 42 == container.get(int)
             raise ValueError
 
         assert close_me.is_closed
-        capture_log.assert_called_once_with("Exception handled in factory")
+        assert captured
 
     @pytest.mark.asyncio
     async def test_async_suppress_context_exit_async_factory_suppress(
-        self, container, close_me, caplog
+        self, container, close_me
     ):
         """
-        The default behaviour, even if exception is raised, the factory is cleaned up. Async factory.
+        By default, if an error in the async container context is raised, it's
+        suppressed and the factory's clean up is ran as if nothing happened
         """
 
         async def factory():
             yield 42
             await close_me.aclose()
 
-        container.registry.register_factory(
-            int, factory, suppress_context_exit=True
-        )
+        container.registry.register_factory(int, factory)
 
-        with pytest.raises(ValueError):  # noqa: PT012
+        with pytest.raises(ValueError):
             async with container:
                 assert 42 == await container.aget(int)
                 raise ValueError
@@ -274,46 +257,56 @@ class TestContainer:
         self, container, close_me, caplog
     ):
         """
-        Disabled suppress_context_exit, so the factory is not cleaned up. Exception stack is passed through. Async factory.
+        If suppress_context_exit is False, the error is propagated into the
+        factory. The factory can still handle the error and clean up. The error
+        bubbles out of the container context.
         """
+        captured = False
 
         async def factory():
-            yield 42
-            await close_me.aclose()  # pragma: no cover
+            nonlocal captured
+
+            try:
+                yield 42
+            except ValueError:
+                captured = True
+
+            await close_me.aclose()
 
         container.registry.register_factory(
             int, factory, suppress_context_exit=False
         )
 
-        with pytest.raises(ValueError):  # noqa: PT012
+        with pytest.raises(ValueError):
             async with container:
                 assert 42 == await container.aget(int)
                 raise ValueError
 
-        assert not close_me.is_aclosed
+        assert close_me.is_aclosed
+        assert captured
 
     @pytest.mark.asyncio
     async def test_async_suppress_context_exit_sync_factory_no_suppress(
         self, container, close_me, caplog
     ):
         """
-        Disabled suppress_context_exit, so the factory is not cleaned up. Exception stack is passed through. Sync factory.
+        If suppress_context_exit is False, the error is propagated into the
+        factory. The factory can still handle the error and clean up. The error
+        bubbles out of the container context.
         """
 
         def factory():
             yield 42
-            close_me.close()  # pragma: no cover
+            pytest.fail("Exception wasn't propagated.")
 
         container.registry.register_factory(
             int, factory, suppress_context_exit=False
         )
 
-        with pytest.raises(ValueError):  # noqa: PT012
+        with pytest.raises(ValueError):
             async with container:
                 assert 42 == await container.aget(int)
                 raise ValueError
-
-        assert not close_me.is_closed
 
 
 class TestServicePing:

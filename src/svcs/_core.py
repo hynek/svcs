@@ -67,7 +67,9 @@ class RegisteredService:
 
         ping: See :ref:`health`.
 
-        suppress_context_exit: Whether to suppress errors raised in the context in exiting registered factories.
+        suppress_context_exit:
+            Whether to suppress errors raised in the container context when
+            exiting registered factories.
     """
 
     svc_type: type
@@ -318,13 +320,23 @@ class Registry:
                 :meth:`svcs.Registry.aclose()` must be called.
 
             suppress_context_exit:
-                Whether to suppress errors raised in the context in exiting registered factories.
-                By default, it is True to avoid propagating factory errors to main code.
-                In such case errors are only logged at warning level.
-                Set it to False to have control over error propagation.
+                Whether to suppress errors raised in the container context when
+                exiting registered factories.
+
+                By default, it is True to avoid propagating factory errors to
+                main code. In such case errors are only logged at warning
+                level.
+
+                Set it to False to have control over error propagation, but
+                note that you can't stop the exception from bubbling out of the
+                container context by handling it in the factory cleanup context
+                manager.
 
         .. versionchanged:: 25.1.0
             *factory* now may take any amount of arguments and they are ignored.
+
+        .. versionadded:: 25.2.0
+           *suppress_context*.
         """
         rs = self._register_factory(
             svc_type,

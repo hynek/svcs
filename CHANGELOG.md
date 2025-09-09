@@ -17,7 +17,10 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ### Added
 
-- New `suppress_context_exit` method on `RegisteredService` to control if errors in context of the container should be suppressed.
+- New *suppress_context_exit* argument to `svcs.register_(factory|value)()`.
+  If set to `False`, errors in the container context will be passed into the factory cleanup context manager and allow you to act on them there.
+
+  You can't stop the exception from bubbling out of the container context, though.
   [#129](https://github.com/hynek/svcs/pull/129)
 
 
