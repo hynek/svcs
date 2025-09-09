@@ -25,7 +25,6 @@ from inspect import (
 )
 from types import TracebackType
 from typing import Any, TypeVar, overload
-from typing import Any, Awaitable, Iterator, TypeVar, overload
 
 import attrs
 
@@ -223,10 +222,6 @@ class Registry:
                 ResourceWarning,
                 stacklevel=1,
             )
-
-    def __iter__(self) -> Iterator[type]:
-        """Iterate over the registered services types."""
-        return iter(self._services)
 
     def register_factory(
         self,
@@ -649,29 +644,23 @@ class Container:
         Returns:
             A list of services that have registered a ping callable.
         """
-        pings = []
-        registered_local_svc_types = set()
-        if self._lazy_local_registry is not None:
-            svcs = (
-                self._lazy_local_registry.get_registered_service_for(tp)
-                for tp in self._lazy_local_registry
-            )
-            for rs in svcs:
-                if rs.ping is not None:
-                    pings.append(
-                        ServicePing(
-                            rs.name,
-                            iscoroutinefunction(rs.ping),
-                            rs.svc_type,
-                            rs.ping,
-                            self,
-                        )
-                    )
-                    registered_local_svc_types.add(rs.svc_type)
-        svcs = (
-            self.registry.get_registered_service_for(tp)
-            for tp in self.registry
-        )
+        if self._lazy_local_registry is None:
+            local_rs_types = set()
+            pings = []
+        else:
+            local_rs_types = {rs.svc_type for rs in self._lazy_local_registry}
+            pings = [
+                ServicePing(
+                    rs.name,
+                    iscoroutinefunction(rs.ping),
+                    rs.svc_type,
+                    rs.ping,
+                    self,
+                )
+                for rs in self._lazy_local_registry
+                if rs.ping is not None
+            ]
+
         pings.extend(
             ServicePing(
                 rs.name,
@@ -680,9 +669,8 @@ class Container:
                 rs.ping,
                 self,
             )
-            for rs in svcs
-            if rs.ping is not None
-            and rs.svc_type not in registered_local_svc_types
+            for rs in self.registry
+            if rs.ping is not None and rs.svc_type not in local_rs_types
         )
         return pings
 
