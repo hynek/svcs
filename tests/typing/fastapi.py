@@ -4,21 +4,14 @@
 
 from __future__ import annotations
 
-import sys
-
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import Annotated
 
 from fastapi import Depends, FastAPI
 from fastapi.responses import JSONResponse
 
 import svcs
-
-
-if sys.version_info < (3, 9):
-    from typing_extensions import Annotated
-else:
-    from typing import Annotated
 
 
 @svcs.fastapi.lifespan
@@ -59,7 +52,7 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 async def view(
-    services: Annotated[svcs.Container, Depends(svcs.fastapi.container)]
+    services: Annotated[svcs.Container, Depends(svcs.fastapi.container)],
 ) -> JSONResponse:
     x: int = services.get(int)
 

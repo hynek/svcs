@@ -2,7 +2,17 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
+
 from importlib import metadata
+
+
+# Set canonical URL from the Read the Docs Domain
+html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
+
+# Tell Jinja2 templates the build is running on Read the Docs
+if os.environ.get("READTHEDOCS", "") == "True":
+    html_context = {"READTHEDOCS": True}
 
 
 # We want an image in the README and include the README in the docs.
@@ -46,7 +56,7 @@ master_doc = "index"
 # General information about the project.
 project = "svcs"
 author = "Hynek Schlawack"
-copyright = f"2023, { author }"
+copyright = f"2023, {author}"
 
 
 # The full version, including alpha/beta/rc tags.
@@ -61,6 +71,8 @@ exclude_patterns = ["_build"]
 
 nitpick_ignore = [
     *[("py:class", f"svcs._core.T{i}") for i in range(1, 11)],
+    # This only fails in CI!?
+    *[("py:class", f"T{i}") for i in range(1, 11)],
     # Welcome, MkDocs projects. :(
     ("py:class", "FastAPI"),
     ("py:class", "Starlette"),
@@ -84,7 +96,7 @@ autodoc_typehints_description_target = "documented"
 html_theme = "furo"
 # None of the options work, so we disable the button completely.
 html_theme_options = {
-    "top_of_page_button": None,
+    "top_of_page_buttons": [],
     "sidebar_hide_name": True,
     "light_css_variables": {
         "font-stack": "Inter,sans-serif",
@@ -103,10 +115,10 @@ _title = "svcs"
 rst_epilog = f"""\
 .. meta::
     :property=og:type: website
-    :property=og:site_name: { _title }
-    :property=og:description: { _descr }
+    :property=og:site_name: {_title}
+    :property=og:description: {_descr}
     :property=og:author: Hynek Schlawack
-    :twitter:title: { _title }
+    :twitter:title: {_title}
     :twitter:creator: @hynek
 """
 

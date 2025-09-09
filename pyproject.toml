@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 [build-system]
-requires = ["hatchling", "hatch-vcs", "hatch-fancy-pypi-readme"]
+requires = ["hatchling>=1.27.0", "hatch-vcs", "hatch-fancy-pypi-readme"]
 build-backend = "hatchling.build"
 
 
@@ -11,31 +11,35 @@ build-backend = "hatchling.build"
 dynamic = ["version", "readme"]
 name = "svcs"
 description = "A Flexible Service Locator"
-requires-python = ">=3.8"
 license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "Hynek Schlawack", email = "hs@ox.cx" }]
+requires-python = ">=3.9"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
-  "License :: OSI Approved :: MIT License",
-  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Typing :: Typed",
+]
+keywords = [
+  "service locator",
+  "dependency injection",
+  "inversion of control",
+  "flask",
+  "starlette",
+  "pyramid",
+  "fastapi",
+  "aiohttp",
 ]
 dependencies = [
   "attrs>=21.3.0", # attrs namespace
 ]
 
-[project.optional-dependencies]
-tests = [
-  "pytest",
-  "pytest-asyncio",
-  "sybil>=6",
-  "typing-extensions; python_version<'3.9'",
-]
-typing = ["mypy>=1.4", "fastapi", "flask", "starlette", "aiohttp", "pyramid"]
+[dependency-groups]
 docs = [
   "sphinx>=7.2.2",
   "sphinx-design",
@@ -46,6 +50,7 @@ docs = [
   "furo>=2023.8.17",
   "sybil",
   "pytest",
+  "pytest-asyncio",
   "httpx",
   "aiohttp",
   "fastapi",
@@ -54,7 +59,22 @@ docs = [
   "starlette",
   "sqlalchemy",
 ]
-dev = ["svcs[tests,typing]", "tox>4", "httpx"]
+tests = ["pytest", "pytest-asyncio", "sybil>=6"]
+typing = [
+  "mypy>=1.4",
+  "fastapi; python_version < '3.14'",
+  "flask",
+  "starlette",
+  "aiohttp",
+  "pyramid",
+]
+dev = [
+  { include-group = "tests" },
+  { include-group = "typing" },
+  # Dependency groups; let it decide on minimum tox version.
+  "tox-uv>=1.16.0",
+  "httpx",
+]
 
 [project.urls]
 Changelog = "https://github.com/hynek/svcs/blob/main/CHANGELOG.md"
@@ -121,14 +141,16 @@ replacement = 'https://raw.githubusercontent.com/hynek/svcs/main/\1"'
 
 
 [tool.pytest.ini_options]
-addopts = ["-ra", "--strict-markers", "--strict-config"]
+addopts = ["--strict-markers", "--strict-config"]
 xfail_strict = true
 filterwarnings = [
   "once::Warning",
-  "ignore:'cgi' is deprecated:DeprecationWarning:webob.compat:",
-  "ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning:pkg_resources:",
-  "ignore:pkg_resources is deprecated:DeprecationWarning:pyramid.asset:",
+  # pkg_resources.declare_namespace('zope')
+  "ignore::DeprecationWarning:pkg_resources",
+  # Nothing we can do about this except hoping Pyramid releases a fix.
+  "ignore:pkg_resources is deprecated:UserWarning:pyramid.asset",
 ]
+asyncio_default_fixture_loop_scope = "function"
 
 
 [tool.coverage.run]
@@ -142,9 +164,7 @@ source = ["src", ".tox/py*/**/site-packages"]
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
-exclude_lines = [
-  "no cov",
-  "if __name__ == .__main__.:",
+exclude_also = [
   # Typing-related
   "if TYPE_CHECKING:",
   ": +\\.\\.\\.$",
@@ -160,11 +180,12 @@ whitelist-regex = ["test_.*"]
 
 [tool.mypy]
 strict = true
+pretty = true
 
 show_error_codes = true
 enable_error_code = ["ignore-without-code"]
 
-allow_any_generics = true
+disallow_any_generics = false
 
 [[tool.mypy.overrides]]
 module = "pyramid.*"
@@ -179,13 +200,17 @@ module = "tests.*"
 ignore_errors = true
 
 [[tool.mypy.overrides]]
+module = "conftest"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
 module = "tests.typing.*"
 ignore_errors = false
 
 [[tool.mypy.overrides]]
 module = "health_check_pyramid"
 
-allow_untyped_decorators = true
+disallow_untyped_decorators = false
 
 
 [tool.pyright]
@@ -193,17 +218,16 @@ ignore = [
   "conftest.py",
   "docs",
   "src/svcs/pyramid.py",
-  "tests",
+  # Excluding tests and allowing tests/typing (like in Mypy) doesn't work.
+  "tests/*.py",
+  "tests/integrations",
   "tests/typing/pyramid.py",
 ]
 
 
-[tool.black]
-line-length = 79
-
-
 [tool.ruff]
 src = ["src", "tests", "conftest.py", "docs"]
+line-length = 79
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -211,35 +235,31 @@ ignore = [
   "A001",    # shadowing is fine
   "ANN",     # Mypy is better at this
   "ARG",     # unused arguments are normal when implementing interfaces
-  "COM",     # Black takes care of our commas
+  "COM",     # Formatter takes care of our commas
   "D",       # We prefer our own docstring style.
-  "E501",    # leave line-length enforcement to Black
+  "E501",    # leave line-length enforcement to formatter
   "FBT",     # we have one function that takes one bool; c'mon!
   "FIX",     # Yes, we want XXX as a marker.
   "INP001",  # sometimes we want Python files outside of packages
+  "ISC001",  # conflicts with formatter
   "PLR0913", # yes, many arguments, but most have defaults
-  "PLR2004", # numbers are sometimes fine
   "PYI034",  # We're not adding typing_extensions just for Self.
   "SLF001",  # private members are accessed by friendly functions
-  "TCH",     # TYPE_CHECKING blocks break autodocs
+  "TC",      # TYPE_CHECKING blocks break autodocs
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "**/test_*" = [
-  "S101",   # assert
-  "SIM300", # Yoda rocks in asserts
-  "PT005",  # we always add underscores and explicit names
-  "PT011",  # broad is fine
-  "TRY002", # stock exceptions are fine in tests
-  "EM101",  # no need for exception msg hygiene in tests
+  "EM101",   # no need for exception msg hygiene in tests
+  "PLR2004", # numbers are fine in tests
+  "PT011",   # broad is fine
+  "S101",    # assert
+  "SIM300",  # Yoda rocks in asserts
+  "TRY002",  # stock exceptions are fine in tests
 ]
 
 "tests/typing/*" = [
   "F841", # unused variables are fine in type checks
-]
-
-"conftest.py" = [
-  "PT005", # we always add underscores and explicit names
 ]
 
 "docs/examples/*" = ["PERF203", "BLE001"]

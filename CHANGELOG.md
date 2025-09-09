@@ -13,7 +13,23 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 <!-- changelog follows -->
 
 
-## [Unreleased](https://github.com/hynek/svcs/compare/24.1.0...HEAD)
+## [Unreleased](https://github.com/hynek/svcs/compare/25.1.0...HEAD)
+
+
+## [25.1.0](https://github.com/hynek/svcs/compare/24.1.0...25.1.0) - 2025-01-25
+
+### Added
+
+- Python 3.13 support.
+
+- `svcs.Registry` now implements a `__iter__` method that allows to iterate over its registered services.
+  [#106](https://github.com/hynek/svcs/pull/106)
+
+
+### Removed
+
+- Python 3.8 support.
+
 
 ### Added
 
@@ -29,6 +45,20 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   [#71](https://github.com/hynek/svcs/discussions/71)
   [#72](https://github.com/hynek/svcs/issues/72)
   [#73](https://github.com/hynek/svcs/pull/73)
+
+- `Registry.register_factory()` is now more lenient regarding the arguments of the factory.
+  It only looks at the first argument (if present) and ignores the rest.
+  [#110](https://github.com/hynek/svcs/pull/110)
+
+
+### Fixed
+
+- `Container.aget()` now also enters and exits synchronous context managers.
+  [#93](https://github.com/hynek/svcs/pull/93)
+
+- `Container.aget()` now also enters and exits context managers that are returned by async factories.
+  [#105](https://github.com/hynek/svcs/pull/105)
+
 
 ## [24.1.0](https://github.com/hynek/svcs/compare/23.21.0...24.1.0) - 2024-01-25
 
@@ -60,7 +90,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   You can now achieve that with `svcs.Container.register_local_factory()` and `svcs.Container.register_local_value()`.
   Once something local is registered, a registry is transparently created and it takes precedence over the global one when a service is requested.
   The local registry is closed together with the container.
-  [#56](https://github.com/hynek/issues/pull/56)
+  [#56](https://github.com/hynek/svcs/pull/56)
 
 - Flask: `svcs.flask.registry` which is a `werkzeug.local.LocalProxy` for the currently active registry on `flask.current_app`.
 
@@ -68,11 +98,11 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 ### Fixed
 
 - We've stopped rewriting the public names of our objects and `typing.get_type_hints()` now works on them as expected for Python 3.10 and later.
-  [#52](https://github.com/hynek/issues/pull/52)
-  [#53](https://github.com/hynek/issues/pull/53)
+  [#52](https://github.com/hynek/svcs/issues/52)
+  [#53](https://github.com/hynek/svcs/pull/53)
 
 - The detection of container arguments in `svcs.Registry()` when using string-based type annotations is more robust now.
-  [#55](https://github.com/hynek/issues/pull/55)
+  [#55](https://github.com/hynek/svcs/pull/55)
 
 
 ## [23.20.0](https://github.com/hynek/svcs/compare/23.19.0...23.20.0) - 2023-09-05

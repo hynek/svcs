@@ -8,7 +8,7 @@ Ensure our fake factories do what we want them to do.
 
 import sys
 
-from typing import AsyncGenerator, Generator
+from collections.abc import AsyncGenerator, Generator
 
 import pytest
 
@@ -51,7 +51,7 @@ def test_str_cleanup_factory():
         next(gen)
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_async_int_factory():
     """
     async_int_factory takes no arguments and returns an int.
@@ -59,7 +59,7 @@ async def test_async_int_factory():
     assert isinstance(await async_int_factory(), int)
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_async_str_cleanup_factory():
     """
     async_str_cleanup_factory takes no arguments and returns an async generator

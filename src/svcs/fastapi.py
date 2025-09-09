@@ -6,9 +6,9 @@ from __future__ import annotations
 
 import contextlib
 import inspect
-import sys
 
-from typing import AsyncGenerator, Callable
+from collections.abc import AsyncGenerator
+from typing import Annotated, Callable
 
 import attrs
 
@@ -17,12 +17,6 @@ from fastapi import Depends, FastAPI, Request
 import svcs
 
 from svcs._core import _KEY_REGISTRY
-
-
-if sys.version_info < (3, 9):
-    from typing_extensions import Annotated
-else:
-    from typing import Annotated
 
 
 @attrs.define

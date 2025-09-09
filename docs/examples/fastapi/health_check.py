@@ -15,7 +15,7 @@ async def healthy(services: svcs.fastapi.DepContainer) -> JSONResponse:
     Ping all external services.
     """
     ok: list[str] = []
-    failing: list[dict[str, str]] = []
+    failing: dict[str, str] = {}
     code = 200
 
     for svc in services.get_pings():
@@ -23,7 +23,7 @@ async def healthy(services: svcs.fastapi.DepContainer) -> JSONResponse:
             await svc.aping()
             ok.append(svc.name)
         except Exception as e:
-            failing.append({svc.name: repr(e)})
+            failing[svc.name] = repr(e)
             code = 500
 
     return JSONResponse(

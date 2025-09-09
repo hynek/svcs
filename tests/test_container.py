@@ -4,6 +4,7 @@
 
 import gc
 
+from contextlib import asynccontextmanager, contextmanager
 from unittest.mock import Mock
 
 import pytest
@@ -26,7 +27,7 @@ class TestContainer:
         """
         assert [] == container.get_pings()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_repr(self, registry, container):
         """
         The repr counts correctly.
@@ -74,7 +75,7 @@ class TestContainer:
 
         assert close_me.is_closed
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_async_context_manager(self, container, close_me):
         """
         The container is also an async context manager that acloses on exit.
@@ -90,6 +91,56 @@ class TestContainer:
             assert 42 == await container.aget(int)
 
         assert close_me.is_aclosed
+
+    @pytest.mark.asyncio
+    async def test_async_context_manager_sync_factory(self, container):
+        """
+        If an async factory returns an context manager, it's entered.
+        """
+        entered = left = False
+
+        @contextmanager
+        def cm():
+            nonlocal entered, left
+            entered = True
+            yield 42
+            left = True
+
+        async def factory(svcs_container):
+            return cm()
+
+        container.registry.register_factory(int, factory)
+
+        async with container:
+            assert 42 == await container.aget(int)
+
+        assert entered
+        assert left
+
+    @pytest.mark.asyncio
+    async def test_async_context_manager_async_factory(self, container):
+        """
+        If an async factory returns an async context manager, it's entered.
+        """
+        entered = left = False
+
+        @asynccontextmanager
+        async def cm():
+            nonlocal entered, left
+            entered = True
+            yield 42
+            left = True
+
+        async def factory(svcs_container):
+            return cm()
+
+        container.registry.register_factory(int, factory)
+
+        async with container:
+            assert 42 == await container.aget(int)
+
+        assert entered
+        assert left
 
     def test_gc_warning(self, recwarn, registry):
         """
@@ -108,6 +159,26 @@ class TestContainer:
         assert (
             "Container was garbage-collected with pending cleanups.",
         ) == recwarn.list[0].message.args
+
+    @pytest.mark.asyncio
+    async def test_aget_enters_sync_contextmanagers(self, container):
+        """
+        aget enters (and exits) synchronous context managers.
+        """
+        is_closed = False
+
+        def factory():
+            yield 42
+
+            nonlocal is_closed
+            is_closed = True
+
+        container.registry.register_factory(int, factory)
+
+        async with container:
+            assert 42 == await container.aget(int)
+
+        assert is_closed
 
 
 class TestServicePing:

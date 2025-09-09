@@ -4,20 +4,14 @@
 
 from unittest.mock import Mock
 
+import flask
 import pytest
 
 import svcs
 
+from svcs.flask import teardown
 from tests.helpers import nop
 from tests.ifaces import AnotherService, Interface, Service
-
-
-try:
-    import flask
-
-    from svcs.flask import teardown
-except ImportError:
-    pytest.skip("Flask not installed", allow_module_level=True)
 
 
 @pytest.fixture(name="app")
@@ -151,7 +145,7 @@ class TestFlask:
             ping._svc_type for ping in svcs.flask.get_pings()
         ]
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_teardown_warns_on_async_on_close(self, container):
         """
         teardown() warns if there are async cleanups.
@@ -164,7 +158,7 @@ class TestFlask:
 
         await container.aget(Service)
 
-        with pytest.warns(UserWarning) as wi:
+        with pytest.warns(UserWarning) as wi:  # noqa: PT030
             teardown(None)
 
         w = wi.pop()

@@ -4,22 +4,17 @@
 
 from unittest.mock import Mock
 
+import httpx
 import pytest
+
+from pyramid.config import Configurator
+from pyramid.view import view_config
 
 import svcs
 
 from tests.fake_factories import int_factory
 from tests.helpers import nop
 from tests.ifaces import AnotherService, Service
-
-
-try:
-    import httpx
-
-    from pyramid.config import Configurator
-    from pyramid.view import view_config
-except ImportError:
-    pytest.skip("Pyramid not installed", allow_module_level=True)
 
 
 @pytest.fixture(name="config")
@@ -30,7 +25,7 @@ def _config():
     config.add_route("tl_view", "/tl")
     config.add_route("health_view", "/health")
 
-    config.scan()
+    config.scan(".test_pyramid")
 
     return config
 
@@ -42,7 +37,9 @@ def _app(config):
 
 @pytest.fixture(name="client")
 def _client(app):
-    return httpx.Client(app=app, base_url="http://example.com/")
+    return httpx.Client(
+        transport=httpx.WSGITransport(app=app), base_url="http://example.com/"
+    )
 
 
 @pytest.fixture(name="rh", params=(0, 1))

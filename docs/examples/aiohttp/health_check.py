@@ -10,7 +10,7 @@ async def healthy_view(request: Request) -> Response:
     Ping all external services.
     """
     ok: list[str] = []
-    failing: list[dict[str, str]] = []
+    failing: dict[str, str] = {}
     code = 200
 
     for svc in svcs.aiohttp.get_pings(request):
@@ -18,7 +18,7 @@ async def healthy_view(request: Request) -> Response:
             await svc.aping()
             ok.append(svc.name)
         except Exception as e:
-            failing.append({svc.name: repr(e)})
+            failing[svc.name] = repr(e)
             code = 500
 
     return json_response({"ok": ok, "failing": failing}, status=code)

@@ -2,7 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-from typing import Generator, Protocol
+from collections.abc import Generator
+from typing import Protocol
 
 from aiohttp.web import Application, Request
 
@@ -38,14 +39,12 @@ h: dict
 i: set
 j: bytes
 
-request = Request()
-
 
 class P(Protocol):
     def m(self) -> None: ...
 
 
-async def func() -> None:
+async def func(request: Request) -> None:
     a, b, c, d, e, f, g, h, i, j = await svcs.aiohttp.aget(
         request, int, str, bool, tuple, object, float, list, dict, set, bytes
     )
@@ -54,5 +53,4 @@ async def func() -> None:
 
     await svcs.aiohttp.aclose_registry(app)
 
-
-con: svcs.Container = svcs.aiohttp.svcs_from(request)
+    con: svcs.Container = svcs.aiohttp.svcs_from(request)

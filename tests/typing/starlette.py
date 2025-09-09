@@ -4,8 +4,9 @@
 
 from __future__ import annotations
 
+from collections.abc import AsyncGenerator, Generator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Generator, Protocol
+from typing import Protocol
 
 from starlette.applications import Starlette
 from starlette.middleware import Middleware

@@ -295,7 +295,7 @@ def test_local_registry_is_lazy_but_only_once(container):
     assert reg is container._lazy_local_registry
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 class TestAsync:
     async def test_async_factory(self, registry, container):
         """
@@ -421,7 +421,7 @@ class TestAsync:
         assert not container._instantiated
         assert not container._on_close
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_aclose_resilient(
         self, container, registry, caplog, close_me
     ):

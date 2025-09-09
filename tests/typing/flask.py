@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from typing import Generator
+from collections.abc import Generator
 
 import flask
 

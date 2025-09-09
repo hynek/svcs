@@ -13,9 +13,9 @@
 
 <p align="center">
   <a href="https://svcs.hynek.me"><img alt="Documentation at ReadTheDocs" src="https://img.shields.io/badge/Docs-Read%20The%20Docs-black"></a>
-  <a href="LICENSE"><img alt="PyPI - License" src="https://img.shields.io/pypi/l/svcs"></a>
   <a href="https://www.bestpractices.dev/projects/8115"><img src="https://www.bestpractices.dev/projects/8115/badge"></a>
   <a href="https://pypi.org/project/svcs/"><img alt="PyPI" src="https://img.shields.io/pypi/v/svcs"></a>
+   <a href="https://pepy.tech/project/svcs"><img src="https://static.pepy.tech/personalized-badge/svcs?period=month&units=international_system&left_color=grey&right_color=blue&left_text=Downloads%20/%20Month" alt="Downloads per month" /></a>
   <a href="https://pypi.org/project/svcs/"><img alt="PyPI - Supported Python versions" src="https://img.shields.io/pypi/pyversions/svcs.svg"></a>
 </p>
 
@@ -80,6 +80,7 @@ Read on in [*Why?*](https://svcs.hynek.me/en/latest/why.html) or watch this shor
 - [**Documentation**](https://svcs.hynek.me)
 - [**Changelog**](https://github.com/hynek/svcs/blob/main/CHANGELOG.md)
 - [**Funding**](https://hynek.me/say-thanks/)
+- [**Third-party extensions**](https://github.com/hynek/svcs/wiki/Third%E2%80%90party-Extensions)
 
 <!-- end pypi -->
 
@@ -92,3 +93,11 @@ The development is kindly supported by my employer [Variomedia AG](https://www.v
 
 The [Bestagon](https://www.youtube.com/watch?v=thOifuHs6eY) radar logo is made by [Lynn Root](https://www.roguelynn.com), based on an [Font Awesome](https://fontawesome.com) icon.
 *svcs* has started out as a wrapper around [*wired*](https://wired.readthedocs.io/) by [Michael Merickel](https://michael.merickel.org/) and has been heavily influenced by it.
+
+
+## *svcs* for Enterprise
+
+Available as part of the [Tidelift Subscription](https://tidelift.com/?utm_source=lifter&utm_medium=referral&utm_campaign=hynek).
+
+The maintainers of *svcs* and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source packages you use to build your applications.
+Save time, reduce risk, and improve code health, while paying the maintainers of the exact packages you use.

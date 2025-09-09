@@ -2,13 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-import sys
 
-
-if sys.version_info >= (3, 9):
-    from typing import Annotated
-else:
-    from typing_extensions import Annotated  # noqa: F401
+from typing import Annotated  # noqa: F401
 
 
 def nop(*_, **__):

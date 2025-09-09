@@ -39,8 +39,12 @@ But the types must be *hashable* because they're used as keys in a lookup dictio
 Sometimes, it makes sense to have multiple instances of the same type.
 For example, you might have multiple HTTP client pools or more than one database connection.
 
-You can achieve this by using either {any}`typing.Annotated` (Python 3.9+, or in [*typing-extensions*](https://pypi.org/project/typing-extensions/)) or by using {keyword}`type` (Python 3.12+, use {any}`typing.NewType` on older versions).
-You can also mix and match the two.
+You can achieve this by creating new types using {any}`typing.NewType`.
+
+On Mypy, you can also use {any}`typing.Annotated` to add metadata to the type to the same effect.
+However, it doesn't work with Pyright and [it's unclear if it's even _supposed_ to work](https://github.com/hynek/svcs/discussions/74), so we recommend the first approach.
+
+You can mix and match those two approaches, as long your type checker supports both.
 For instance, if you need a primary and a secondary database connection:
 
 % invisible-code-block: python
@@ -57,18 +61,25 @@ from sqlalchemy import Connection, create_engine
 primary_engine = create_engine(primary_url)
 secondary_engine = create_engine(secondary_url)
 
-# Create unique types for both with two different approaches
-PrimaryConnection = Annotated[Connection, "primary"]
-SecondaryConnection = NewType("SecondaryConnection", Connection)
-# Or on Python 3.12:
-# type SecondaryConnection = Connection
+# Clunky, but works universally.
+PrimaryConnection = NewType("PrimaryConnection", Connection)
+
+# This works with Mypy, but NOT with Pyright:
+SecondaryConnection = Annotated[Connection, "secondary"]
 
 # Register the factories to the aliases
 registry.register_factory(PrimaryConnection, primary_engine.connect)
 registry.register_factory(SecondaryConnection, secondary_engine.connect)
 ```
 
-The type and content of the annotated metadata ("primary") are not important to *svcs*, as long as the whole type is hashable.
+The type and content of the annotated metadata ("secondary") are not important to *svcs*, as long as the whole type is hashable.
+
+::: {note}
+- As of Pyright 1.1.402, the NewType approach [doesn't pass the type checker anymore](https://github.com/microsoft/pyright/discussions/10596).
+  Unless a better solution is found earlier, it looks like such kind of functionality won't work until {pep}`747` has passed and is widely implemented.
+- The {pep}`695` {keyword}`type` keyword is currently not supported and we weren't able to figure out how to support it.
+  It looks like this also will require at least {pep}`747` to be workable.
+:::
 
 
 ### Cleanup
@@ -92,7 +103,7 @@ For instance, you could free a database connection pool in an {mod}`atexit` hand
 This liberates you from keeping track of registered services yourself.
 You can also use a registry as an (async) context manager that (a)closes automatically on exit.
 
-*svcs* will raise a {class}`ResourceWarning` if a registry with pending cleanups is garbage-collected.
+*svcs* will raise a {class}`ResourceWarning` when a registry with pending cleanups is garbage-collected.
 
 
 ## Containers
@@ -271,7 +282,7 @@ Now the type name expresses the purpose of the object and it doesn't matter if t
 
 Each registered service may have a `ping` callable that you can use for health checks.
 You can request all pingable registered services with {meth}`svcs.Container.get_pings()`.
-This returns a list of {class}`svcs.ServicePing` objects that currently have a name property to identify the ping and a {meth}`~svcs.ServicePing.ping()` method that instantiates the service, adds it to the cleanup list, and runs the ping.
+This returns a list of {class}`svcs.ServicePing` objects that have a name property to identify the ping and a {meth}`~svcs.ServicePing.ping()` method that acquires the service, adds it to the cleanup list, and runs the ping with the acquired service as its only argument.
 
 If you have async services (factory or ping callable), you can use {meth}`~svcs.ServicePing.aping()` instead.
 `aping()` works with sync services, too, so you can use it universally in async code.
@@ -354,13 +365,15 @@ You can see that the datetime factory and the str value have both been registere
 .. module:: svcs
 
 .. autoclass:: Registry()
-   :members: register_factory, register_value, close, aclose, __contains__
+   :members: register_factory, register_value, close, aclose, __contains__, __iter__
 
 .. autoclass:: Container()
    :members: get, aget, get_abstract, aget_abstract, register_local_factory, register_local_value, close, aclose, get_pings, __contains__
 
 .. autoclass:: ServicePing()
    :members: name, ping, aping, is_async
+
+.. autoclass:: RegisteredService()
 
 .. autoclass:: svcs.exceptions.ServiceNotFoundError
 ```

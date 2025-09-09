@@ -8,7 +8,7 @@ import inspect
 import logging
 import warnings
 
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable, Iterator
 from contextlib import (
     AbstractAsyncContextManager,
     AbstractContextManager,
@@ -24,6 +24,7 @@ from inspect import (
     isgeneratorfunction,
 )
 from types import TracebackType
+from typing import Any, TypeVar, overload
 from typing import Any, Awaitable, Iterator, TypeVar, overload
 
 import attrs
@@ -48,6 +49,26 @@ _KEY_CONTAINER = "svcs_container"
 
 @attrs.frozen(repr=False)
 class RegisteredService:
+    """
+    A recipe for creating a service.
+
+    .. warning::
+
+        Strictly read-only.
+
+    Attributes:
+        svc_type: The type under which the type has been registered.
+
+        factory: Callable that creates the service.
+
+        takes_container:
+            Whether the factory takes a container as its first argument.
+
+        enter: Whether context managers returned by the factory are entered.
+
+        ping: See :ref:`health`.
+    """
+
     svc_type: type
     factory: Callable = attrs.field(hash=False)
     takes_container: bool
@@ -65,7 +86,7 @@ class RegisteredService:
             f"factory={self.factory}, "
             f"takes_container={self.takes_container}, "
             f"enter={self.enter}, "
-            f"has_ping={ self.ping is not None}"
+            f"has_ping={self.ping is not None}"
             ")>"
         )
 
@@ -92,15 +113,15 @@ class ServicePing:
 
     def ping(self) -> None:
         """
-        Instantiate the service, schedule its cleanup, and call its ping
-        method.
+        Acquire the service, schedule its cleanup, and call its ping callable
+        with the acquired service as its only argument.
         """
         svc: Any = self._container.get(self._svc_type)
         self._ping(svc)
 
     async def aping(self) -> None:
         """
-        Same as :meth:`ping` but instantiate and/or ping asynchronously, if
+        Same as :meth:`ping` but acquire and/or ping asynchronously, if
         necessary.
 
         Also works with synchronous services, so in an async application, just
@@ -160,6 +181,15 @@ class Registry:
             False
         """
         return svc_type in self._services
+
+    def __iter__(self) -> Iterator[RegisteredService]:
+        """
+        Returns:
+            An iterator over registered services.
+
+        .. versionadded:: 25.1.0
+        """
+        return iter(self._services.values())
 
     def __enter__(self) -> Registry:
         return self
@@ -254,6 +284,9 @@ class Registry:
                 Can also be an async callable or an
                 :class:`collections.abc.Awaitable`; then
                 :meth:`svcs.Registry.aclose()` must be called.
+
+        .. versionchanged:: 25.1.0
+            *factory* now may take any amount of arguments and they are ignored.
         """
         rs = self._register_factory(
             svc_type,
@@ -364,7 +397,7 @@ class Registry:
 
             try:
                 log.debug("closing %r", name)
-                oc()  # type: ignore[operator]
+                oc()
                 log.debug("closed %r", name)
             except Exception:  # noqa: BLE001
                 log.warning(
@@ -397,7 +430,7 @@ class Registry:
                     log.debug("async closed %r", name)
                 else:
                     log.debug("closing %r", name)
-                    oc()  # type: ignore[operator]
+                    oc()
                     log.debug("closed %r", name)
             except Exception:  # noqa: BLE001, PERF203
                 log.warning(
@@ -416,33 +449,28 @@ def _takes_container(factory: Callable) -> bool:
     Return True if *factory* takes a svcs.Container as its first argument.
     """
     try:
-        # Provide the locals so that `eval_str` will work even if the user places the `Container`
-        # under a `if TYPE_CHECKING` block
+        # Provide the locals so that `eval_str` will work even if the user
+        # places the `Container` under a `if TYPE_CHECKING` block.
         sig = inspect.signature(
             factory, locals={"Container": Container}, eval_str=True
         )
     except Exception:  # noqa: BLE001
-        # Retry without `eval_str` since if the annotation is "svcs.Container" the eval
-        # will fail due to it not finding the `svcs` module
+        # Retry without `eval_str` since if the annotation is "svcs.Container"
+        # the eval will fail due to it not finding the `svcs` module
         try:
             sig = inspect.signature(factory)
         except Exception:  # noqa: BLE001
             return False
 
-    if not sig.parameters:
-        return False
+    try:
+        (name, p) = next(iter(sig.parameters.items()))
+    except StopIteration:
+        return False  # 0 arguments
 
-    if len(sig.parameters) != 1:
-        msg = "Factories must take 0 or 1 parameters."
-        raise TypeError(msg)
-
-    ((name, p),) = tuple(sig.parameters.items())
-
-    return (
-        name == "svcs_container"
-        or p.annotation is Container
-        or p.annotation == "svcs.Container"
-        or p.annotation == "Container"
+    return name == "svcs_container" or p.annotation in (
+        Container,
+        "svcs.Container",
+        "Container",
     )
 
 
@@ -1024,6 +1052,9 @@ class Container:
 
         Also works with synchronous services, so in an async application, just
         use this.
+
+        .. versionchanged:: 25.1.0
+           Synchronous context managers are now entered/exited, too.
         """
         rv = []
         for svc_type in svc_types:
@@ -1035,8 +1066,23 @@ class Container:
             if enter and isinstance(svc, AbstractAsyncContextManager):
                 self._on_close.append((name, svc))
                 svc = await svc.__aenter__()
+            elif enter and isinstance(svc, AbstractContextManager):
+                self._on_close.append((name, svc))
+                svc = svc.__enter__()
+            # _lookup() doesn't handle async factories, so we have to live with
+            # some repetition.
             elif isawaitable(svc):
+                # Execute the factory. Until now, we've only created the
+                # awaitable.
                 svc = await svc
+
+                # Factory returned a contextmanager.
+                if enter and isinstance(svc, AbstractAsyncContextManager):
+                    self._on_close.append((name, svc))
+                    svc = await svc.__aenter__()
+                elif enter and isinstance(svc, AbstractContextManager):
+                    self._on_close.append((name, svc))
+                    svc = svc.__enter__()
 
             self._instantiated[svc_type] = svc
 
