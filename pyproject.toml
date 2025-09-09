@@ -141,17 +141,14 @@ replacement = 'https://raw.githubusercontent.com/hynek/svcs/main/\1"'
 
 
 [tool.pytest.ini_options]
-addopts = ["-ra", "--strict-markers", "--strict-config"]
+addopts = ["--strict-markers", "--strict-config"]
 xfail_strict = true
 filterwarnings = [
   "once::Warning",
   # pkg_resources.declare_namespace('zope')
   "ignore::DeprecationWarning:pkg_resources",
-  "ignore:pkg_resources is deprecated:DeprecationWarning:pyramid.asset",
-  # Silence warning that we're testing for but can't capture..
-  "ignore: coroutine method 'aclose' of 'TestFlask.test_teardown_warns_on_async_on_close.*:RuntimeWarning:",
-  # Bug in Starlette 0.37.2: https://github.com/encode/starlette/discussions/2603
-  "ignore:Unclosed <MemoryObject(Send|Receive)Stream>:ResourceWarning:anyio.streams.memory",
+  # Nothing we can do about this except hoping Pyramid releases a fix.
+  "ignore:pkg_resources is deprecated:UserWarning:pyramid.asset",
 ]
 asyncio_default_fixture_loop_scope = "function"
 
