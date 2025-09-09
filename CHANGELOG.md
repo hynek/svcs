@@ -31,14 +31,11 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 - Python 3.8 support.
 
 
-### Added
-
-- An `__iter__` method to `Registry` that yields all registered types.
-
 ### Changed
 
 - The `get_pings` method on the `Container` now includes the locally registered services.
   [#81](https://github.com/hynek/svcs/discussions/81)
+- When a locally defined service created with `register_local_factory` or `register_local_value` lacks a defined ping, it will be excluded from the list returned by get_pings.
 - Flask: The registry is now stored on `app.extensions`, not `app.config`.
   This is an implementation detail.
   If you are directly accessing the registry via `app.config`, this is a breaking change, though you should ideally move to `svcs.flask.registry` anyway.
