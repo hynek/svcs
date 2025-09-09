@@ -323,9 +323,8 @@ class Registry:
                 Whether to suppress errors raised in the container context when
                 exiting registered factories.
 
-                By default, it is True to avoid propagating factory errors to
-                main code. In such case errors are only logged at warning
-                level.
+                By default, it is True to avoid propagating errors raised in container context,
+                so factories cleanup code is executed unconditionally.
 
                 Set it to False to have control over error propagation, but
                 note that you can't stop the exception from bubbling out of the
