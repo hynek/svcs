@@ -32,6 +32,14 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   [#139](https://github.com/hynek/svcs/discussions/139)
 
 
+### Changed
+
+- `Container.get_pings()` now includes registry-local services.
+  Locally defined services overwrite global ones if they are registered for the same type.
+  This includes that a local service without a ping disables a global service's ping.
+  [#83](https://github.com/hynek/svcs/discussions/83)
+
+
 ## [25.1.0](https://github.com/hynek/svcs/compare/24.1.0...25.1.0) - 2025-01-25
 
 ### Added
@@ -49,9 +57,6 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ### Changed
 
-- The `get_pings` method on the `Container` now includes the locally registered services.
-  [#81](https://github.com/hynek/svcs/discussions/81)
-- When a locally defined service created with `register_local_factory` or `register_local_value` lacks a defined ping, it will be excluded from the list returned by get_pings.
 - Flask: The registry is now stored on `app.extensions`, not `app.config`.
   This is an implementation detail.
   If you are directly accessing the registry via `app.config`, this is a breaking change, though you should ideally move to `svcs.flask.registry` anyway.
