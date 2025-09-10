@@ -278,8 +278,9 @@ ignore = [
 ]
 
 "tests/typing/*" = [
-  "F841", # unused variables are fine in type checks
-  "SLOT", # we don't care about slots in type checks
+  "F841",   # unused variables are fine in type checks
+  "RUF059", # unused variables are fine in type checks
+  "SLOT",   # we don't care about slots in type checks
 ]
 
 "docs/examples/*" = ["PERF203", "BLE001"]
