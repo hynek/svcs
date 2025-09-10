@@ -228,6 +228,21 @@ ignore = [
 ]
 
 
+[tool.ty.rules]
+possibly-unbound-attribute = "ignore"
+
+[tool.ty.src]
+include = [
+  "src/svcs",
+  "tests/typing/"
+]
+exclude = [
+  "src/svcs/pyramid.py",
+  "tests/typing/mypy.py",
+  "tests/typing/pyramid.py",
+]
+
+
 [tool.ruff]
 src = ["src", "tests", "conftest.py", "docs"]
 line-length = 79
