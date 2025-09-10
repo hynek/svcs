@@ -8,7 +8,7 @@ from collections.abc import Callable
 from contextlib import suppress
 from typing import Any, overload
 
-from aiohttp import web
+import aiohttp.web as web  # noqa: PLR0402 -- work around broken __getattr__ type hint
 
 import svcs
 

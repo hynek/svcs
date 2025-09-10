@@ -237,7 +237,6 @@ include = [
   "tests/typing/"
 ]
 exclude = [
-  "src/svcs/aiohttp.py",
   "src/svcs/pyramid.py",
   "tests/typing/mypy.py",
   "tests/typing/pyramid.py",
