@@ -24,6 +24,14 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   [#129](https://github.com/hynek/svcs/pull/129)
 
 
+### Removed
+
+- Debug logs doesn't contain stack information anymore since it leads to excessive output.
+  If you miss these, please open an issue and we make it an option on `svcs.Registry`.
+  [#135](https://github.com/hynek/svcs/discussions/135)
+  [#139](https://github.com/hynek/svcs/discussions/139)
+
+
 ## [25.1.0](https://github.com/hynek/svcs/compare/24.1.0...25.1.0) - 2025-01-25
 
 ### Added
