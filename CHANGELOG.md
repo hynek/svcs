@@ -15,6 +15,14 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/25.1.0...HEAD)
 
+### Added
+
+- New *suppress_context_exit* argument to `svcs.register_(factory|value)()`.
+  If set to `False`, errors in the container context will be passed into the factory cleanup context manager and allow you to act on them there.
+
+  You can't stop the exception from bubbling out of the container context, though.
+  [#129](https://github.com/hynek/svcs/pull/129)
+
 
 ## [25.1.0](https://github.com/hynek/svcs/compare/24.1.0...25.1.0) - 2025-01-25
 
