@@ -29,7 +29,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 - Debug logs doesn't contain stack information anymore since it leads to excessive output.
   If you miss these, please open an issue and we make it an option on `svcs.Registry`.
   [#135](https://github.com/hynek/svcs/discussions/135)
-  [#139](https://github.com/hynek/svcs/discussions/139)
+  [#139](https://github.com/hynek/svcs/pull/139)
 
 
 ### Changed
@@ -37,7 +37,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 - `Container.get_pings()` now includes registry-local services.
   Locally defined services overwrite global ones if they are registered for the same type.
   This includes that a local service without a ping disables a global service's ping.
-  [#83](https://github.com/hynek/svcs/discussions/83)
+  [#83](https://github.com/hynek/svcs/pull/83)
 
 
 ## [25.1.0](https://github.com/hynek/svcs/compare/24.1.0...25.1.0) - 2025-01-25
