@@ -39,7 +39,7 @@ But the types must be *hashable* because they're used as keys in a lookup dictio
 Sometimes, it makes sense to have multiple instances of the same type.
 For example, you might have multiple HTTP client pools or more than one database connection.
 
-You can achieve this by creating new types using {any}`typing.NewType`.
+You can achieve this by creating new types by subclassing the common type.
 
 On Mypy, you can also use {any}`typing.Annotated` to add metadata to the type to the same effect.
 However, it doesn't work with Pyright and [it's unclear if it's even _supposed_ to work](https://github.com/hynek/svcs/discussions/74), so we recommend the first approach.
@@ -62,7 +62,8 @@ primary_engine = create_engine(primary_url)
 secondary_engine = create_engine(secondary_url)
 
 # Clunky, but works universally.
-PrimaryConnection = NewType("PrimaryConnection", Connection)
+class PrimaryConnection(Connection):
+    pass
 
 # This works with Mypy, but NOT with Pyright:
 SecondaryConnection = Annotated[Connection, "secondary"]
@@ -75,8 +76,9 @@ registry.register_factory(SecondaryConnection, secondary_engine.connect)
 The type and content of the annotated metadata ("secondary") are not important to *svcs*, as long as the whole type is hashable.
 
 ::: {note}
-- As of Pyright 1.1.402, the NewType approach [doesn't pass the type checker anymore](https://github.com/microsoft/pyright/discussions/10596).
+- As of Pyright 1.1.402, the NewType approach that we used to recommend [doesn't pass the type checker anymore](https://github.com/microsoft/pyright/discussions/10596).
   Unless a better solution is found earlier, it looks like such kind of functionality won't work until {pep}`747` has passed and is widely implemented.
+  We're tracking this in [#128](https://github.com/hynek/svcs/issues/128).
 - The {pep}`695` {keyword}`type` keyword is currently not supported and we weren't able to figure out how to support it.
   It looks like this also will require at least {pep}`747` to be workable.
 :::
