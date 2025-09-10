@@ -46,7 +46,7 @@ _KEY_REGISTRY = "svcs_registry"
 _KEY_CONTAINER = "svcs_container"
 
 
-@attrs.frozen(repr=False)
+@attrs.frozen
 class RegisteredService:
     """
     A recipe for creating a service.
@@ -169,7 +169,7 @@ class ServicePing:
             self._ping(svc)
 
 
-@attrs.define(repr=False)
+@attrs.define
 class Registry:
     """
     A central registry of recipes for creating services.
@@ -543,7 +543,7 @@ T9 = TypeVar("T9")
 T10 = TypeVar("T10")
 
 
-@attrs.define(repr=False)
+@attrs.define
 class Container:
     """
     A per-context container for instantiated services and cleanups.
