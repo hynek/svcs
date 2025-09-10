@@ -313,9 +313,6 @@ class TestContainer:
 class TestServicePing:
     @pytest.fixture
     def make_ping_stub(self) -> Callable[[], Mock]:
-        """
-        Return a stub for ping.
-        """
         return lambda: Mock(spec_set=["__call__"])
 
     def test_ping(self, registry, container, close_me, make_ping_stub):
