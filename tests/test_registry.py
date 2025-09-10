@@ -289,9 +289,9 @@ class TestRegistry:
         registry.register_factory(AnotherService, AnotherService)
 
         assert {
-            svcs.RegisteredService(Service, Service, False, True, None),
+            svcs.RegisteredService(Service, Service, False, True, None, True),
             svcs.RegisteredService(
-                AnotherService, AnotherService, False, True, None
+                AnotherService, AnotherService, False, True, None, True
             ),
         } == {rs for rs in registry}  # noqa: C416 -- explicit on purpose
 
@@ -324,7 +324,8 @@ class TestRegisteredService:
             "factory=<class 'tests.ifaces.Service'>, "
             "takes_container=False, "
             "enter=True, "
-            "has_ping=False"
+            "has_ping=False, "
+            "suppress_context_exit=True"
             ")>"
         ) == repr(rs)
 

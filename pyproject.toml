@@ -168,6 +168,8 @@ exclude_also = [
   # Typing-related
   "if TYPE_CHECKING:",
   ": +\\.\\.\\.$",
+  # Tests
+  'pytest\.fail\('
 ]
 
 
@@ -253,6 +255,7 @@ ignore = [
   "EM101",   # no need for exception msg hygiene in tests
   "PLR2004", # numbers are fine in tests
   "PT011",   # broad is fine
+  "PT012",   # Sometimes we need more than one statement in raises()
   "S101",    # assert
   "SIM300",  # Yoda rocks in asserts
   "TRY002",  # stock exceptions are fine in tests
