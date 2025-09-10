@@ -4,6 +4,7 @@
 
 import gc
 
+from collections.abc import Callable
 from contextlib import asynccontextmanager, contextmanager
 from unittest.mock import Mock
 
@@ -310,7 +311,11 @@ class TestContainer:
 
 
 class TestServicePing:
-    def test_ping(self, registry, container, close_me):
+    @pytest.fixture
+    def make_ping_stub(self) -> Callable[[], Mock]:
+        return lambda: Mock(spec_set=["__call__"])
+
+    def test_ping(self, registry, container, close_me, make_ping_stub):
         """
         Calling ping instantiates the service using its factory, appends it to
         the cleanup list, and calls the service's ping method.
@@ -320,7 +325,7 @@ class TestServicePing:
             yield Service()
             close_me.close()
 
-        ping = Mock(spec_set=["__call__"])
+        ping = make_ping_stub()
         registry.register_factory(Service, factory, ping=ping)
 
         (svc_ping,) = container.get_pings()
@@ -336,3 +341,50 @@ class TestServicePing:
         assert close_me.is_closed
         assert not container._instantiated
         assert not container._on_close
+
+    def test_local_pings_are_retrieved(self, container, make_ping_stub):
+        """
+        Registering a local factory with a ping defined makes it possible to
+        invoke a ping for that service.
+        """
+        service_ping = make_ping_stub()
+        container.register_local_factory(Service, Service, ping=service_ping)
+
+        (svc_ping,) = container.get_pings()
+        svc_ping.ping()
+
+        service_ping.assert_called_once()
+
+    def test_local_pings_override_global_pings(
+        self, registry, container, make_ping_stub
+    ):
+        """
+        If a local factory overwrites an existing, global one, and the local
+        factory has a ping defined, the local ping isused.
+        """
+        service_ping, local_service_ping = make_ping_stub(), make_ping_stub()
+        registry.register_factory(Service, Service, ping=service_ping)
+        container.register_local_factory(
+            Service,
+            Service,
+            ping=local_service_ping,
+        )
+
+        (svc_ping,) = container.get_pings()
+        svc_ping.ping()
+
+        service_ping.assert_not_called()
+        local_service_ping.assert_called_once()
+
+    def test_local_services_without_pings_discard_global_pings(
+        self, registry, container, make_ping_stub
+    ):
+        """
+        If a local factory overwrites an existing, global one, but the local
+        factory does not have a ping defined, the global ping is not returned
+        either.
+        """
+        registry.register_factory(Service, Service, ping=make_ping_stub())
+        container.register_local_factory(Service, Service, ping=None)
+
+        assert not container.get_pings()

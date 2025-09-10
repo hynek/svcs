@@ -720,7 +720,24 @@ class Container:
         Returns:
             A list of services that have registered a ping callable.
         """
-        return [
+        if self._lazy_local_registry is None:
+            local_rs_types = set()
+            pings = []
+        else:
+            local_rs_types = {rs.svc_type for rs in self._lazy_local_registry}
+            pings = [
+                ServicePing(
+                    rs.name,
+                    iscoroutinefunction(rs.ping),
+                    rs.svc_type,
+                    rs.ping,
+                    self,
+                )
+                for rs in self._lazy_local_registry
+                if rs.ping is not None
+            ]
+
+        pings.extend(
             ServicePing(
                 rs.name,
                 iscoroutinefunction(rs.ping),
@@ -728,9 +745,10 @@ class Container:
                 rs.ping,
                 self,
             )
-            for rs in self.registry._services.values()
-            if rs.ping is not None
-        ]
+            for rs in self.registry
+            if rs.ping is not None and rs.svc_type not in local_rs_types
+        )
+        return pings
 
     def get_abstract(self, *svc_types: type) -> Any:
         """

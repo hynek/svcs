@@ -32,6 +32,14 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   [#139](https://github.com/hynek/svcs/discussions/139)
 
 
+### Changed
+
+- `Container.get_pings()` now includes registry-local services.
+  Locally defined services overwrite global ones if they are registered for the same type.
+  This includes that a local service without a ping disables a global service's ping.
+  [#83](https://github.com/hynek/svcs/discussions/83)
+
+
 ## [25.1.0](https://github.com/hynek/svcs/compare/24.1.0...25.1.0) - 2025-01-25
 
 ### Added
