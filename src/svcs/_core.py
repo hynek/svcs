@@ -505,23 +505,22 @@ class Registry:
 if sys.version_info >= (3, 10):
 
     def _robust_signature(factory: Callable) -> inspect.Signature | None:
-        try:
+        with suppress(Exception):
             # Provide the locals so that `eval_str` will work even if the user
             # places the `Container` under a `if TYPE_CHECKING` block.
-            sig = inspect.signature(
+            return inspect.signature(
                 factory,
                 locals={"Container": Container},  # ty: ignore[unknown-argument]
                 eval_str=True,  # ty: ignore[unknown-argument]
             )
-        except Exception:  # noqa: BLE001
-            # Retry without `eval_str` since if the annotation is "svcs.Container"
-            # the eval will fail due to it not finding the `svcs` module
-            try:
-                sig = inspect.signature(factory)
-            except Exception:  # noqa: BLE001
-                return None
 
-        return sig
+        # Retry without `eval_str` since if the annotation is "svcs.Container"
+        # the eval will fail due to it not finding the `svcs` module
+        with suppress(Exception):
+            return inspect.signature(factory)
+
+        return None
+
 else:
 
     def _robust_signature(factory: Callable) -> inspect.Signature | None:
