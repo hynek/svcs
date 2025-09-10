@@ -6,7 +6,7 @@ import contextlib
 import sys
 
 from collections.abc import AsyncGenerator, Generator
-from typing import NewType, Protocol
+from typing import Protocol
 
 import svcs
 
@@ -137,8 +137,13 @@ if sys.version_info >= (3, 10):
 
 
 # Multiple factories for same type:
-S1 = NewType("S1", str)
-S2 = NewType("S2", str)
+class S1(str):
+    pass
+
+
+class S2(str):
+    pass
+
 
 reg.register_value(S1, "foo")
 reg.register_value(S2, "bar")

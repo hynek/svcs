@@ -223,6 +223,7 @@ ignore = [
   # Excluding tests and allowing tests/typing (like in Mypy) doesn't work.
   "tests/*.py",
   "tests/integrations",
+  "tests/typing/mypy.py",
   "tests/typing/pyramid.py",
 ]
 
@@ -263,6 +264,7 @@ ignore = [
 
 "tests/typing/*" = [
   "F841", # unused variables are fine in type checks
+  "SLOT", # we don't care about slots in type checks
 ]
 
 "docs/examples/*" = ["PERF203", "BLE001"]
