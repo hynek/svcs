@@ -12,6 +12,7 @@ from contextlib import (
     contextmanager,
 )
 from typing import NewType
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -256,6 +257,40 @@ def test_get_on_async_factory_raises_type_error(
         assert (
             "coroutine 'async_int_factory' was never awaited",
         ) == recwarn.pop().message.args
+
+
+def test_get_with_magicmock_factory_works(registry, container):
+    """
+    A sync factory can return a MagicMock as long as they're registered with
+    enter=False.
+    """
+
+    mm = MagicMock()
+    registry.register_factory(Service, lambda: mm, enter=False)
+
+    svc = container.get(Service)
+
+    assert mm is svc
+    assert svc is container.get(Service)
+
+
+@pytest.mark.asyncio
+async def test_aget_with_asyncmock_factory_works(registry, container):
+    """
+    A async factory can return a MagicMock as long as they're registered with
+    enter=False.
+    """
+    mm = MagicMock()
+
+    async def factory():
+        return mm
+
+    registry.register_factory(Service, factory, enter=False)
+
+    svc = await container.aget(Service)
+
+    assert mm is svc
+    assert svc is container.get(Service)
 
 
 def test_local_value_overrides_global_value(registry, container):
