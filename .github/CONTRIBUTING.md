@@ -41,7 +41,7 @@ It's people like *you* who make this project such a great tool for everyone.
 
 First, **fork** the repository on GitHub and **clone** it using one of the alternatives that you can copy-paste by pressing the big green button labeled `<> Code`.
 
-You can (and should) run our test suite using [*tox*](https://tox.wiki/).
+You can (and should) run our test suite using [*tox*](https://tox.wiki/) (and keep in mind, that `tox run-parallel` is about 5x faster than `tox run`).
 However, you'll probably want a more traditional environment as well.
 
 We recommend using the Python version from the `.python-version-default` file in the project's root directory, because that's the one that is used in the CI by default, too.
