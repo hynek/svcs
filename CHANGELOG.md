@@ -40,6 +40,12 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   [#83](https://github.com/hynek/svcs/pull/83)
 
 
+### Fixed
+
+- Factories now can return [`MagicMock`](https://docs.python.org/3/library/unittest.mock.html#unittest.mock.MagicMock)s without crashing with a TypeError.
+  [#137](https://github.com/hynek/svcs/issues/137)
+
+
 ## [25.1.0](https://github.com/hynek/svcs/compare/24.1.0...25.1.0) - 2025-01-25
 
 ### Added

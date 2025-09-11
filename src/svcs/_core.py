@@ -26,6 +26,7 @@ from inspect import (
 )
 from types import TracebackType
 from typing import Any, TypeVar, overload
+from unittest.mock import MagicMock
 
 import attrs
 
@@ -1006,8 +1007,9 @@ class Container:
                 rv.append(svc)
                 continue
 
-            if iscoroutine(svc) or isinstance(
-                svc, AbstractAsyncContextManager
+            if not isinstance(svc, MagicMock) and (
+                iscoroutine(svc)
+                or isinstance(svc, AbstractAsyncContextManager)
             ):
                 msg = "Use `aget()` for async factories."
                 raise TypeError(msg)
