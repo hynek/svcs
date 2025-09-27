@@ -862,23 +862,24 @@ class Container:
         meaningful.
         """
         rs: RegisteredService | None = None
-        if cached_data := self._instantiated.get(svc_type):
-            svc, rs = cached_data
-            return True, svc, rs
 
-        if self._lazy_local_registry is not None:
-            with suppress(ServiceNotFoundError):
-                rs = self._lazy_local_registry.get_registered_service_for(
-                    svc_type
-                )
+        container = self
+        while container is not None:
+            if cached_data := container._instantiated.get(svc_type):
+                svc, rs = cached_data
+                return True, svc, rs
 
-        if self.parent is not None:
-            try:
-                cached, svc, rs = self.parent._lookup(svc_type)
-            except ServiceNotFoundError:
-                pass
-            else:
-                return cached, svc, rs
+            if container._lazy_local_registry is not None:
+                try:
+                    rs = container._lazy_local_registry.get_registered_service_for(
+                        svc_type
+                    )
+                except ServiceNotFoundError:
+                    pass
+                else:
+                    break
+
+            container = container.parent
 
         if rs is None:
             rs = self.registry.get_registered_service_for(svc_type)
