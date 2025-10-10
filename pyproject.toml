@@ -141,12 +141,7 @@ replacement = 'https://raw.githubusercontent.com/hynek/svcs/main/\1"'
 
 
 [tool.pytest.ini_options]
-addopts = [
-  "-ra",
-  "--strict-markers",
-  "--strict-config",
-  "--import-mode=importlib",
-]
+addopts = ["-ra", "--strict-markers", "--strict-config"]
 xfail_strict = true
 filterwarnings = [
   "once::Warning",
