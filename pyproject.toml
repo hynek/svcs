@@ -141,7 +141,12 @@ replacement = 'https://raw.githubusercontent.com/hynek/svcs/main/\1"'
 
 
 [tool.pytest.ini_options]
-addopts = ["--strict-markers", "--strict-config"]
+addopts = [
+  "-ra",
+  "--strict-markers",
+  "--strict-config",
+  "--import-mode=importlib",
+]
 xfail_strict = true
 filterwarnings = [
   "once::Warning",
@@ -169,7 +174,7 @@ exclude_also = [
   "if TYPE_CHECKING:",
   ": +\\.\\.\\.$",
   # Tests
-  'pytest\.fail\('
+  'pytest\.fail\(',
 ]
 
 
@@ -232,15 +237,17 @@ ignore = [
 possibly-unbound-attribute = "ignore"
 
 [tool.ty.src]
-include = [
-  "src/svcs",
-  "tests/typing/"
-]
+include = ["src/svcs", "tests/typing/"]
 exclude = [
   "src/svcs/pyramid.py",
   "tests/typing/mypy.py",
   "tests/typing/pyramid.py",
 ]
+
+
+[tool.pyrefly]
+project-includes = ["tests/typing"]
+project-excludes = ["tests/typing/mypy.py", "tests/typing/pyramid.py"]
 
 
 [tool.ruff]
