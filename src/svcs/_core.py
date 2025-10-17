@@ -7,6 +7,7 @@ from __future__ import annotations
 import inspect
 import logging
 import sys
+import threading
 import warnings
 
 from collections.abc import Awaitable, Callable, Iterator
@@ -25,7 +26,7 @@ from inspect import (
     isgeneratorfunction,
 )
 from types import TracebackType
-from typing import Any, TypeVar, overload
+from typing import Any, Self, TypeVar, overload
 from unittest.mock import MagicMock
 
 import attrs
@@ -596,6 +597,7 @@ class Container:
     """
 
     registry: Registry
+    parent: Self | None = None
     _lazy_local_registry: Registry | None = None
     _instantiated: dict[type, tuple[object, RegisteredService]] = (
         attrs.Factory(dict)
@@ -606,6 +608,12 @@ class Container:
             AbstractContextManager | AbstractAsyncContextManager,
         ]
     ] = attrs.Factory(list)
+
+    # Tracks the number of children containers
+    _usecount: int = 0
+    # Jamie thinks RLock is compatible with async, preventing deadlocks
+    # (Not that deadlocks should happen the way count modification is implemented)
+    _uselock: threading.RLock = attrs.Factory(threading.RLock)
 
     def __repr__(self) -> str:
         return (
@@ -620,6 +628,8 @@ class Container:
         return svc_type in self._instantiated
 
     def __enter__(self) -> Container:
+        with self._uselock:
+            self._usecount += 1
         return self
 
     def __exit__(
@@ -628,9 +638,22 @@ class Container:
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
-        self.close(exc_type, exc_val, exc_tb)
+        with self._uselock:
+            self._usecount -= 1
+            if self._usecount < 0:
+                warnings.warn(
+                    "Container was exited more than entered",
+                    ResourceWarning,
+                    stacklevel=1,
+                )
+                self._usecount = 0
+
+        if self._usecount == 0:
+            self.close(exc_type, exc_val, exc_tb)
 
     async def __aenter__(self) -> Container:
+        with self._uselock:
+            self._usecount += 1
         return self
 
     async def __aexit__(
@@ -639,7 +662,18 @@ class Container:
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
-        await self.aclose(exc_type, exc_val, exc_tb)
+        with self._uselock:
+            self._usecount -= 1
+            if self._usecount < 0:
+                warnings.warn(
+                    "Container was exited more than entered",
+                    ResourceWarning,
+                    stacklevel=1,
+                )
+                self._usecount = 0
+
+        if self._usecount == 0:
+            await self.aclose(exc_type, exc_val, exc_tb)
 
     def __del__(self) -> None:
         """
@@ -651,6 +685,25 @@ class Container:
                 ResourceWarning,
                 stacklevel=1,
             )
+
+    @contextmanager
+    def fork(self):
+        """
+        Create a child container, inheriting from this one.
+        """
+        with self, Container(registry=self.registry, parent=self) as child:
+            yield child
+
+    @asynccontextmanager
+    async def afork(self):
+        """
+        Create a child container, inheriting from this one.
+        """
+        async with (
+            self,
+            Container(registry=self.registry, parent=self) as child,
+        ):
+            yield child
 
     def close(
         self,
@@ -668,6 +721,10 @@ class Container:
         Hint:
             The Container can be used again after this. Closing it is an
             idempotent way to reset it.
+
+        Note:
+            You almost certainly do not want to call this directly, since it'll
+            cause child containers to recreate all their resources.
         """
         for rs, cm in reversed(self._on_close):
             try:
@@ -711,6 +768,10 @@ class Container:
         Hint:
             The container can be used again after this. Closing it is an
             idempotent way to reset it.
+
+        Note:
+            You almost certainly do not want to call this directly, since it'll
+            cause child containers to recreate all their resources.
         """
         for rs, cm in reversed(self._on_close):
             try:
@@ -810,6 +871,14 @@ class Container:
                 rs = self._lazy_local_registry.get_registered_service_for(
                     svc_type
                 )
+
+        if self.parent is not None:
+            try:
+                cached, svc, rs = self.parent._lookup(svc_type)
+            except ServiceNotFoundError:
+                pass
+            else:
+                return cached, svc, rs
 
         if rs is None:
             rs = self.registry.get_registered_service_for(svc_type)
