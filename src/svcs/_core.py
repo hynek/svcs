@@ -81,6 +81,7 @@ class RegisteredService:
     enter: bool
     ping: Callable | None = attrs.field(hash=False)
     suppress_context_exit: bool
+    inheritable: bool = True
 
     @property
     def name(self) -> str:
@@ -94,7 +95,8 @@ class RegisteredService:
             f"takes_container={self.takes_container}, "
             f"enter={self.enter}, "
             f"has_ping={self.ping is not None}, "
-            f"suppress_context_exit={self.suppress_context_exit}"
+            f"suppress_context_exit={self.suppress_context_exit}, "
+            f"inheritable={self.inheritable}"
             ")>"
         )
 
@@ -273,6 +275,7 @@ class Registry:
         ping: Callable | None = None,
         on_registry_close: Callable | Awaitable | None = None,
         suppress_context_exit: bool = True,
+        inheritable: bool = True,
     ) -> None:
         """
         Register *factory* to be used when asked for a *svc_type*.
@@ -347,6 +350,7 @@ class Registry:
             ping=ping,
             on_registry_close=on_registry_close,
             suppress_context_exit=suppress_context_exit,
+            inheritable=inheritable,
         )
 
         log.debug(
@@ -368,6 +372,7 @@ class Registry:
         ping: Callable | None = None,
         on_registry_close: Callable | Awaitable | None = None,
         suppress_context_exit: bool = True,
+        inheritable: bool = True,
     ) -> None:
         """
         Syntactic sugar for::
@@ -378,7 +383,8 @@ class Registry:
                enter=enter,
                ping=ping,
                on_registry_close=on_registry_close,
-               suppress_context_exit=suppress_context_exit
+               suppress_context_exit=suppress_context_exit,
+               inheritable=inheritable,
            )
 
         Please note that, unlike with :meth:`register_factory`, entering
@@ -394,6 +400,7 @@ class Registry:
             ping=ping,
             on_registry_close=on_registry_close,
             suppress_context_exit=suppress_context_exit,
+            inheritable=inheritable,
         )
 
         log.debug(
@@ -411,6 +418,7 @@ class Registry:
         ping: Callable | None,
         on_registry_close: Callable | Awaitable | None = None,
         suppress_context_exit: bool = True,
+        inheritable: bool = True,
     ) -> RegisteredService:
         if isgeneratorfunction(factory):
             factory = contextmanager(factory)
@@ -424,6 +432,7 @@ class Registry:
             enter,
             ping,
             suppress_context_exit,
+            inheritable,
         )
         self._services[svc_type] = rs
         if on_registry_close is not None:
@@ -867,7 +876,15 @@ class Container:
         while container is not None:
             if cached_data := container._instantiated.get(svc_type):
                 svc, rs = cached_data
-                return True, svc, rs
+                if rs.inheritable:
+                    # If inheritable, we don't care about the container checks below
+                    return True, svc, rs
+                if container is self:
+                    # non-inheritable, but found it on ourselves
+                    return True, svc, rs
+                # Found the rs, but can't use the inherited instance
+                svc = None
+                break
 
             if container._lazy_local_registry is not None:
                 try:
@@ -895,6 +912,7 @@ class Container:
         enter: bool = True,
         ping: Callable | None = None,
         on_registry_close: Callable | Awaitable | None = None,
+        inheritable: bool = True,
     ) -> None:
         """
         Same as :meth:`svcs.Registry.register_factory()`, but registers the
@@ -917,6 +935,7 @@ class Container:
             enter=enter,
             ping=ping,
             on_registry_close=on_registry_close,
+            inheritable=inheritable,
         )
 
     def register_local_value(
@@ -927,6 +946,7 @@ class Container:
         enter: bool = False,
         ping: Callable | None = None,
         on_registry_close: Callable | Awaitable | None = None,
+        inheritable: bool = True,
     ) -> None:
         """
         Syntactic sugar for::
@@ -936,7 +956,8 @@ class Container:
                lambda: value,
                enter=enter,
                ping=ping,
-               on_registry_close=on_registry_close
+               on_registry_close=on_registry_close,
+               inheritable=inheritable,
            )
 
         Please note that, unlike with :meth:`register_local_factory`, entering
@@ -953,6 +974,7 @@ class Container:
             enter=enter,
             ping=ping,
             on_registry_close=on_registry_close,
+            inheritable=inheritable,
         )
 
     @overload
