@@ -229,7 +229,7 @@ ignore = [
 
 
 [tool.ty.rules]
-possibly-unbound-attribute = "ignore"
+possibly-missing-attribute = "ignore"
 
 [tool.ty.src]
 include = ["src/svcs", "tests/typing/"]
@@ -241,11 +241,12 @@ exclude = [
 
 
 [tool.pyrefly]
-# Currently can't type-check the package itself due to
-# <https://github.com/facebook/pyrefly/issues/805>. I've been told a beta
-# release with that fix should come ~end of November 2025.
-project-includes = ["tests/typing"]
-project-excludes = ["tests/typing/mypy.py", "tests/typing/pyramid.py"]
+project-includes = ["src", "tests/typing"]
+project-excludes = [
+  "src/svcs/pyramid.py",
+  "tests/typing/mypy.py",
+  "tests/typing/pyramid.py",
+]
 
 
 [tool.ruff]

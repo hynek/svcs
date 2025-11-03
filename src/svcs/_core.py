@@ -25,7 +25,7 @@ from inspect import (
     isgeneratorfunction,
 )
 from types import TracebackType
-from typing import Any, TypeVar, overload
+from typing import Any, TypeVar, no_type_check, overload
 from unittest.mock import MagicMock
 
 import attrs
@@ -469,6 +469,7 @@ class Registry:
         self._services.clear()
         self._on_close.clear()
 
+    @no_type_check  # both ty and pyrefly choke on this method
     async def aclose(self) -> None:
         """
         Clear registrations and run all *on_registry_close* callbacks.
