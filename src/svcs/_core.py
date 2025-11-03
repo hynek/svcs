@@ -25,7 +25,7 @@ from inspect import (
     isgeneratorfunction,
 )
 from types import TracebackType
-from typing import Any, TypeVar, no_type_check, overload
+from typing import Any, TypeVar, overload
 from unittest.mock import MagicMock
 
 import attrs
@@ -469,7 +469,6 @@ class Registry:
         self._services.clear()
         self._on_close.clear()
 
-    @no_type_check  # both ty and pyrefly choke on this method
     async def aclose(self) -> None:
         """
         Clear registrations and run all *on_registry_close* callbacks.
@@ -482,7 +481,7 @@ class Registry:
         for rs, oc in reversed(self._on_close):
             try:
                 if iscoroutinefunction(oc):
-                    oc = oc()  # noqa: PLW2901
+                    oc = oc()  # noqa: PLW2901 # ty: ignore[call-non-callable]  # pyrefly: ignore[bad-assignment]
 
                 if isawaitable(oc):
                     log.debug("async closing %r", rs.name)
@@ -490,7 +489,7 @@ class Registry:
                     log.debug("async closed %r", rs.name)
                 else:
                     log.debug("closing %r", rs.name)
-                    oc()
+                    oc()  # pyrefly: ignore[unused-coroutine]
                     log.debug("closed %r", rs.name)
             except Exception:  # noqa: BLE001, PERF203
                 log.warning(
