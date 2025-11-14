@@ -7,6 +7,7 @@ from __future__ import annotations
 import inspect
 import logging
 import sys
+import threading
 import warnings
 
 from collections.abc import Awaitable, Callable, Iterator
@@ -25,7 +26,7 @@ from inspect import (
     isgeneratorfunction,
 )
 from types import TracebackType
-from typing import Any, TypeVar, overload
+from typing import Any, Self, TypeVar, overload
 from unittest.mock import MagicMock
 
 import attrs
@@ -80,6 +81,7 @@ class RegisteredService:
     enter: bool
     ping: Callable | None = attrs.field(hash=False)
     suppress_context_exit: bool
+    inheritable: bool = True
 
     @property
     def name(self) -> str:
@@ -93,7 +95,8 @@ class RegisteredService:
             f"takes_container={self.takes_container}, "
             f"enter={self.enter}, "
             f"has_ping={self.ping is not None}, "
-            f"suppress_context_exit={self.suppress_context_exit}"
+            f"suppress_context_exit={self.suppress_context_exit}, "
+            f"inheritable={self.inheritable}"
             ")>"
         )
 
@@ -272,6 +275,7 @@ class Registry:
         ping: Callable | None = None,
         on_registry_close: Callable | Awaitable | None = None,
         suppress_context_exit: bool = True,
+        inheritable: bool = True,
     ) -> None:
         """
         Register *factory* to be used when asked for a *svc_type*.
@@ -346,6 +350,7 @@ class Registry:
             ping=ping,
             on_registry_close=on_registry_close,
             suppress_context_exit=suppress_context_exit,
+            inheritable=inheritable,
         )
 
         log.debug(
@@ -367,6 +372,7 @@ class Registry:
         ping: Callable | None = None,
         on_registry_close: Callable | Awaitable | None = None,
         suppress_context_exit: bool = True,
+        inheritable: bool = True,
     ) -> None:
         """
         Syntactic sugar for::
@@ -377,7 +383,8 @@ class Registry:
                enter=enter,
                ping=ping,
                on_registry_close=on_registry_close,
-               suppress_context_exit=suppress_context_exit
+               suppress_context_exit=suppress_context_exit,
+               inheritable=inheritable,
            )
 
         Please note that, unlike with :meth:`register_factory`, entering
@@ -393,6 +400,7 @@ class Registry:
             ping=ping,
             on_registry_close=on_registry_close,
             suppress_context_exit=suppress_context_exit,
+            inheritable=inheritable,
         )
 
         log.debug(
@@ -410,6 +418,7 @@ class Registry:
         ping: Callable | None,
         on_registry_close: Callable | Awaitable | None = None,
         suppress_context_exit: bool = True,
+        inheritable: bool = True,
     ) -> RegisteredService:
         if isgeneratorfunction(factory):
             factory = contextmanager(factory)
@@ -423,6 +432,7 @@ class Registry:
             enter,
             ping,
             suppress_context_exit,
+            inheritable,
         )
         self._services[svc_type] = rs
         if on_registry_close is not None:
@@ -596,6 +606,7 @@ class Container:
     """
 
     registry: Registry
+    parent: Self | None = None
     _lazy_local_registry: Registry | None = None
     _instantiated: dict[type, tuple[object, RegisteredService]] = (
         attrs.Factory(dict)
@@ -606,6 +617,12 @@ class Container:
             AbstractContextManager | AbstractAsyncContextManager,
         ]
     ] = attrs.Factory(list)
+
+    # Tracks the number of children containers
+    _usecount: int = 0
+    # Jamie thinks RLock is compatible with async, preventing deadlocks
+    # (Not that deadlocks should happen the way count modification is implemented)
+    _uselock: threading.RLock = attrs.Factory(threading.RLock)
 
     def __repr__(self) -> str:
         return (
@@ -620,6 +637,8 @@ class Container:
         return svc_type in self._instantiated
 
     def __enter__(self) -> Container:
+        with self._uselock:
+            self._usecount += 1
         return self
 
     def __exit__(
@@ -628,9 +647,22 @@ class Container:
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
-        self.close(exc_type, exc_val, exc_tb)
+        with self._uselock:
+            self._usecount -= 1
+            if self._usecount < 0:
+                warnings.warn(
+                    "Container was exited more than entered",
+                    ResourceWarning,
+                    stacklevel=1,
+                )
+                self._usecount = 0
+
+        if self._usecount == 0:
+            self.close(exc_type, exc_val, exc_tb)
 
     async def __aenter__(self) -> Container:
+        with self._uselock:
+            self._usecount += 1
         return self
 
     async def __aexit__(
@@ -639,7 +671,18 @@ class Container:
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
-        await self.aclose(exc_type, exc_val, exc_tb)
+        with self._uselock:
+            self._usecount -= 1
+            if self._usecount < 0:
+                warnings.warn(
+                    "Container was exited more than entered",
+                    ResourceWarning,
+                    stacklevel=1,
+                )
+                self._usecount = 0
+
+        if self._usecount == 0:
+            await self.aclose(exc_type, exc_val, exc_tb)
 
     def __del__(self) -> None:
         """
@@ -651,6 +694,25 @@ class Container:
                 ResourceWarning,
                 stacklevel=1,
             )
+
+    @contextmanager
+    def fork(self):
+        """
+        Create a child container, inheriting from this one.
+        """
+        with self, Container(registry=self.registry, parent=self) as child:
+            yield child
+
+    @asynccontextmanager
+    async def afork(self):
+        """
+        Create a child container, inheriting from this one.
+        """
+        async with (
+            self,
+            Container(registry=self.registry, parent=self) as child,
+        ):
+            yield child
 
     def close(
         self,
@@ -668,6 +730,10 @@ class Container:
         Hint:
             The Container can be used again after this. Closing it is an
             idempotent way to reset it.
+
+        Note:
+            You almost certainly do not want to call this directly, since it'll
+            cause child containers to recreate all their resources.
         """
         for rs, cm in reversed(self._on_close):
             try:
@@ -711,6 +777,10 @@ class Container:
         Hint:
             The container can be used again after this. Closing it is an
             idempotent way to reset it.
+
+        Note:
+            You almost certainly do not want to call this directly, since it'll
+            cause child containers to recreate all their resources.
         """
         for rs, cm in reversed(self._on_close):
             try:
@@ -801,15 +871,32 @@ class Container:
         meaningful.
         """
         rs: RegisteredService | None = None
-        if cached_data := self._instantiated.get(svc_type):
-            svc, rs = cached_data
-            return True, svc, rs
 
-        if self._lazy_local_registry is not None:
-            with suppress(ServiceNotFoundError):
-                rs = self._lazy_local_registry.get_registered_service_for(
-                    svc_type
-                )
+        container = self
+        while container is not None:
+            if cached_data := container._instantiated.get(svc_type):
+                svc, rs = cached_data
+                if rs.inheritable:
+                    # If inheritable, we don't care about the container checks below
+                    return True, svc, rs
+                if container is self:
+                    # non-inheritable, but found it on ourselves
+                    return True, svc, rs
+                # Found the rs, but can't use the inherited instance
+                svc = None
+                break
+
+            if container._lazy_local_registry is not None:
+                try:
+                    rs = container._lazy_local_registry.get_registered_service_for(
+                        svc_type
+                    )
+                except ServiceNotFoundError:
+                    pass
+                else:
+                    break
+
+            container = container.parent
 
         if rs is None:
             rs = self.registry.get_registered_service_for(svc_type)
@@ -825,6 +912,7 @@ class Container:
         enter: bool = True,
         ping: Callable | None = None,
         on_registry_close: Callable | Awaitable | None = None,
+        inheritable: bool = True,
     ) -> None:
         """
         Same as :meth:`svcs.Registry.register_factory()`, but registers the
@@ -847,6 +935,7 @@ class Container:
             enter=enter,
             ping=ping,
             on_registry_close=on_registry_close,
+            inheritable=inheritable,
         )
 
     def register_local_value(
@@ -857,6 +946,7 @@ class Container:
         enter: bool = False,
         ping: Callable | None = None,
         on_registry_close: Callable | Awaitable | None = None,
+        inheritable: bool = True,
     ) -> None:
         """
         Syntactic sugar for::
@@ -866,7 +956,8 @@ class Container:
                lambda: value,
                enter=enter,
                ping=ping,
-               on_registry_close=on_registry_close
+               on_registry_close=on_registry_close,
+               inheritable=inheritable,
            )
 
         Please note that, unlike with :meth:`register_local_factory`, entering
@@ -883,6 +974,7 @@ class Container:
             enter=enter,
             ping=ping,
             on_registry_close=on_registry_close,
+            inheritable=inheritable,
         )
 
     @overload
