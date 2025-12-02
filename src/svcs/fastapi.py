@@ -7,8 +7,8 @@ from __future__ import annotations
 import contextlib
 import inspect
 
-from collections.abc import AsyncGenerator
-from typing import Annotated, Callable
+from collections.abc import AsyncGenerator, Callable
+from typing import Annotated
 
 import attrs
 

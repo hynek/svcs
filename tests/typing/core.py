@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 import contextlib
-import sys
 
 from collections.abc import AsyncGenerator, Generator
 from typing import Protocol
@@ -126,14 +125,13 @@ with contextlib.closing(svcs.Container(reg)) as con:
 with svcs.Container(reg) as con:
     i2: int = con.get(int)
 
-if sys.version_info >= (3, 10):
 
-    async def ctx() -> None:
-        async with contextlib.aclosing(svcs.Container(reg)):
-            ...
+async def ctx() -> None:
+    async with contextlib.aclosing(svcs.Container(reg)):
+        ...
 
-        async with contextlib.aclosing(svcs.Registry()):
-            ...
+    async with contextlib.aclosing(svcs.Registry()):
+        ...
 
 
 # Multiple factories for same type:
