@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import inspect
 import logging
-import sys
 import warnings
 
 from collections.abc import Awaitable, Callable, Iterator
@@ -503,32 +502,22 @@ class Registry:
         self._on_close.clear()
 
 
-if sys.version_info >= (3, 10):
+def _robust_signature(factory: Callable) -> inspect.Signature | None:
+    with suppress(Exception):
+        # Provide the locals so that `eval_str` will work even if the user
+        # places the `Container` under a `if TYPE_CHECKING` block.
+        return inspect.signature(
+            factory,
+            locals={"Container": Container},  # ty: ignore[unknown-argument]
+            eval_str=True,  # ty: ignore[unknown-argument]
+        )
 
-    def _robust_signature(factory: Callable) -> inspect.Signature | None:
-        with suppress(Exception):
-            # Provide the locals so that `eval_str` will work even if the user
-            # places the `Container` under a `if TYPE_CHECKING` block.
-            return inspect.signature(
-                factory,
-                locals={"Container": Container},  # ty: ignore[unknown-argument]
-                eval_str=True,  # ty: ignore[unknown-argument]
-            )
+    # Retry without `eval_str` since if the annotation is "svcs.Container"
+    # the eval will fail due to it not finding the `svcs` module
+    with suppress(Exception):
+        return inspect.signature(factory)
 
-        # Retry without `eval_str` since if the annotation is "svcs.Container"
-        # the eval will fail due to it not finding the `svcs` module
-        with suppress(Exception):
-            return inspect.signature(factory)
-
-        return None
-
-else:
-
-    def _robust_signature(factory: Callable) -> inspect.Signature | None:
-        try:
-            return inspect.signature(factory)
-        except Exception:  # noqa: BLE001
-            return None
+    return None
 
 
 def _takes_container(factory: Callable) -> bool:

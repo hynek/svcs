@@ -6,8 +6,6 @@
 Ensure our fake factories do what we want them to do.
 """
 
-import sys
-
 from collections.abc import AsyncGenerator, Generator
 
 import pytest
@@ -72,9 +70,3 @@ async def test_async_str_cleanup_factory():
 
     with pytest.raises(StopAsyncIteration):
         await anext(gen)
-
-
-if sys.version_info < (3, 10):
-
-    def anext(gen: AsyncGenerator):
-        return gen.__anext__()
