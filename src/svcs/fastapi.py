@@ -8,7 +8,7 @@ import contextlib
 import inspect
 
 from collections.abc import AsyncGenerator, Callable
-from typing import Annotated
+from typing import Annotated, TypeAlias, cast
 
 import attrs
 
@@ -17,6 +17,17 @@ from fastapi import Depends, FastAPI, Request
 import svcs
 
 from svcs._core import _KEY_REGISTRY
+
+
+AsyncGenLifespan: TypeAlias = Callable[
+    [FastAPI, svcs.Registry],
+    AsyncGenerator[dict[str, object] | None, None],
+]
+AsyncCMLifespan: TypeAlias = Callable[
+    [FastAPI, svcs.Registry],
+    contextlib.AbstractAsyncContextManager[dict[str, object] | None],
+]
+SomeLifespan: TypeAlias = AsyncGenLifespan | AsyncCMLifespan
 
 
 @attrs.define
@@ -34,20 +45,7 @@ class lifespan:  # noqa: N801
         lifespan: The lifespan function to make *svcs*-aware.
     """
 
-    _lifespan: (
-        Callable[
-            [FastAPI, svcs.Registry],
-            contextlib.AbstractAsyncContextManager[dict[str, object]],
-        ]
-        | Callable[
-            [FastAPI, svcs.Registry],
-            contextlib.AbstractAsyncContextManager[None],
-        ]
-        | Callable[
-            [FastAPI, svcs.Registry], AsyncGenerator[dict[str, object], None]
-        ]
-        | Callable[[FastAPI, svcs.Registry], AsyncGenerator[None, None]]
-    )
+    _lifespan: SomeLifespan
     _state: dict[str, object] = attrs.field(factory=dict)
     registry: svcs.Registry = attrs.field(factory=svcs.Registry)
 
@@ -55,13 +53,13 @@ class lifespan:  # noqa: N801
     async def __call__(
         self, app: FastAPI
     ) -> AsyncGenerator[dict[str, object], None]:
-        cm: Callable[
-            [FastAPI, svcs.Registry], contextlib.AbstractAsyncContextManager
-        ]
+        cm: AsyncCMLifespan
         if inspect.isasyncgenfunction(self._lifespan):
-            cm = contextlib.asynccontextmanager(self._lifespan)
+            cm = contextlib.asynccontextmanager(
+                cast(AsyncGenLifespan, self._lifespan)
+            )
         else:
-            cm = self._lifespan  # type: ignore[assignment]
+            cm = cast(AsyncCMLifespan, self._lifespan)
 
         async with self.registry, cm(app, self.registry) as state:
             self._state = state or {}
