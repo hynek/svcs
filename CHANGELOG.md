@@ -17,6 +17,8 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ### Added
 
+- Python 3.14 support.
+
 - New *suppress_context_exit* argument to `svcs.register_(factory|value)()`.
   If set to `False`, errors in the container context will be passed into the factory cleanup context manager and allow you to act on them there.
 
