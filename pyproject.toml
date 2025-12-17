@@ -61,7 +61,7 @@ docs = [
 tests = ["pytest", "pytest-asyncio", "sybil>=6"]
 typing = [
   "mypy>=1.4",
-  "fastapi; python_version < '3.14'",
+  "fastapi",
   "flask",
   "starlette",
   "aiohttp",
