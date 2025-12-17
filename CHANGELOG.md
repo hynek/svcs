@@ -33,7 +33,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   [#135](https://github.com/hynek/svcs/discussions/135)
   [#139](https://github.com/hynek/svcs/pull/139)
 
-- Support for Python 3.9.
+- Python 3.9 support.
   [#152](https://github.com/hynek/svcs/pull/152)
 
 
