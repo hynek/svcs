@@ -164,7 +164,7 @@ source = ["src", ".tox/py*/**/site-packages"]
 show_missing = true
 skip_covered = true
 exclude_also = [
-  # Typing-related
+  # Typing
   "if TYPE_CHECKING:",
   ": +\\.\\.\\.$",
   # Tests
