@@ -480,7 +480,7 @@ class Registry:
         for rs, oc in reversed(self._on_close):
             try:
                 if iscoroutinefunction(oc):
-                    oc = oc()  # noqa: PLW2901 # ty: ignore[call-non-callable]  # pyrefly: ignore[bad-assignment]
+                    oc = oc()  # noqa: PLW2901 # ty: ignore[call-non-callable]
 
                 if isawaitable(oc):
                     log.debug("async closing %r", rs.name)
@@ -488,7 +488,7 @@ class Registry:
                     log.debug("async closed %r", rs.name)
                 else:
                     log.debug("closing %r", rs.name)
-                    oc()  # pyrefly: ignore[unused-coroutine]
+                    oc()
                     log.debug("closed %r", rs.name)
             except Exception:  # noqa: BLE001, PERF203
                 log.warning(
