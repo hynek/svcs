@@ -236,11 +236,6 @@ exclude = [
   "src/svcs/pyramid.py",
   "tests/typing/mypy.py",
   "tests/typing/pyramid.py",
-  # Starlette started failing since ty 0.0.0a26 and is nontrivial to fix due to
-  # the prevalence of private types:
-  # <https://github.com/Kludex/starlette/blob/49d4de92867cb38a781069701ad57cecab4a1a36/starlette/middleware/__init__.py#L9-L18>.
-  "src/svcs/starlette.py",
-  "tests/typing/starlette.py",
 ]
 
 
