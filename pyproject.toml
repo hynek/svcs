@@ -14,10 +14,9 @@ description = "A Flexible Service Locator"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Hynek Schlawack", email = "hs@ox.cx" }]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -56,17 +55,19 @@ docs = [
   "fastapi",
   "flask",
   "pyramid",
+  "setuptools<82",
   "starlette",
   "sqlalchemy",
 ]
 tests = ["pytest", "pytest-asyncio", "sybil>=6"]
 typing = [
   "mypy>=1.4",
-  "fastapi; python_version < '3.14'",
+  "fastapi",
   "flask",
   "starlette",
   "aiohttp",
   "pyramid",
+  "setuptools<82",
 ]
 dev = [
   { include-group = "tests" },
@@ -159,13 +160,13 @@ parallel = true
 source = ["svcs", "tests"]
 
 [tool.coverage.paths]
-source = ["src", ".tox/py*/**/site-packages"]
+source = ["src", ".tox/3.*/**/site-packages"]
 
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
 exclude_also = [
-  # Typing-related
+  # Typing
   "if TYPE_CHECKING:",
   ": +\\.\\.\\.$",
   # Tests
@@ -229,7 +230,7 @@ ignore = [
 
 
 [tool.ty.rules]
-possibly-unbound-attribute = "ignore"
+possibly-missing-attribute = "ignore"
 
 [tool.ty.src]
 include = ["src/svcs", "tests/typing/"]
@@ -241,11 +242,12 @@ exclude = [
 
 
 [tool.pyrefly]
-# Currently can't type-check the package itself due to
-# <https://github.com/facebook/pyrefly/issues/805>. I've been told a beta
-# release with that fix should come ~end of November 2025.
-project-includes = ["tests/typing"]
-project-excludes = ["tests/typing/mypy.py", "tests/typing/pyramid.py"]
+project-includes = ["src", "tests/typing"]
+project-excludes = [
+  "src/svcs/pyramid.py",
+  "tests/typing/mypy.py",
+  "tests/typing/pyramid.py",
+]
 
 
 [tool.ruff]
