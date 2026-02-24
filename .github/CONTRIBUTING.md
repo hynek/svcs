@@ -1,8 +1,10 @@
 # How To Contribute
 
 > [!IMPORTANT]
-> This document is mainly to help you to get started by codifying tribal knowledge and expectations and make it more accessible to everyone.
-> But don't be afraid to open half-finished PRs and ask questions if something is unclear!
+> - This document is mainly to help you to get started by codifying tribal knowledge and expectations and make it more accessible to everyone.
+>   But don't be afraid to open half-finished PRs and ask questions if something is unclear!
+>
+> - If you use LLM / "AI" tools for your contributions, please read and follow our [_Generative AI / LLM Policy_][llm].
 
 
 ## Workflow
@@ -16,6 +18,8 @@ It's people like *you* who make this project such a great tool for everyone.
 - No contribution is too small!
   Please submit as many fixes for typos and grammar bloopers as you can!
 
+- **Only contribute code that you fully understand.**
+  See also our [AI policy][llm].
 - Try to limit each pull request to *one* change only.
 
 - Since we squash on merge, it's up to you how you handle updates to the `main` branch.
@@ -235,3 +239,4 @@ Please report any harm to [Hynek Schlawack](https://hynek.me/about/) in any way 
 
 
 [semantic newlines]: https://rhodesmill.org/brandon/2012/one-sentence-per-line/
+[llm]: AI_POLICY.md
