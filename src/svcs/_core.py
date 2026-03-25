@@ -37,7 +37,7 @@ log = logging.getLogger("svcs")
 
 def _full_name(obj: object) -> str:
     try:
-        return f"{obj.__module__}.{obj.__qualname__}"  # type: ignore[attr-defined]
+        return f"{obj.__module__}.{obj.__qualname__}"  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
     except AttributeError:
         return repr(obj)
 
@@ -480,7 +480,7 @@ class Registry:
         for rs, oc in reversed(self._on_close):
             try:
                 if iscoroutinefunction(oc):
-                    oc = oc()  # noqa: PLW2901 # ty: ignore[call-non-callable]
+                    oc = oc()  # noqa: PLW2901
 
                 if isawaitable(oc):
                     log.debug("async closing %r", rs.name)
@@ -508,8 +508,8 @@ def _robust_signature(factory: Callable) -> inspect.Signature | None:
         # places the `Container` under a `if TYPE_CHECKING` block.
         return inspect.signature(
             factory,
-            locals={"Container": Container},  # ty: ignore[unknown-argument]
-            eval_str=True,  # ty: ignore[unknown-argument]
+            locals={"Container": Container},
+            eval_str=True,
         )
 
     # Retry without `eval_str` since if the annotation is "svcs.Container"

@@ -83,7 +83,7 @@ class lifespan:  # noqa: N801
         if inspect.isasyncgenfunction(self._lifespan):
             cm = contextlib.asynccontextmanager(self._lifespan)
         else:
-            cm = self._lifespan  # type: ignore[assignment]
+            cm = self._lifespan  # type: ignore[assignment]  # ty: ignore[invalid-assignment]
 
         async with self.registry, cm(app, self.registry) as state:
             self._state = state or {}
