@@ -20,6 +20,7 @@ It's people like *you* who make this project such a great tool for everyone.
 
 - **Only contribute code that you fully understand.**
   See also our [AI policy][llm].
+
 - Try to limit each pull request to *one* change only.
 
 - Since we squash on merge, it's up to you how you handle updates to the `main` branch.
