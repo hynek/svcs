@@ -164,7 +164,7 @@ jobs:
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           # Keep in sync with tox/docs and .readthedocs.yaml.
-          python-version: "3.13"
+          python-version: "3.14"
       - uses: hynek/setup-cached-uv@757bedc3f972eb7227a1aa657651f15a8527c817 # v2.3.0
 
       - run: uvx --with=tox-uv tox run -e docs-doctests
