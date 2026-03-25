@@ -996,14 +996,11 @@ class Container:
                 rv.append(svc)
                 continue
 
-            if (
-                not isinstance(svc, MagicMock)
-                and (
-                    iscoroutine(svc)
-                    or isinstance(
-                        svc,
-                        AbstractAsyncContextManager,  # pyrefly: ignore[unsafe-overlap]
-                    )
+            if not isinstance(svc, MagicMock) and (
+                iscoroutine(svc)
+                or isinstance(
+                    svc,
+                    AbstractAsyncContextManager,  # pyrefly: ignore[unsafe-overlap]
                 )
             ):
                 msg = "Use `aget()` for async factories."
