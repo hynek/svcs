@@ -60,6 +60,7 @@ jobs:
           # because there's nothing that would prevent a malicious PyPI from
           # serving a signed TestPyPI asset in place of a release intended for
           # PyPI.
+          attestations: false
           repository-url: https://test.pypi.org/legacy/
 
   # Upload to real PyPI on GitHub Releases.
