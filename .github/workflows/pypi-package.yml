@@ -56,7 +56,10 @@ jobs:
       - name: Upload package to Test PyPI
         uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
         with:
-          attestations: true
+          # Do not perform attestation for things for TestPyPI. This is
+          # because there's nothing that would prevent a malicious PyPI from
+          # serving a signed TestPyPI asset in place of a release intended for
+          # PyPI.
           repository-url: https://test.pypi.org/legacy/
 
   # Upload to real PyPI on GitHub Releases.
