@@ -11,6 +11,7 @@ from ._core import (
     Registry,
     ServicePing,
 )
+from .helpers import aautowire, autowire
 
 
 __all__ = [
@@ -18,6 +19,8 @@ __all__ = [
     "RegisteredService",
     "Registry",
     "ServicePing",
+    "aautowire",
+    "autowire",
     "exceptions",
 ]
 

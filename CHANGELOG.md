@@ -19,6 +19,9 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 - Python 3.14 support.
 
+- New `svcs.autowire()` and `svcs.aautowire()` that can be used to automatically resolve dependencies based on type annotations of the provided callable.
+  [#167](https://github.com/hynek/svcs/pull/167)
+
 - New *suppress_context_exit* argument to `svcs.register_(factory|value)()`.
   If set to `False`, errors in the container context will be passed into the factory cleanup context manager and allow you to act on them there.
 

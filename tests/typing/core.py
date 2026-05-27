@@ -158,3 +158,20 @@ class Foo:
 foo = Foo()
 
 reg.register_value(Foo, foo)
+
+
+# Autowire
+@svcs.autowire
+def fn(a: str, /, b: int, *, c: bool) -> str:
+    return "fn"
+
+
+@svcs.aautowire
+async def afn(a: str, /, b: int, *, c: bool) -> str:
+    return "afn"
+
+
+reg.register_factory(str, fn)
+reg.register_factory(str, afn)
+reg.register_factory(P, svcs.autowire(P))
+reg.register_factory(P, svcs.aautowire(P))

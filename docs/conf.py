@@ -77,6 +77,8 @@ nitpick_ignore = [
     ("py:class", "FastAPI"),
     ("py:class", "Starlette"),
     ("py:class", "starlette.requests.Request"),
+    # TypeVar in helpers module
+    ("py:class", "svcs.helpers._T"),
 ]
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
