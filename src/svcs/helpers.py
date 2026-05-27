@@ -94,13 +94,11 @@ def autowire(fn_or_cls: Callable[..., _T]) -> Callable[[Container], _T]:
     ..  versionadded:: 25.2.0
 
     """
-
     sig = inspect.signature(fn_or_cls, follow_wrapped=False, eval_str=True)
 
     def wrapper(svcs_container: Container) -> _T:
 
         posargs: list[Any] = []
-
         kwargs: dict[str, Any] = {}
 
         for name, param in sig.parameters.items():
@@ -121,7 +119,6 @@ def autowire(fn_or_cls: Callable[..., _T]) -> Callable[[Container], _T]:
 
             try:
                 kwargs[name] = svcs_container.get(annotation)
-
             except ServiceNotFoundError:
                 if param.default is param.empty:
                     raise
@@ -152,15 +149,12 @@ def aautowire(
     ..  versionadded:: 25.2.0
 
     """
-
     sig = inspect.signature(fn_or_cls, follow_wrapped=False, eval_str=True)
-
     is_async_fn = inspect.iscoroutinefunction(fn_or_cls)
 
     async def wrapper(svcs_container: Container) -> _T:
 
         posargs: list[Any] = []
-
         kwargs: dict[str, Any] = {}
 
         for name, param in sig.parameters.items():
@@ -181,7 +175,6 @@ def aautowire(
 
             try:
                 kwargs[name] = await svcs_container.aget(annotation)
-
             except ServiceNotFoundError:
                 if param.default is param.empty:
                     raise
