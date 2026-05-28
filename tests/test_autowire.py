@@ -54,17 +54,17 @@ SPECIAL_TYPE_CASES = [
 """Special Python types that autowire should support when resolving dependencies."""
 
 
-SERVICE = Service()
-ANOTHER_SERVICE = AnotherService()
-YET_ANOTHER_SERVICE = YetAnotherService()
+_service = Service()
+_another_service = AnotherService()
+_yet_another_service = YetAnotherService()
 
 
 # Autouse fixture to register service instances
 @pytest.fixture(autouse=True)
 def register_services(registry):
-    registry.register_value(Service, SERVICE)
-    registry.register_value(AnotherService, ANOTHER_SERVICE)
-    registry.register_value(YetAnotherService, YET_ANOTHER_SERVICE)
+    registry.register_value(Service, _service)
+    registry.register_value(AnotherService, _another_service)
+    registry.register_value(YetAnotherService, _yet_another_service)
 
 
 class TestAutowireFunction:
@@ -73,37 +73,37 @@ class TestAutowireFunction:
         [
             pytest.param(
                 list_multiple_dependencies_factory,
-                [SERVICE, ANOTHER_SERVICE],
+                [_service, _another_service],
                 id="multiple_dependencies",
             ),
             pytest.param(
                 list_positional_only_factory,
-                [SERVICE, ANOTHER_SERVICE, YET_ANOTHER_SERVICE],
+                [_service, _another_service, _yet_another_service],
                 id="positional_only",
             ),
             pytest.param(
                 list_positional_only_arg_with_default_factory,
-                [SERVICE, None],
+                [_service, None],
                 id="positional_only_arg_with_default",
             ),
             pytest.param(
                 list_keyword_only_factory,
-                [SERVICE, ANOTHER_SERVICE],
+                [_service, _another_service],
                 id="keyword_only",
             ),
             pytest.param(
                 list_keyword_arg_with_default_factory,
-                [SERVICE, None],
+                [_service, None],
                 id="keyword_arg_with_default",
             ),
             pytest.param(
                 list_ignores_variadic_args_factory,
-                [SERVICE, (), {}],
+                [_service, (), {}],
                 id="variadic_args",
             ),
             pytest.param(
                 list_string_type_annotation_factory,
-                [SERVICE],
+                [_service],
                 id="string_type_annotation",
             ),
         ],
@@ -156,47 +156,47 @@ class TestAutowireClass:
     @pytest.mark.parametrize(
         ("service_cls", "expected"),
         [
-            pytest.param(SingleService, SingleService(SERVICE), id="single"),
+            pytest.param(SingleService, SingleService(_service), id="single"),
             pytest.param(
                 MultipleServices,
-                MultipleServices(SERVICE, ANOTHER_SERVICE),
+                MultipleServices(_service, _another_service),
                 id="multiple",
             ),
             pytest.param(
                 KeywordOnlyServices,
                 KeywordOnlyServices(
-                    svc=SERVICE,
-                    another=ANOTHER_SERVICE,
+                    svc=_service,
+                    another=_another_service,
                 ),
                 id="keyword_only",
             ),
             pytest.param(
                 PositionalOnlyServices,
                 PositionalOnlyServices(
-                    SERVICE,
-                    ANOTHER_SERVICE,
-                    YET_ANOTHER_SERVICE,
+                    _service,
+                    _another_service,
+                    _yet_another_service,
                 ),
                 id="positional_only",
             ),
             pytest.param(
                 KeywordArgWithDefault,
-                KeywordArgWithDefault(SERVICE, None),
+                KeywordArgWithDefault(_service, None),
                 id="keyword_arg_with_default",
             ),
             pytest.param(
                 PositionalOnlyArgWithDefault,
-                PositionalOnlyArgWithDefault(SERVICE, None),
+                PositionalOnlyArgWithDefault(_service, None),
                 id="positional_only_arg_with_default",
             ),
             pytest.param(
                 VariadicArgs,
-                VariadicArgs(SERVICE),
+                VariadicArgs(_service),
                 id="variadic_args",
             ),
             pytest.param(
                 InitVarService,
-                InitVarService(SERVICE, ANOTHER_SERVICE),
+                InitVarService(_service, _another_service),
                 id="initvar",
             ),
         ],
@@ -254,37 +254,37 @@ class TestAAutowireFunction:
         [
             pytest.param(
                 async_list_multiple_dependencies_factory,
-                [SERVICE, ANOTHER_SERVICE],
+                [_service, _another_service],
                 id="multiple_dependencies",
             ),
             pytest.param(
                 async_list_positional_only_factory,
-                [SERVICE, ANOTHER_SERVICE, YET_ANOTHER_SERVICE],
+                [_service, _another_service, _yet_another_service],
                 id="positional_only",
             ),
             pytest.param(
                 async_list_positional_only_arg_with_default_factory,
-                [SERVICE, None],
+                [_service, None],
                 id="positional_only_arg_with_default",
             ),
             pytest.param(
                 async_list_keyword_only_factory,
-                [SERVICE, ANOTHER_SERVICE],
+                [_service, _another_service],
                 id="keyword_only",
             ),
             pytest.param(
                 async_list_keyword_arg_with_default_factory,
-                [SERVICE, None],
+                [_service, None],
                 id="keyword_arg_with_default",
             ),
             pytest.param(
                 async_list_ignores_variadic_args_factory,
-                [SERVICE, (), {}],
+                [_service, (), {}],
                 id="variadic_args",
             ),
             pytest.param(
                 async_list_string_type_annotation_factory,
-                [SERVICE],
+                [_service],
                 id="string_type_annotation",
             ),
         ],
@@ -340,47 +340,47 @@ class TestAAutowireClass:
     @pytest.mark.parametrize(
         ("service_cls", "expected"),
         [
-            pytest.param(SingleService, SingleService(SERVICE), id="single"),
+            pytest.param(SingleService, SingleService(_service), id="single"),
             pytest.param(
                 MultipleServices,
-                MultipleServices(SERVICE, ANOTHER_SERVICE),
+                MultipleServices(_service, _another_service),
                 id="multiple",
             ),
             pytest.param(
                 KeywordOnlyServices,
                 KeywordOnlyServices(
-                    svc=SERVICE,
-                    another=ANOTHER_SERVICE,
+                    svc=_service,
+                    another=_another_service,
                 ),
                 id="keyword_only",
             ),
             pytest.param(
                 PositionalOnlyServices,
                 PositionalOnlyServices(
-                    SERVICE,
-                    ANOTHER_SERVICE,
-                    YET_ANOTHER_SERVICE,
+                    _service,
+                    _another_service,
+                    _yet_another_service,
                 ),
                 id="positional_only",
             ),
             pytest.param(
                 KeywordArgWithDefault,
-                KeywordArgWithDefault(SERVICE, None),
+                KeywordArgWithDefault(_service, None),
                 id="keyword_arg_with_default",
             ),
             pytest.param(
                 PositionalOnlyArgWithDefault,
-                PositionalOnlyArgWithDefault(SERVICE, None),
+                PositionalOnlyArgWithDefault(_service, None),
                 id="positional_only_arg_with_default",
             ),
             pytest.param(
                 VariadicArgs,
-                VariadicArgs(SERVICE),
+                VariadicArgs(_service),
                 id="variadic_args",
             ),
             pytest.param(
                 InitVarService,
-                InitVarService(SERVICE, ANOTHER_SERVICE),
+                InitVarService(_service, _another_service),
                 id="initvar",
             ),
         ],
