@@ -94,3 +94,8 @@ class InitVarService:  # noqa: PLW1641
 
     def __eq__(self, other: object) -> bool:
         return self.service == other.service and self.another == other.another
+
+
+@dataclass
+class StringAnnotationService:
+    svc: "Service"

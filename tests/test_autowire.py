@@ -36,6 +36,7 @@ from tests.fake_services import (
     PositionalOnlyArgWithDefault,
     PositionalOnlyServices,
     SingleService,
+    StringAnnotationService,
     VariadicArgs,
 )
 from tests.ifaces import (
@@ -198,6 +199,11 @@ class TestAutowireClass:
                 InitVarService,
                 InitVarService(_service, _another_service),
                 id="initvar",
+            ),
+            pytest.param(
+                StringAnnotationService,
+                StringAnnotationService(_service),
+                id="string_type_annotation",
             ),
         ],
     )
@@ -382,6 +388,11 @@ class TestAAutowireClass:
                 InitVarService,
                 InitVarService(_service, _another_service),
                 id="initvar",
+            ),
+            pytest.param(
+                StringAnnotationService,
+                StringAnnotationService(_service),
+                id="string_type_annotation",
             ),
         ],
     )
