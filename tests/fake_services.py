@@ -93,7 +93,4 @@ class InitVarService:  # noqa: PLW1641
         self.another = another
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, InitVarService):
-            return NotImplemented
-
         return self.service == other.service and self.another == other.another

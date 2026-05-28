@@ -239,9 +239,7 @@ class TestAutowireClass:
         """
 
         class MyClass:
-            def __init__(self, svc: Service, required: str):
-                self.svc = svc
-                self.required = required
+            def __init__(self, svc: Service, required: str): ...
 
         registry.register_factory(MyClass, autowire(MyClass))
 
@@ -425,9 +423,7 @@ class TestAAutowireClass:
         """
 
         class MyClass:
-            def __init__(self, svc: Service, required: str):
-                self.svc = svc
-                self.required = required
+            def __init__(self, svc: Service, required: str): ...
 
         registry.register_factory(MyClass, aautowire(MyClass))
 
