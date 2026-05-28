@@ -111,17 +111,18 @@ def autowire(fn_or_cls: Callable[..., _T]) -> Callable[[Container], _T]:
             if isinstance(annotation, dataclasses.InitVar):
                 annotation = annotation.type
 
-            if param.kind == param.POSITIONAL_ONLY:
-                resolved = svcs_container.get(annotation)
-
-                posargs.append(resolved)
-                continue
-
             try:
-                kwargs[name] = svcs_container.get(annotation)
+                resolved = svcs_container.get(annotation)
             except ServiceNotFoundError:
                 if param.default is param.empty:
                     raise
+                resolved = param.default
+
+            if param.kind == param.POSITIONAL_ONLY:
+                posargs.append(resolved)
+                continue
+
+            kwargs[name] = resolved
 
         return fn_or_cls(*posargs, **kwargs)
 
@@ -167,17 +168,18 @@ def aautowire(
             if isinstance(annotation, dataclasses.InitVar):
                 annotation = annotation.type
 
-            if param.kind == param.POSITIONAL_ONLY:
-                resolved = await svcs_container.aget(annotation)
-
-                posargs.append(resolved)
-                continue
-
             try:
-                kwargs[name] = await svcs_container.aget(annotation)
+                resolved = await svcs_container.aget(annotation)
             except ServiceNotFoundError:
                 if param.default is param.empty:
                     raise
+                resolved = param.default
+
+            if param.kind == param.POSITIONAL_ONLY:
+                posargs.append(resolved)
+                continue
+
+            kwargs[name] = resolved
 
         if is_async_fn:
             return await fn_or_cls(*posargs, **kwargs)  # type: ignore[no-any-return,misc]  # ty:ignore[invalid-await]

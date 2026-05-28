@@ -92,6 +92,24 @@ class TestAutowireFunction:
             container.get(Service, AnotherService, YetAnotherService) == result
         )
 
+    def test_autowire_positional_only_arg_with_default(
+        self, registry, container
+    ):
+        """
+        autowire uses the default value if a positional-only parameter
+        cannot be found in the container.
+        """
+
+        @autowire
+        def func(svc: Service, optional: str | None = None, /) -> list:
+            return [svc, optional]
+
+        registry.register_factory(list, func)
+
+        result = container.get(list)
+
+        assert [container.get(Service), None] == result
+
     def test_autowire_keyword_only(self, registry, container):
         """
         autowire resolves keyword-only parameters from the container.
@@ -237,6 +255,24 @@ class TestAutowireClass:
             container.get(YetAnotherService),
         ) == container.get(MyClass)
 
+    def test_autowire_class_positional_only_arg_with_default(
+        self, registry, container
+    ):
+        """
+        autowire uses the default value if a positional-only class
+        parameter cannot be found in the container.
+        """
+
+        @dataclass(init=False)
+        class MyClass:
+            def __init__(self, svc: Service, optional: str | None = None, /):
+                self.svc = svc
+                self.optional = optional
+
+        registry.register_factory(MyClass, autowire(MyClass))
+
+        assert MyClass(container.get(Service), None) == container.get(MyClass)
+
     @pytest.mark.parametrize(
         ("special_type", "field_name"),
         [
@@ -355,6 +391,24 @@ class TestAAutowireFunction:
             await container.aget(Service, AnotherService, YetAnotherService)
             == result
         )
+
+    async def test_aautowire_positional_only_arg_with_default(
+        self, registry, container
+    ):
+        """
+        aautowire uses the default value if a positional-only parameter
+        cannot be found in the container.
+        """
+
+        @aautowire
+        async def func(svc: Service, optional: str | None = None, /) -> list:
+            return [svc, optional]
+
+        registry.register_factory(list, func)
+
+        result = await container.aget(list)
+
+        assert [await container.aget(Service), None] == result
 
     async def test_aautowire_keyword_only(self, registry, container):
         """
@@ -507,6 +561,26 @@ class TestAAutowireClass:
             await container.aget(Service),
             await container.aget(AnotherService),
             await container.aget(YetAnotherService),
+        ) == await container.aget(MyClass)
+
+    async def test_aautowire_class_positional_only_arg_with_default(
+        self, registry, container
+    ):
+        """
+        aautowire uses the default value if a positional-only class
+        parameter cannot be found in the container.
+        """
+
+        @dataclass(init=False)
+        class MyClass:
+            def __init__(self, svc: Service, optional: str | None = None, /):
+                self.svc = svc
+                self.optional = optional
+
+        registry.register_factory(MyClass, aautowire(MyClass))
+
+        assert MyClass(
+            await container.aget(Service), None
         ) == await container.aget(MyClass)
 
     @pytest.mark.parametrize(
