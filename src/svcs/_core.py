@@ -182,7 +182,7 @@ class ServicePing:
 
 @attrs.define
 class Registry:
-    """
+    r"""
     A central registry of recipes for creating services.
 
     An instance of this should live as long as your application does.
@@ -205,6 +205,10 @@ class Registry:
     Warns:
         ResourceWarning:
             If a registry with pending cleanups is garbage-collected.
+
+    .. versionadded:: 26.1.0
+       It is now possible to register (and get) abstract types like
+       :class:`typing.Protocol`\ s or abstract base classes.
     """
 
     _services: dict[_ServiceType, RegisteredService] = attrs.Factory(dict)
