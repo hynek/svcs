@@ -324,8 +324,9 @@ class Registry:
                 Whether to suppress errors raised in the container context when
                 exiting registered factories.
 
-                By default, it is True to avoid propagating errors raised in container context,
-                so factories cleanup code is executed unconditionally.
+                By default, it is True to avoid propagating errors raised in
+                container context, so factories cleanup code is executed
+                unconditionally.
 
                 Set it to False to have control over error propagation, but
                 note that you can't stop the exception from bubbling out of the
@@ -335,7 +336,7 @@ class Registry:
         .. versionchanged:: 25.1.0
             *factory* now may take any amount of arguments and they are ignored.
 
-        .. versionadded:: 25.2.0
+        .. versionadded:: 26.1.0
            *suppress_context*.
         """
         rs = self._register_factory(
