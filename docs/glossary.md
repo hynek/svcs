@@ -286,7 +286,7 @@ Hexagonal Architecture
 
     - <https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)>
 
-    - <https://alistair.cockburn.us/hexagonal-architecture/>
+    - <https://web.archive.org/web/20140329201018/http://alistair.cockburn.us/Hexagonal+architecture>
 
     - [*Functional Core, Imperative Shell*](https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell) -- a screencast by Gary Bernhardt.
 
