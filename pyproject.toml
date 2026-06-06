@@ -233,12 +233,16 @@ ignore = [
 possibly-missing-attribute = "ignore"
 
 [tool.ty.src]
-include = ["src/svcs", "tests/typing/"]
 exclude = [
+  "docs",
   "src/svcs/pyramid.py",
   "tests/typing/mypy.py",
   "tests/typing/pyramid.py",
 ]
+
+[[tool.ty.overrides]]
+include = ["conftest.py", "tests"]
+rules.all = "ignore"
 
 
 [tool.pyrefly]
