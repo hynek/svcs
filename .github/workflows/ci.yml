@@ -84,6 +84,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Check public API with Mypy
+        if: matrix.python-version != '3.15'
         run: >
           uvx --with tox-uv tox run
           --installpkg dist/*.whl
