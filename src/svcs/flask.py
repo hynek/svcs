@@ -27,6 +27,8 @@ from ._core import (
     Container,
     Registry,
     ServicePing,
+    TypeForm,
+    _ServiceType,
 )
 
 
@@ -74,17 +76,19 @@ def init_app(app: FlaskAppT, *, registry: Registry | None = None) -> FlaskAppT:
     return app
 
 
-def get_abstract(*svc_types: type) -> Any:
+def get_abstract(*svc_types: _ServiceType) -> Any:
     """
     Same as :meth:`svcs.Container.get_abstract()`, but uses container on
     :obj:`flask.g`.
+
+    .. deprecated:: 26.1.0
     """
     return get(*svc_types)
 
 
 def register_factory(
     app: Flask,
-    svc_type: type,
+    svc_type: _ServiceType,
     factory: Callable,
     *,
     enter: bool = True,
@@ -106,7 +110,7 @@ def register_factory(
 
 def register_value(
     app: Flask,
-    svc_type: type,
+    svc_type: _ServiceType,
     value: object,
     *,
     enter: bool = False,
@@ -127,7 +131,7 @@ def register_value(
 
 
 def overwrite_factory(
-    svc_type: type,
+    svc_type: _ServiceType,
     factory: Callable,
     *,
     enter: bool = True,
@@ -156,7 +160,7 @@ def overwrite_factory(
 
 
 def overwrite_value(
-    svc_type: type,
+    svc_type: _ServiceType,
     value: object,
     *,
     enter: bool = True,
@@ -214,111 +218,116 @@ def close_registry(app: Flask) -> None:
 
 
 @overload
-def get(svc_type: type[T1], /) -> T1: ...
-
-
-@overload
-def get(svc_type1: type[T1], svc_type2: type[T2], /) -> tuple[T1, T2]: ...
+def get(svc_type: TypeForm[T1], /) -> T1: ...
 
 
 @overload
 def get(
-    svc_type1: type[T1], svc_type2: type[T2], svc_type3: type[T3], /
+    svc_type1: TypeForm[T1], svc_type2: TypeForm[T2], /
+) -> tuple[T1, T2]: ...
+
+
+@overload
+def get(
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    /,
 ) -> tuple[T1, T2, T3]: ...
 
 
 @overload
 def get(
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
     /,
 ) -> tuple[T1, T2, T3, T4]: ...
 
 
 @overload
 def get(
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
     /,
 ) -> tuple[T1, T2, T3, T4, T5]: ...
 
 
 @overload
 def get(
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
-    svc_type6: type[T6],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
+    svc_type6: TypeForm[T6],
     /,
 ) -> tuple[T1, T2, T3, T4, T5, T6]: ...
 
 
 @overload
 def get(
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
-    svc_type6: type[T6],
-    svc_type7: type[T7],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
+    svc_type6: TypeForm[T6],
+    svc_type7: TypeForm[T7],
     /,
 ) -> tuple[T1, T2, T3, T4, T5, T6, T7]: ...
 
 
 @overload
 def get(
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
-    svc_type6: type[T6],
-    svc_type7: type[T7],
-    svc_type8: type[T8],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
+    svc_type6: TypeForm[T6],
+    svc_type7: TypeForm[T7],
+    svc_type8: TypeForm[T8],
     /,
 ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8]: ...
 
 
 @overload
 def get(
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
-    svc_type6: type[T6],
-    svc_type7: type[T7],
-    svc_type8: type[T8],
-    svc_type9: type[T9],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
+    svc_type6: TypeForm[T6],
+    svc_type7: TypeForm[T7],
+    svc_type8: TypeForm[T8],
+    svc_type9: TypeForm[T9],
     /,
 ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9]: ...
 
 
 @overload
 def get(
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
-    svc_type6: type[T6],
-    svc_type7: type[T7],
-    svc_type8: type[T8],
-    svc_type9: type[T9],
-    svc_type10: type[T10],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
+    svc_type6: TypeForm[T6],
+    svc_type7: TypeForm[T7],
+    svc_type8: TypeForm[T8],
+    svc_type9: TypeForm[T9],
+    svc_type10: TypeForm[T10],
     /,
 ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]: ...
 
 
-def get(*svc_types: type) -> object:
+def get(*svc_types: _ServiceType) -> object:
     """
     Same as :meth:`svcs.Container.get()`, but uses container on :obj:`flask.g`.
     """

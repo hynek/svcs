@@ -15,9 +15,25 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/25.1.0...HEAD)
 
+### Deprecated
+
+- `svcs.get_abstract()` and all its `*_abstract()` siblings.
+  Thanks to [PEP 747] they are no longer necessary.
+  No deprecation warnings or plans to remove them for now.
+
+[PEP 747]: https://peps.python.org/pep-0747/
+
+
 ### Added
 
-- Python 3.14 support.
+- Python 3.14 and 3.15 support.
+
+- [PEP 747] support, aka [`typing.TypeForm`](https://docs.python.org/3.15/library/typing.html#typing.TypeForm).
+  This means that it's now possible use abstract types like `Protocol`s or abstract base classes for registered services, removing an important typing caveat.
+  This change introduces a dependency on `typing-extensions` for Python 3.14 and earlier.
+
+  Note: Mypy users that want to take advantage of this must pass the `--enable-incomplete-feature=TypeForm` argument for the time being.
+  Since the [PR to activate it has been merged](https://github.com/python/mypy/pull/21262), we expect it to land in Mypy 2.2.
 
 - New *suppress_context_exit* argument to `svcs.register_(factory|value)()`.
   If set to `False`, errors in the container context will be passed into the factory cleanup context manager and allow you to act on them there.
