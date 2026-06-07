@@ -67,8 +67,6 @@ Service Layer
 
     The business rules are enforced by `domain_model.check_if_can_add_user_to_org()` which is a pure function working on plain domain objects and doesn't use any services.
 
-    ---
-
     As you can see, ideally you call service layer functions from your views and pass them all the services it needs to do their job.
     That keeps the service layer clean from any framework-specific code and makes it easy to test.
     You could also call that function from a CLI entry point, a work queue, or a test.
@@ -170,8 +168,6 @@ Dependency Injection
         except DuplicateUserError:
             log.warning("Duplicate user", email=email)
     ```
-
-    ---
 
     Often when talking about dependency injection, people think of *dependency injection frameworks* that use decorators or other magic to inject services into their code.
     But *dependency injection* just means that services are passed from the outside, with no control over how that happens (hence {term}`Inversion of Control`).
@@ -290,7 +286,7 @@ Hexagonal Architecture
 
     - <https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)>
 
-    - <https://alistair.cockburn.us/hexagonal-architecture/>
+    - <https://web.archive.org/web/20140329201018/http://alistair.cockburn.us/Hexagonal+architecture>
 
     - [*Functional Core, Imperative Shell*](https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell) -- a screencast by Gary Bernhardt.
 

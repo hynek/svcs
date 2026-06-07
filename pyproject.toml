@@ -48,7 +48,7 @@ docs = [
   "myst-parser",
   "furo>=2023.8.17",
   "sybil",
-  "pytest",
+  "pytest>9",
   "pytest-asyncio",
   "httpx",
   "aiohttp",
@@ -141,9 +141,10 @@ pattern = '(docs/_static/.*")'
 replacement = 'https://raw.githubusercontent.com/hynek/svcs/main/\1"'
 
 
-[tool.pytest.ini_options]
-addopts = ["-ra", "--strict-markers", "--strict-config"]
-xfail_strict = true
+[tool.pytest]
+strict = true
+testpaths = ["tests"]
+addopts = ["-ra"]
 filterwarnings = [
   "once::Warning",
   # pkg_resources.declare_namespace('zope')
@@ -233,12 +234,16 @@ ignore = [
 possibly-missing-attribute = "ignore"
 
 [tool.ty.src]
-include = ["src/svcs", "tests/typing/"]
 exclude = [
+  "docs",
   "src/svcs/pyramid.py",
   "tests/typing/mypy.py",
   "tests/typing/pyramid.py",
 ]
+
+[[tool.ty.overrides]]
+include = ["conftest.py", "tests"]
+rules.all = "ignore"
 
 
 [tool.pyrefly]

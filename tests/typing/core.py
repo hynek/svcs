@@ -148,3 +148,13 @@ reg.register_value(S2, "bar")
 
 s1: str = con.get(S1)
 s2: str = con.get(S2)
+
+
+# Register instances of custom classes as values
+class Foo:
+    pass
+
+
+foo = Foo()
+
+reg.register_value(Foo, foo)

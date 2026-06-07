@@ -35,15 +35,19 @@ except (
 ):  # pragma: no cover -- not adding a tox env for aiohttp<3.9
     _AIOHTTP_KEY_REGISTRY = _KEY_REGISTRY  # type: ignore[assignment]
 
-# No equivalent of AppKey for Requests, yet?
-_AIOHTTP_KEY_CONTAINER = _KEY_CONTAINER
+try:
+    _AIOHTTP_KEY_CONTAINER = web.RequestKey(_KEY_CONTAINER, svcs.Container)
+except (
+    AttributeError
+):  # pragma: no cover -- not adding a tox env for aiohttp<3.14
+    _AIOHTTP_KEY_CONTAINER = _KEY_CONTAINER  # type: ignore[assignment]
 
 
 def svcs_from(request: web.Request) -> svcs.Container:
     """
     Get the current container from *request*.
     """
-    return request[_AIOHTTP_KEY_CONTAINER]  # type: ignore[no-any-return]
+    return request[_AIOHTTP_KEY_CONTAINER]
 
 
 def get_registry(app: web.Application) -> svcs.Registry:

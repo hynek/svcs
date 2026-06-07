@@ -38,7 +38,7 @@ log = logging.getLogger("svcs")
 
 def _full_name(obj: object) -> str:
     try:
-        return f"{obj.__module__}.{obj.__qualname__}"  # type: ignore[attr-defined]
+        return f"{obj.__module__}.{obj.__qualname__}"  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
     except AttributeError:
         return repr(obj)
 
@@ -328,8 +328,9 @@ class Registry:
                 Whether to suppress errors raised in the container context when
                 exiting registered factories.
 
-                By default, it is True to avoid propagating errors raised in container context,
-                so factories cleanup code is executed unconditionally.
+                By default, it is True to avoid propagating errors raised in
+                container context, so factories cleanup code is executed
+                unconditionally.
 
                 Set it to False to have control over error propagation, but
                 note that you can't stop the exception from bubbling out of the
@@ -339,7 +340,7 @@ class Registry:
         .. versionchanged:: 25.1.0
             *factory* now may take any amount of arguments and they are ignored.
 
-        .. versionadded:: 25.2.0
+        .. versionadded:: 26.1.0
            *suppress_context*.
         """
         rs = self._register_factory(
@@ -490,7 +491,7 @@ class Registry:
         for rs, oc in reversed(self._on_close):
             try:
                 if iscoroutinefunction(oc):
-                    oc = oc()  # noqa: PLW2901 # ty: ignore[call-non-callable]
+                    oc = oc()  # noqa: PLW2901
 
                 if isawaitable(oc):
                     log.debug("async closing %r", rs.name)
@@ -518,8 +519,8 @@ def _robust_signature(factory: Callable) -> inspect.Signature | None:
         # places the `Container` under a `if TYPE_CHECKING` block.
         return inspect.signature(
             factory,
-            locals={"Container": Container},  # ty: ignore[unknown-argument]
-            eval_str=True,  # ty: ignore[unknown-argument]
+            locals={"Container": Container},
+            eval_str=True,
         )
 
     # Retry without `eval_str` since if the annotation is "svcs.Container"
@@ -1088,14 +1089,11 @@ class Container:
                 rv.append(svc)
                 continue
 
-            if (
-                not isinstance(svc, MagicMock)
-                and (
-                    iscoroutine(svc)
-                    or isinstance(
-                        svc,
-                        AbstractAsyncContextManager,  # pyrefly: ignore[unsafe-overlap]
-                    )
+            if not isinstance(svc, MagicMock) and (
+                iscoroutine(svc)
+                or isinstance(
+                    svc,
+                    AbstractAsyncContextManager,  # pyrefly: ignore[unsafe-overlap]
                 )
             ):
                 msg = "Use `aget()` for async factories."
