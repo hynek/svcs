@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import inspect
 import logging
+import sys
 import warnings
 
 from collections.abc import Awaitable, Callable, Iterator
@@ -24,12 +25,21 @@ from inspect import (
     isgeneratorfunction,
 )
 from types import TracebackType
-from typing import Any, TypeVar, overload
+from typing import Any, TypeAlias, TypeVar, overload
 from unittest.mock import MagicMock
 
 import attrs
 
 from .exceptions import ServiceNotFoundError
+
+
+if sys.version_info < (3, 15):
+    from typing_extensions import TypeForm as TypeForm  # noqa: PLC0414
+else:
+    from typing import TypeForm as TypeForm  # noqa: PLC0414
+
+
+_ServiceType: TypeAlias = TypeForm[Any]
 
 
 log = logging.getLogger("svcs")
@@ -73,7 +83,7 @@ class RegisteredService:
             exiting registered factories.
     """
 
-    svc_type: type
+    svc_type: _ServiceType
     factory: Callable = attrs.field(hash=False)
     takes_container: bool
     enter: bool
@@ -143,7 +153,7 @@ class ServicePing:
 
     name: str
     is_async: bool
-    _svc_type: type
+    _svc_type: _ServiceType
     _ping: Callable
     _container: Container
 
@@ -172,7 +182,7 @@ class ServicePing:
 
 @attrs.define
 class Registry:
-    """
+    r"""
     A central registry of recipes for creating services.
 
     An instance of this should live as long as your application does.
@@ -195,9 +205,13 @@ class Registry:
     Warns:
         ResourceWarning:
             If a registry with pending cleanups is garbage-collected.
+
+    .. versionadded:: 26.1.0
+       It is now possible to register (and get) abstract types like
+       :class:`typing.Protocol`\ s or abstract base classes.
     """
 
-    _services: dict[type, RegisteredService] = attrs.Factory(dict)
+    _services: dict[_ServiceType, RegisteredService] = attrs.Factory(dict)
     _on_close: list[tuple[RegisteredService, Callable | Awaitable]] = (
         attrs.Factory(list)
     )
@@ -205,7 +219,7 @@ class Registry:
     def __repr__(self) -> str:
         return f"<svcs.Registry(num_services={len(self._services)})>"
 
-    def __contains__(self, svc_type: type) -> bool:
+    def __contains__(self, svc_type: _ServiceType) -> bool:
         """
         Check whether this registry knows how to create *svc_type*:
 
@@ -264,7 +278,7 @@ class Registry:
 
     def register_factory(
         self,
-        svc_type: type,
+        svc_type: _ServiceType,
         factory: Callable,
         *,
         enter: bool = True,
@@ -324,8 +338,9 @@ class Registry:
                 Whether to suppress errors raised in the container context when
                 exiting registered factories.
 
-                By default, it is True to avoid propagating errors raised in container context,
-                so factories cleanup code is executed unconditionally.
+                By default, it is True to avoid propagating errors raised in
+                container context, so factories cleanup code is executed
+                unconditionally.
 
                 Set it to False to have control over error propagation, but
                 note that you can't stop the exception from bubbling out of the
@@ -335,7 +350,7 @@ class Registry:
         .. versionchanged:: 25.1.0
             *factory* now may take any amount of arguments and they are ignored.
 
-        .. versionadded:: 25.2.0
+        .. versionadded:: 26.1.0
            *suppress_context*.
         """
         rs = self._register_factory(
@@ -359,7 +374,7 @@ class Registry:
 
     def register_value(
         self,
-        svc_type: type,
+        svc_type: _ServiceType,
         value: object,
         *,
         enter: bool = False,
@@ -403,7 +418,7 @@ class Registry:
 
     def _register_factory(
         self,
-        svc_type: type,
+        svc_type: _ServiceType,
         factory: Callable,
         enter: bool,
         ping: Callable | None,
@@ -428,7 +443,9 @@ class Registry:
             self._on_close.append((rs, on_registry_close))
         return rs
 
-    def get_registered_service_for(self, svc_type: type) -> RegisteredService:
+    def get_registered_service_for(
+        self, svc_type: _ServiceType
+    ) -> RegisteredService:
         try:
             return self._services[svc_type]
         except KeyError:
@@ -586,7 +603,7 @@ class Container:
 
     registry: Registry
     _lazy_local_registry: Registry | None = None
-    _instantiated: dict[type, tuple[object, RegisteredService]] = (
+    _instantiated: dict[_ServiceType, tuple[object, RegisteredService]] = (
         attrs.Factory(dict)
     )
     _on_close: list[
@@ -602,7 +619,7 @@ class Container:
             f"cleanups={len(self._on_close)})>"
         )
 
-    def __contains__(self, svc_type: type) -> bool:
+    def __contains__(self, svc_type: _ServiceType) -> bool:
         """
         Check whether this container has a cached instance of *svc_type*.
         """
@@ -759,29 +776,32 @@ class Container:
         )
         return pings
 
-    def get_abstract(self, *svc_types: type) -> Any:
+    def get_abstract(self, *svc_types: _ServiceType) -> Any:
         """
         Like :meth:`get` but is annotated to return :data:`typing.Any` which
-        allows it to be used with abstract types like :class:`typing.Protocol`
-        or :mod:`abc` classes.
+        used to be the only way to allow it to be used with abstract types like
+        :class:`typing.Protocol` or :mod:`abc` classes.
 
-        Note:
-             See :doc:`typing-caveats` why this is necessary.
+        As of *svcs* 26.1.0 and :pep:`747`, this is no longer necessary.
+
+        .. deprecated:: 26.1.0
         """
         return self.get(*svc_types)
 
-    async def aget_abstract(self, *svc_types: type) -> Any:
+    async def aget_abstract(self, *svc_types: _ServiceType) -> Any:
         """
         Same as :meth:`get_abstract` but instantiates asynchronously, if
         necessary.
 
         Also works with synchronous services, so in an async application, just
         use this.
+
+        .. deprecated:: 26.1.0
         """
         return await self.aget(*svc_types)
 
     def _lookup(
-        self, svc_type: type
+        self, svc_type: _ServiceType
     ) -> tuple[bool, object, RegisteredService]:
         """
         Look up svc_type first in our cache, then in the registry.
@@ -808,7 +828,7 @@ class Container:
 
     def register_local_factory(
         self,
-        svc_type: type,
+        svc_type: _ServiceType,
         factory: Callable,
         *,
         enter: bool = True,
@@ -840,7 +860,7 @@ class Container:
 
     def register_local_value(
         self,
-        svc_type: type,
+        svc_type: _ServiceType,
         value: object,
         *,
         enter: bool = False,
@@ -875,110 +895,114 @@ class Container:
         )
 
     @overload
-    def get(self, svc_type: type[T1], /) -> T1: ...
+    def get(self, svc_type: TypeForm[T1], /) -> T1: ...
 
     @overload
     def get(
-        self, svc_type1: type[T1], svc_type2: type[T2], /
+        self, svc_type1: TypeForm[T1], svc_type2: TypeForm[T2], /
     ) -> tuple[T1, T2]: ...
 
     @overload
     def get(
-        self, svc_type1: type[T1], svc_type2: type[T2], svc_type3: type[T3], /
+        self,
+        svc_type1: TypeForm[T1],
+        svc_type2: TypeForm[T2],
+        svc_type3: TypeForm[T3],
+        /,
     ) -> tuple[T1, T2, T3]: ...
 
     @overload
     def get(
         self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
+        svc_type1: TypeForm[T1],
+        svc_type2: TypeForm[T2],
+        svc_type3: TypeForm[T3],
+        svc_type4: TypeForm[T4],
         /,
     ) -> tuple[T1, T2, T3, T4]: ...
 
     @overload
     def get(
         self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
+        svc_type1: TypeForm[T1],
+        svc_type2: TypeForm[T2],
+        svc_type3: TypeForm[T3],
+        svc_type4: TypeForm[T4],
+        svc_type5: TypeForm[T5],
         /,
     ) -> tuple[T1, T2, T3, T4, T5]: ...
 
     @overload
     def get(
         self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
+        svc_type1: TypeForm[T1],
+        svc_type2: TypeForm[T2],
+        svc_type3: TypeForm[T3],
+        svc_type4: TypeForm[T4],
+        svc_type5: TypeForm[T5],
+        svc_type6: TypeForm[T6],
         /,
     ) -> tuple[T1, T2, T3, T4, T5, T6]: ...
 
     @overload
     def get(
         self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        svc_type7: type[T7],
+        svc_type1: TypeForm[T1],
+        svc_type2: TypeForm[T2],
+        svc_type3: TypeForm[T3],
+        svc_type4: TypeForm[T4],
+        svc_type5: TypeForm[T5],
+        svc_type6: TypeForm[T6],
+        svc_type7: TypeForm[T7],
         /,
     ) -> tuple[T1, T2, T3, T4, T5, T6, T7]: ...
 
     @overload
     def get(
         self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        svc_type7: type[T7],
-        svc_type8: type[T8],
+        svc_type1: TypeForm[T1],
+        svc_type2: TypeForm[T2],
+        svc_type3: TypeForm[T3],
+        svc_type4: TypeForm[T4],
+        svc_type5: TypeForm[T5],
+        svc_type6: TypeForm[T6],
+        svc_type7: TypeForm[T7],
+        svc_type8: TypeForm[T8],
         /,
     ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8]: ...
 
     @overload
     def get(
         self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        svc_type7: type[T7],
-        svc_type8: type[T8],
-        svc_type9: type[T9],
+        svc_type1: TypeForm[T1],
+        svc_type2: TypeForm[T2],
+        svc_type3: TypeForm[T3],
+        svc_type4: TypeForm[T4],
+        svc_type5: TypeForm[T5],
+        svc_type6: TypeForm[T6],
+        svc_type7: TypeForm[T7],
+        svc_type8: TypeForm[T8],
+        svc_type9: TypeForm[T9],
         /,
     ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9]: ...
 
     @overload
     def get(
         self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        svc_type7: type[T7],
-        svc_type8: type[T8],
-        svc_type9: type[T9],
-        svc_type10: type[T10],
+        svc_type1: TypeForm[T1],
+        svc_type2: TypeForm[T2],
+        svc_type3: TypeForm[T3],
+        svc_type4: TypeForm[T4],
+        svc_type5: TypeForm[T5],
+        svc_type6: TypeForm[T6],
+        svc_type7: TypeForm[T7],
+        svc_type8: TypeForm[T8],
+        svc_type9: TypeForm[T9],
+        svc_type10: TypeForm[T10],
         /,
     ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]: ...
 
-    def get(self, *svc_types: type) -> object:
+    def get(self, *svc_types: _ServiceType) -> object:
         """
         Get services of *svc_types*.
 
@@ -1020,110 +1044,114 @@ class Container:
         return rv
 
     @overload
-    async def aget(self, svc_type: type[T1], /) -> T1: ...
+    async def aget(self, svc_type: TypeForm[T1], /) -> T1: ...
 
     @overload
     async def aget(
-        self, svc_type1: type[T1], svc_type2: type[T2], /
+        self, svc_type1: TypeForm[T1], svc_type2: TypeForm[T2], /
     ) -> tuple[T1, T2]: ...
 
     @overload
     async def aget(
-        self, svc_type1: type[T1], svc_type2: type[T2], svc_type3: type[T3], /
+        self,
+        svc_type1: TypeForm[T1],
+        svc_type2: TypeForm[T2],
+        svc_type3: TypeForm[T3],
+        /,
     ) -> tuple[T1, T2, T3]: ...
 
     @overload
     async def aget(
         self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
+        svc_type1: TypeForm[T1],
+        svc_type2: TypeForm[T2],
+        svc_type3: TypeForm[T3],
+        svc_type4: TypeForm[T4],
         /,
     ) -> tuple[T1, T2, T3, T4]: ...
 
     @overload
     async def aget(
         self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
+        svc_type1: TypeForm[T1],
+        svc_type2: TypeForm[T2],
+        svc_type3: TypeForm[T3],
+        svc_type4: TypeForm[T4],
+        svc_type5: TypeForm[T5],
         /,
     ) -> tuple[T1, T2, T3, T4, T5]: ...
 
     @overload
     async def aget(
         self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
+        svc_type1: TypeForm[T1],
+        svc_type2: TypeForm[T2],
+        svc_type3: TypeForm[T3],
+        svc_type4: TypeForm[T4],
+        svc_type5: TypeForm[T5],
+        svc_type6: TypeForm[T6],
         /,
     ) -> tuple[T1, T2, T3, T4, T5, T6]: ...
 
     @overload
     async def aget(
         self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        svc_type7: type[T7],
+        svc_type1: TypeForm[T1],
+        svc_type2: TypeForm[T2],
+        svc_type3: TypeForm[T3],
+        svc_type4: TypeForm[T4],
+        svc_type5: TypeForm[T5],
+        svc_type6: TypeForm[T6],
+        svc_type7: TypeForm[T7],
         /,
     ) -> tuple[T1, T2, T3, T4, T5, T6, T7]: ...
 
     @overload
     async def aget(
         self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        svc_type7: type[T7],
-        svc_type8: type[T8],
+        svc_type1: TypeForm[T1],
+        svc_type2: TypeForm[T2],
+        svc_type3: TypeForm[T3],
+        svc_type4: TypeForm[T4],
+        svc_type5: TypeForm[T5],
+        svc_type6: TypeForm[T6],
+        svc_type7: TypeForm[T7],
+        svc_type8: TypeForm[T8],
         /,
     ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8]: ...
 
     @overload
     async def aget(
         self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        svc_type7: type[T7],
-        svc_type8: type[T8],
-        svc_type9: type[T9],
+        svc_type1: TypeForm[T1],
+        svc_type2: TypeForm[T2],
+        svc_type3: TypeForm[T3],
+        svc_type4: TypeForm[T4],
+        svc_type5: TypeForm[T5],
+        svc_type6: TypeForm[T6],
+        svc_type7: TypeForm[T7],
+        svc_type8: TypeForm[T8],
+        svc_type9: TypeForm[T9],
         /,
     ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9]: ...
 
     @overload
     async def aget(
         self,
-        svc_type1: type[T1],
-        svc_type2: type[T2],
-        svc_type3: type[T3],
-        svc_type4: type[T4],
-        svc_type5: type[T5],
-        svc_type6: type[T6],
-        svc_type7: type[T7],
-        svc_type8: type[T8],
-        svc_type9: type[T9],
-        svc_type10: type[T10],
+        svc_type1: TypeForm[T1],
+        svc_type2: TypeForm[T2],
+        svc_type3: TypeForm[T3],
+        svc_type4: TypeForm[T4],
+        svc_type5: TypeForm[T5],
+        svc_type6: TypeForm[T6],
+        svc_type7: TypeForm[T7],
+        svc_type8: TypeForm[T8],
+        svc_type9: TypeForm[T9],
+        svc_type10: TypeForm[T10],
         /,
     ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]: ...
 
-    async def aget(self, *svc_types: type) -> object:
+    async def aget(self, *svc_types: _ServiceType) -> object:
         """
         Same as :meth:`get` but instantiates asynchronously, if necessary.
 

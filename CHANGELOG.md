@@ -15,9 +15,25 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/25.1.0...HEAD)
 
+### Deprecated
+
+- `svcs.get_abstract()` and all its `*_abstract()` siblings.
+  Thanks to [PEP 747] they are no longer necessary.
+  No deprecation warnings or plans to remove them for now.
+
+[PEP 747]: https://peps.python.org/pep-0747/
+
+
 ### Added
 
-- Python 3.14 support.
+- Python 3.14 and 3.15 support.
+
+- [PEP 747] support, aka [`typing.TypeForm`](https://docs.python.org/3.15/library/typing.html#typing.TypeForm).
+  This means that it's now possible use abstract types like `Protocol`s or abstract base classes for registered services, removing an important typing caveat.
+  This change introduces a dependency on `typing-extensions` for Python 3.14 and earlier.
+
+  Note: Mypy users that want to take advantage of this must pass the `--enable-incomplete-feature=TypeForm` argument for the time being.
+  Since the [PR to activate it has been merged](https://github.com/python/mypy/pull/21262), we expect it to land in Mypy 2.2.
 
 - New `svcs.autowire()` and `svcs.aautowire()` that can be used to automatically resolve dependencies based on type annotations of the provided callable.
   [#167](https://github.com/hynek/svcs/pull/167)
@@ -52,6 +68,9 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 - Factories now can return [`MagicMock`](https://docs.python.org/3/library/unittest.mock.html#unittest.mock.MagicMock)s without crashing with a TypeError.
   [#137](https://github.com/hynek/svcs/issues/137)
+
+- AIOHTTP: The container is now stored using `aiohttp.web.RequestKey`s on the application.
+  This is an implementation detail and shouldn't matter, but it fixes a warning on AIOHTTP 3.14 and later.
 
 
 ## [25.1.0](https://github.com/hynek/svcs/compare/24.1.0...25.1.0) - 2025-01-25

@@ -25,6 +25,8 @@ from ._core import (
     T8,
     T9,
     T10,
+    TypeForm,
+    _ServiceType,
 )
 
 
@@ -35,15 +37,19 @@ except (
 ):  # pragma: no cover -- not adding a tox env for aiohttp<3.9
     _AIOHTTP_KEY_REGISTRY = _KEY_REGISTRY  # type: ignore[assignment]
 
-# No equivalent of AppKey for Requests, yet?
-_AIOHTTP_KEY_CONTAINER = _KEY_CONTAINER
+try:
+    _AIOHTTP_KEY_CONTAINER = web.RequestKey(_KEY_CONTAINER, svcs.Container)
+except (
+    AttributeError
+):  # pragma: no cover -- not adding a tox env for aiohttp<3.14
+    _AIOHTTP_KEY_CONTAINER = _KEY_CONTAINER  # type: ignore[assignment]
 
 
 def svcs_from(request: web.Request) -> svcs.Container:
     """
     Get the current container from *request*.
     """
-    return request[_AIOHTTP_KEY_CONTAINER]  # type: ignore[no-any-return]
+    return request[_AIOHTTP_KEY_CONTAINER]
 
 
 def get_registry(app: web.Application) -> svcs.Registry:
@@ -84,7 +90,7 @@ async def svcs_middleware(
 
 def register_value(
     app: web.Application,
-    svc_type: type,
+    svc_type: _ServiceType,
     value: object,
     *,
     enter: bool = False,
@@ -106,7 +112,7 @@ def register_value(
 
 def register_factory(
     app: web.Application,
-    svc_type: type,
+    svc_type: _ServiceType,
     factory: Callable,
     *,
     enter: bool = True,
@@ -151,30 +157,35 @@ def get_pings(request: web.Request) -> list[svcs.ServicePing]:
     return svcs_from(request).get_pings()
 
 
-async def aget_abstract(request: web.Request, *svc_types: type) -> Any:
+async def aget_abstract(request: web.Request, *svc_types: _ServiceType) -> Any:
     """
     Same as :meth:`svcs.Container.aget_abstract()`, but uses container from
     *request*.
+
+    .. deprecated:: 26.1.0
     """
     return await svcs_from(request).aget_abstract(*svc_types)
 
 
 @overload
-async def aget(request: web.Request, svc_type: type[T1], /) -> T1: ...
+async def aget(request: web.Request, svc_type: TypeForm[T1], /) -> T1: ...
 
 
 @overload
 async def aget(
-    request: web.Request, svc_type1: type[T1], svc_type2: type[T2], /
+    request: web.Request,
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    /,
 ) -> tuple[T1, T2]: ...
 
 
 @overload
 async def aget(
     request: web.Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
     /,
 ) -> tuple[T1, T2, T3]: ...
 
@@ -182,10 +193,10 @@ async def aget(
 @overload
 async def aget(
     request: web.Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
     /,
 ) -> tuple[T1, T2, T3, T4]: ...
 
@@ -193,11 +204,11 @@ async def aget(
 @overload
 async def aget(
     request: web.Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
     /,
 ) -> tuple[T1, T2, T3, T4, T5]: ...
 
@@ -205,12 +216,12 @@ async def aget(
 @overload
 async def aget(
     request: web.Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
-    svc_type6: type[T6],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
+    svc_type6: TypeForm[T6],
     /,
 ) -> tuple[T1, T2, T3, T4, T5, T6]: ...
 
@@ -218,13 +229,13 @@ async def aget(
 @overload
 async def aget(
     request: web.Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
-    svc_type6: type[T6],
-    svc_type7: type[T7],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
+    svc_type6: TypeForm[T6],
+    svc_type7: TypeForm[T7],
     /,
 ) -> tuple[T1, T2, T3, T4, T5, T6, T7]: ...
 
@@ -232,14 +243,14 @@ async def aget(
 @overload
 async def aget(
     request: web.Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
-    svc_type6: type[T6],
-    svc_type7: type[T7],
-    svc_type8: type[T8],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
+    svc_type6: TypeForm[T6],
+    svc_type7: TypeForm[T7],
+    svc_type8: TypeForm[T8],
     /,
 ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8]: ...
 
@@ -247,15 +258,15 @@ async def aget(
 @overload
 async def aget(
     request: web.Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
-    svc_type6: type[T6],
-    svc_type7: type[T7],
-    svc_type8: type[T8],
-    svc_type9: type[T9],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
+    svc_type6: TypeForm[T6],
+    svc_type7: TypeForm[T7],
+    svc_type8: TypeForm[T8],
+    svc_type9: TypeForm[T9],
     /,
 ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9]: ...
 
@@ -263,21 +274,21 @@ async def aget(
 @overload
 async def aget(
     request: web.Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
-    svc_type6: type[T6],
-    svc_type7: type[T7],
-    svc_type8: type[T8],
-    svc_type9: type[T9],
-    svc_type10: type[T10],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
+    svc_type6: TypeForm[T6],
+    svc_type7: TypeForm[T7],
+    svc_type8: TypeForm[T8],
+    svc_type9: TypeForm[T9],
+    svc_type10: TypeForm[T10],
     /,
 ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]: ...
 
 
-async def aget(request: web.Request, *svc_types: type) -> object:
+async def aget(request: web.Request, *svc_types: _ServiceType) -> object:
     """
     Same as :meth:`svcs.Container.aget`, but uses the container from *request*.
     """

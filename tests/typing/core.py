@@ -3,11 +3,18 @@
 # SPDX-License-Identifier: MIT
 
 import contextlib
+import sys
 
 from collections.abc import AsyncGenerator, Generator
 from typing import Protocol
 
 import svcs
+
+
+if sys.version_info < (3, 11):
+    from typing_extensions import assert_type
+else:
+    from typing import assert_type
 
 
 reg = svcs.Registry()
@@ -115,6 +122,9 @@ class P(Protocol):
     def m(self) -> None: ...
 
 
+p_from_get: P = con.get(P)
+
+assert_type(p_from_get, P)
 p: P = con.get_abstract(P)
 
 con.close()
