@@ -4,7 +4,7 @@
 
 from unittest.mock import Mock
 
-import httpx
+import httpx2
 import pytest
 
 from pyramid.config import Configurator
@@ -37,8 +37,8 @@ def _app(config):
 
 @pytest.fixture(name="client")
 def _client(app):
-    return httpx.Client(
-        transport=httpx.WSGITransport(app=app), base_url="http://example.com/"
+    return httpx2.Client(
+        transport=httpx2.WSGITransport(app=app), base_url="http://example.com/"
     )
 
 
