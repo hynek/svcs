@@ -258,8 +258,6 @@ Dependency Inversion Principle
     Nobody will stop you from passing a Mock where a Django `QuerySet` is expected.
 
     ::: {seealso}
-    - {doc}`typing-caveats` regarding abstract classes and *svcs*.
-
     - <https://en.wikipedia.org/wiki/Dependency_inversion_principle>
 
     - The third chapter of the wonderful [*Architecture Patterns with Python*] book called [*On Coupling and Abstractions*](https://www.cosmicpython.com/book/chapter_03_abstractions.html) (you can read it for free on the web).

@@ -56,7 +56,7 @@ reg = svcs.Registry()
 
 app = Starlette(
     lifespan=lifespan,
-    middleware=[Middleware(svcs.starlette.SVCSMiddleware)],  # ty: ignore[invalid-argument-type] https://github.com/astral-sh/ty/issues/1635
+    middleware=[Middleware(svcs.starlette.SVCSMiddleware)],
 )
 
 a: int

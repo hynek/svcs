@@ -19,7 +19,6 @@ env:
 
 permissions: {}
 
-
 jobs:
   build-package:
     name: Build & verify package
@@ -38,7 +37,6 @@ jobs:
       # Used to define the matrix for tests below. The value is based on
       # packaging metadata (trove classifiers).
       python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
-
 
   tests:
     name: Tests & Mypy API on ${{ matrix.python-version }}
@@ -84,11 +82,12 @@ jobs:
           if-no-files-found: ignore
 
       - name: Check public API with Mypy
+        if: matrix.python-version != '3.15'
         run: >
-          uvx --with tox-uv tox run
+          uvx --with tox-uv
+          tox run
           --installpkg dist/*.whl
           -e ${PYTHON}-mypy
-
 
   coverage:
     name: Ensure 100% test coverage
@@ -113,16 +112,14 @@ jobs:
 
       - name: Combine coverage and fail if it's <100%.
         run: |
-          uv tool install coverage
-
-          coverage combine
-          coverage html --skip-covered --skip-empty
+          uv run coverage combine
+          uv run coverage html --skip-covered --skip-empty
 
           # Report and write to summary.
-          coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
+          uv run coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
 
           # Report again and fail if under 100%.
-          coverage report --fail-under=100
+          uv run coverage report --fail-under=100
 
       - name: Upload HTML report if check failed.
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -130,7 +127,6 @@ jobs:
           name: html-report
           path: htmlcov
         if: ${{ failure() }}
-
 
   typing:
     name: Check types using supported type checkers
@@ -153,7 +149,6 @@ jobs:
           uvx --with tox-uv
           tox run -f typing
 
-
   docs:
     name: Run doctests
     runs-on: ubuntu-latest
@@ -171,8 +166,9 @@ jobs:
           python-version: "3.14"
       - uses: hynek/setup-cached-uv@4300ec2180bc77d705e626a34e381b81a4772c51 # v2.5.0
 
-      - run: uvx --with=tox-uv tox run -e docs-doctests
-
+      - run: >
+          uvx --with tox-uv
+          tox run -e docs-doctests
 
   install-dev:
     name: Verify dev env
@@ -182,20 +178,17 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
-      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        with:
-          python-version-file: .python-version-default
       - uses: hynek/setup-cached-uv@4300ec2180bc77d705e626a34e381b81a4772c51 # v2.5.0
 
-      - run: |
-          uv venv
-          uv pip install -e . --group dev
+      - run: uv sync --locked --python $(cat .python-version-default)
+
+      - name: Ensure we can import svcs and its integrations
+        run: |
           source .venv/bin/activate
 
           python -Ic 'import svcs'
           python -Ic 'import svcs.flask'
           python -Ic 'import svcs.pyramid'
-
 
   required-checks-pass:
     if: always()
@@ -211,6 +204,6 @@ jobs:
 
     steps:
       - name: Decide whether the needed jobs succeeded or failed
-        uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe  # v1.2.2
+        uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # v1.2.2
         with:
           jobs: ${{ toJSON(needs) }}

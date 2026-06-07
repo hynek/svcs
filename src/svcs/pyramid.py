@@ -31,6 +31,8 @@ from ._core import (
     T8,
     T9,
     T10,
+    TypeForm,
+    _ServiceType,
 )
 
 
@@ -117,7 +119,7 @@ class ServicesTween:
 
 def register_factory(
     config: PyramidRegistryHaver,
-    svc_type: type,
+    svc_type: _ServiceType,
     factory: Callable,
     *,
     enter: bool = True,
@@ -139,7 +141,7 @@ def register_factory(
 
 def register_value(
     config: PyramidRegistryHaver,
-    svc_type: type,
+    svc_type: _ServiceType,
     value: object,
     *,
     enter: bool = False,
@@ -192,23 +194,25 @@ def get_pings(request: Request) -> list[svcs.ServicePing]:
     return svcs_from(request).get_pings()
 
 
-def get_abstract(request: Request, *svc_types: type) -> Any:
+def get_abstract(request: Request, *svc_types: _ServiceType) -> Any:
     """
     Same as :meth:`svcs.Container.get_abstract()`, but uses container from
     *request*.
+
+    .. deprecated:: 26.1.0
     """
     return svcs_from(request).get(*svc_types)
 
 
 @overload
-def get(request: Request, svc_type: type[T1], /) -> T1: ...
+def get(request: Request, svc_type: TypeForm[T1], /) -> T1: ...
 
 
 @overload
 def get(
     request: Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
     /,
 ) -> tuple[T1, T2]: ...
 
@@ -216,9 +220,9 @@ def get(
 @overload
 def get(
     request: Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
     /,
 ) -> tuple[T1, T2, T3]: ...
 
@@ -226,10 +230,10 @@ def get(
 @overload
 def get(
     request: Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
     /,
 ) -> tuple[T1, T2, T3, T4]: ...
 
@@ -237,11 +241,11 @@ def get(
 @overload
 def get(
     request: Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
     /,
 ) -> tuple[T1, T2, T3, T4, T5]: ...
 
@@ -249,12 +253,12 @@ def get(
 @overload
 def get(
     request: Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
-    svc_type6: type[T6],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
+    svc_type6: TypeForm[T6],
     /,
 ) -> tuple[T1, T2, T3, T4, T5, T6]: ...
 
@@ -262,13 +266,13 @@ def get(
 @overload
 def get(
     request: Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
-    svc_type6: type[T6],
-    svc_type7: type[T7],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
+    svc_type6: TypeForm[T6],
+    svc_type7: TypeForm[T7],
     /,
 ) -> tuple[T1, T2, T3, T4, T5, T6, T7]: ...
 
@@ -276,14 +280,14 @@ def get(
 @overload
 def get(
     request: Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
-    svc_type6: type[T6],
-    svc_type7: type[T7],
-    svc_type8: type[T8],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
+    svc_type6: TypeForm[T6],
+    svc_type7: TypeForm[T7],
+    svc_type8: TypeForm[T8],
     /,
 ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8]: ...
 
@@ -291,15 +295,15 @@ def get(
 @overload
 def get(
     request: Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
-    svc_type6: type[T6],
-    svc_type7: type[T7],
-    svc_type8: type[T8],
-    svc_type9: type[T9],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
+    svc_type6: TypeForm[T6],
+    svc_type7: TypeForm[T7],
+    svc_type8: TypeForm[T8],
+    svc_type9: TypeForm[T9],
     /,
 ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9]: ...
 
@@ -307,21 +311,21 @@ def get(
 @overload
 def get(
     request: Request,
-    svc_type1: type[T1],
-    svc_type2: type[T2],
-    svc_type3: type[T3],
-    svc_type4: type[T4],
-    svc_type5: type[T5],
-    svc_type6: type[T6],
-    svc_type7: type[T7],
-    svc_type8: type[T8],
-    svc_type9: type[T9],
-    svc_type10: type[T10],
+    svc_type1: TypeForm[T1],
+    svc_type2: TypeForm[T2],
+    svc_type3: TypeForm[T3],
+    svc_type4: TypeForm[T4],
+    svc_type5: TypeForm[T5],
+    svc_type6: TypeForm[T6],
+    svc_type7: TypeForm[T7],
+    svc_type8: TypeForm[T8],
+    svc_type9: TypeForm[T9],
+    svc_type10: TypeForm[T10],
     /,
 ) -> tuple[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]: ...
 
 
-def get(request: Request, *svc_types: type) -> object:
+def get(request: Request, *svc_types: _ServiceType) -> object:
     """
     Same as :meth:`svcs.Container.get()`, but uses thread locals to find the
     current request.
