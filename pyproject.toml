@@ -97,6 +97,12 @@ dev = [
   "tox-uv",
 ]
 
+
+[tool.uv]
+# Dependency cooldown
+exclude-newer = "1 week"
+
+
 [project.urls]
 Changelog = "https://github.com/hynek/svcs/blob/main/CHANGELOG.md"
 Documentation = "https://svcs.hynek.me/"
@@ -104,16 +110,6 @@ GitHub = "https://github.com/hynek/svcs"
 Funding = "https://github.com/sponsors/hynek"
 Mastodon = "https://mastodon.social/@hynek"
 Twitter = "https://twitter.com/hynek"
-
-
-[tool.uv]
-# Dependency cooldown
-exclude-newer = "1 week"
-
-# TODO: Remove once aiohttp 3.14 -- which added web.RequestKey that svcs.aiohttp
-# relies on for type-checking -- is older than the cooldown window above.
-[tool.uv.exclude-newer-package]
-aiohttp = false
 
 
 [tool.hatch.version]
