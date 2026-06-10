@@ -377,5 +377,9 @@ You can see that the datetime factory and the str value have both been registere
 
 .. autoclass:: RegisteredService()
 
+.. autofunction:: autowire
+
+.. autofunction:: aautowire
+
 .. autoclass:: svcs.exceptions.ServiceNotFoundError
 ```

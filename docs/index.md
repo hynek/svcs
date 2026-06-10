@@ -88,6 +88,7 @@ why
 core-concepts
 integrations/index
 typing-caveats
+helpers
 glossary
 credits
 ```

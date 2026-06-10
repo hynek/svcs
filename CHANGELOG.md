@@ -35,6 +35,9 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   Note: Mypy users that want to take advantage of this must pass the `--enable-incomplete-feature=TypeForm` argument for the time being.
   Since the [PR to activate it has been merged](https://github.com/python/mypy/pull/21262), we expect it to land in Mypy 2.2.
 
+- New `svcs.autowire()` and `svcs.aautowire()` that can be used to automatically resolve dependencies based on type annotations of the provided callable.
+  [#167](https://github.com/hynek/svcs/pull/167)
+
 - New *suppress_context_exit* argument to `svcs.register_(factory|value)()`.
   If set to `False`, errors in the container context will be passed into the factory cleanup context manager and allow you to act on them there.
 

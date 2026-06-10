@@ -30,3 +30,8 @@ class AnotherService:
 @dataclasses.dataclass
 class YetAnotherService:
     pass
+
+
+@dataclasses.dataclass
+class UnregisteredService:
+    pass
