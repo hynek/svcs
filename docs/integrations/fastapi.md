@@ -34,6 +34,15 @@ async def lifespan(app: FastAPI, registry: svcs.Registry):
 app = FastAPI(lifespan=lifespan)
 ```
 
+::: {tip}
+In larger applications, the {class}`svcs.fastapi.lifespan` wrapper also works as a `lifespan` function for [`fastapi.APIRouter`](https://fastapi.tiangolo.com/reference/apirouter/).
+Your wrapped lifespan function still receives the same parameters:
+the [`fastapi.FastAPI`](https://fastapi.tiangolo.com/reference/fastapi/) instance the router is included in, and a {class}`svcs.Registry`.
+
+However, FastAPI merges the application lifespan state with all its routers' lifespan states into one mapping that becomes `request.state`.
+Therefore, you **can't** have per-router scoped registries.
+:::
+
 ::: {seealso}
 - [Lifespan state](https://www.starlette.io/lifespan/) in *starlette* documentation.
 - [Lifespan](https://fastapi.tiangolo.com/advanced/events/) in FastAPI documentation (more verbose, but doesn't mention lifespan state).
