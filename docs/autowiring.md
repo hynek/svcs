@@ -1,5 +1,8 @@
 # Autowiring
 
+::: {versionadded} 26.1.0
+:::
+
 Autowiring is an optional technique that automatically resolves dependencies based on type annotations, eliminating the need to manually specify each dependency when invoking a function or instantiating a class.
 This reduces boilerplate and makes your code more declarative.
 
@@ -58,7 +61,7 @@ with Container(registry) as container:
 
 ## Autowiring a class
 
-Best used as a wrapper during registration – do **not** decorate the class itself!
+Best used as a wrapper during registration:
 
 ```python
 from svcs import Container, Registry, autowire
@@ -79,4 +82,20 @@ registry.register_factory(Handler, autowire(Handler))
 with Container(registry) as container:
     handler = container.get(Handler)
     print(handler.svc.name, handler.prefix)  # Output: "api svc:"
+```
+
+::: {warning}
+Do **not** decorate the class itself!
+Decorating the class replaces the class with the autowire factory, so its name suddenly refers to a function, not a type.
+
+Wrap the class only at register time.
+:::
+
+
+## API Reference
+
+```{eval-rst}
+.. autofunction:: svcs.autowire
+
+.. autofunction:: svcs.aautowire
 ```

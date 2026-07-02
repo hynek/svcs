@@ -121,24 +121,12 @@ def aautowire(
     fn_or_cls: Callable[..., _T],
 ) -> Callable[[Container], Awaitable[_T]]:
     """
-    Return an async factory that resolves the dependencies of *fn_or_cls*
-    from a container, based on its type annotations.
-
     Like :func:`autowire`, but dependencies are resolved with
     :meth:`svcs.Container.aget` and *fn_or_cls* is awaited if it's a
     coroutine function, so both may be asynchronous.
 
     It also works with synchronous callables and services, so in an async
     application, just use this.
-
-    Args:
-        fn_or_cls:
-            A callable (function or class) whose parameters will be
-            autowired based on their type annotations.
-
-    Returns:
-        An async factory that takes a container and returns the result of
-        calling *fn_or_cls* with the resolved dependencies.
 
     .. versionadded:: 26.1.0
     """
