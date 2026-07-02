@@ -9,7 +9,44 @@ This reduces boilerplate and makes your code more declarative.
 The autowiring functions inject dependencies from a {class}`svcs.Container`
 directly into function or class parameters based on their type annotations.
 This is particularly useful when you want to build factories or handlers
-that consume multiple services without explicitly passing them through each layer.
+that consume multiple services without explicitly passing them through each layer:
+
+```python
+>>> from dataclasses import dataclass
+
+>>> import svcs
+
+>>> @dataclass
+... class Database: ...
+
+>>> @dataclass
+... class Cache: ...
+
+>>> registry = svcs.Registry()
+>>> registry.register_factory(Database, Database)
+>>> registry.register_factory(Cache, Cache)
+
+>>> @dataclass
+... class AppServices:
+...     db: Database
+...     cache: Cache
+
+>>> # Before: wire the dependencies by hand.
+>>> registry.register_factory(
+...     AppServices,
+...     lambda svcs_container: AppServices(
+...         db=svcs_container.get(Database),
+...         cache=svcs_container.get(Cache),
+...     ),
+... )
+
+>>> # After: the type annotations are enough.
+>>> registry.register_factory(AppServices, svcs.autowire(AppServices))
+
+>>> with svcs.Container(registry) as container:
+...     container.get(AppServices)
+AppServices(db=Database(), cache=Cache())
+```
 
 It handles regular, positional-only, and keyword-only parameters, and ignores variadic ones (`*args` and `**kwargs`).
 If a parameter cannot be resolved because the service has not been registered,
