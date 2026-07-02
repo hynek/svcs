@@ -6,10 +6,8 @@
 Autowiring is an optional technique that automatically resolves dependencies based on type annotations, eliminating the need to manually specify each dependency when invoking a function or instantiating a class.
 This reduces boilerplate and makes your code more declarative.
 
-The autowiring functions inject dependencies from a {class}`svcs.Container`
-directly into function or class parameters based on their type annotations.
-This is particularly useful when you want to build factories or handlers
-that consume multiple services without explicitly passing them through each layer:
+The autowiring functions inject dependencies from a {class}`svcs.Container` directly into function or class parameters based on their type annotations.
+This is particularly useful when you want to build factories or handlers that consume multiple services without explicitly passing them through each layer:
 
 ```python
 >>> from dataclasses import dataclass
@@ -48,7 +46,7 @@ that consume multiple services without explicitly passing them through each laye
 AppServices(db=Database(), cache=Cache())
 ```
 
-It handles regular, positional-only, and keyword-only parameters, and ignores variadic ones (`*args` and `**kwargs`).
+Autowiring handles regular, positional-only, and keyword-only parameters, and ignores variadic ones (`*args` and `**kwargs`).
 If a parameter cannot be resolved because the service has not been registered,
 the default value is injected instead.
 
@@ -67,33 +65,7 @@ Pros:
 Cons:
 
 - **More Implicit:** Dependency lookup is less explicit than direct {meth}`svcs.Container.get()` calls.
-- **Annotation-Driven:** Incorrect or missing type hints break resolution.
 - **Extra Indirection:** Wrapping and introspection add small runtime and debugging overhead.
-
-
-## Autowiring a function
-
-Best used as a decorator on top of your factories.
-
-```python
-from svcs import Container, Registry, autowire
-
-class Service:
-    def __init__(self, name: str) -> None:
-        self.name = name
-
-@autowire
-def build_label(svc: Service, suffix: int = 42) -> str:
-    return f"{svc.name}{suffix}"
-
-registry = Registry()
-registry.register_value(Service, Service("api"))
-registry.register_factory(str, build_label)
-
-with Container(registry) as container:
-    result = container.get(str)
-    print(result)  # Output: "api42"
-```
 
 
 ## Autowiring a class
@@ -127,6 +99,31 @@ Decorating the class replaces the class with the autowire factory, so its name s
 
 Wrap the class only at register time.
 :::
+
+
+## Autowiring a function
+
+Best used as a decorator on top of your factories.
+
+```python
+from svcs import Container, Registry, autowire
+
+class Service:
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+@autowire
+def build_label(svc: Service, suffix: int = 42) -> str:
+    return f"{svc.name}{suffix}"
+
+registry = Registry()
+registry.register_value(Service, Service("api"))
+registry.register_factory(str, build_label)
+
+with Container(registry) as container:
+    result = container.get(str)
+    print(result)  # Output: "api42"
+```
 
 
 ## API Reference
