@@ -17,7 +17,7 @@ You may check boxes that don't apply to your pull request to indicate that there
 
 - [ ] I acknowledge this project's [**AI policy**](https://github.com/hynek/svcs/blob/main/.github/AI_POLICY.md).
 - [ ] Typos aside (please, always submit typo fixes!), I understand that this pull request may be **closed** in case there was **no [previous discussion](https://github.com/hynek/svcs/discussions/categories/ideas)**.
-- [ ] This pull requests is [**not** from my `main` branch](https://hynek.me/articles/pull-requests-branch/).
+- [ ] This pull request is [**not** from my `main` branch](https://hynek.me/articles/pull-requests-branch/).
   - Consider granting [push permissions to the PR branch](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/allowing-changes-to-a-pull-request-branch-created-from-a-fork), so maintainers can fix minor issues themselves without pestering you.
 - [ ] There's **tests** for all new and changed code.
 - [ ] **New APIs** are added to our typing tests at <https://github.com/hynek/svcs/blob/main/tests/typing/>.
