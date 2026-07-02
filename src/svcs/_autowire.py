@@ -41,45 +41,13 @@ def autowire(fn_or_cls: Callable[..., _T]) -> Callable[[Container], _T]:
         A factory that takes a container and returns the result of calling
         *fn_or_cls* with the resolved dependencies.
 
-    Autowiring a function using decorator notation:
+    .. warning::
+        Do **not** decorate classes at definition time!
+        Decorating a class using ``@autowire`` notation replaces the class
+        with the autowire factory, so its name suddenly refers to a function,
+        not a type.
 
-    .. doctest::
-
-        >>> import svcs
-
-        >>> class Service:
-        ...     def __init__(self, name: str) -> None:
-        ...         self.name = name
-
-        >>> @svcs.autowire
-        ... def build_label(svc: Service, suffix: int = 42) -> str:
-        ...     return f"{svc.name}{suffix}"
-
-        >>> registry = svcs.Registry()
-        >>> registry.register_value(Service, Service("api"))
-        >>> registry.register_factory(str, build_label)
-
-        >>> with svcs.Container(registry) as container:
-        ...     container.get(str)
-        'api42'
-
-    Autowiring a class:
-
-    .. doctest::
-
-        >>> class Handler:
-        ...     def __init__(self, svc: Service, prefix: str = "svc:") -> None:
-        ...         self.svc = svc
-        ...         self.prefix = prefix
-
-        >>> registry = svcs.Registry()
-        >>> registry.register_value(Service, Service("api"))
-        >>> registry.register_factory(Handler, svcs.autowire(Handler))
-
-        >>> with svcs.Container(registry) as container:
-        ...     handler = container.get(Handler)
-        ...     (handler.svc.name, handler.prefix)
-        ('api', 'svc:')
+        Wrap the class only at register time.
 
     .. versionadded:: 26.1.0
     """
@@ -122,8 +90,8 @@ def aautowire(
 ) -> Callable[[Container], Awaitable[_T]]:
     """
     Like :func:`autowire`, but dependencies are resolved with
-    :meth:`svcs.Container.aget` and *fn_or_cls* is awaited if it's a
-    coroutine function, so both may be asynchronous.
+    :meth:`svcs.Container.aget`, the returned factory is async, and
+    *fn_or_cls* is awaited if it's a coroutine function.
 
     It also works with synchronous callables and services, so in an async
     application, just use this.

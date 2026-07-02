@@ -11,6 +11,7 @@ This is particularly useful when you want to build factories or handlers that co
 
 ```python
 >>> from dataclasses import dataclass
+>>> from typing import NewType
 
 >>> import svcs
 
@@ -29,21 +30,39 @@ This is particularly useful when you want to build factories or handlers that co
 ...     db: Database
 ...     cache: Cache
 
->>> # Before: wire the dependencies by hand.
+>>> # BEFORE: wire the dependencies by hand.
+>>> BeforeAppServices = NewType("BeforeAppServices", AppServices)
 >>> registry.register_factory(
-...     AppServices,
+...     BeforeAppServices,
 ...     lambda svcs_container: AppServices(
 ...         db=svcs_container.get(Database),
 ...         cache=svcs_container.get(Cache),
 ...     ),
 ... )
 
->>> # After: the type annotations are enough.
->>> registry.register_factory(AppServices, svcs.autowire(AppServices))
+>>> # AFTER: the type annotations are enough.
+>>> AfterAppServices = NewType("AfterAppServices", AppServices)
+>>> registry.register_factory(AfterAppServices, svcs.autowire(AppServices))
 
 >>> with svcs.Container(registry) as container:
-...     container.get(AppServices)
+...     before = container.get(BeforeAppServices)
+...     after = container.get(AfterAppServices)
+
+>>> # The resulting services look the same...
+>>> before
 AppServices(db=Database(), cache=Cache())
+>>> after
+AppServices(db=Database(), cache=Cache())
+>>> before == after
+True
+>>> # but they are different instances...
+>>> before is after
+False
+>>> # ... although their dependencies are shared.
+>>> before.db is after.db
+True
+>>> before.cache is after.cache
+True
 ```
 
 Autowiring handles regular, positional-only, and keyword-only parameters, and ignores variadic ones (`*args` and `**kwargs`).
@@ -53,7 +72,7 @@ the default value is injected instead.
 ::: {note}
 For asynchronous resolution, {func}`svcs.aautowire` exists
 and uses {meth}`svcs.Container.aget()` instead of {meth}`svcs.Container.get()`.
-It supports both synchronous and asynchronous callables, therefore in async contexts you can always use {func}`svcs.aautowire`.
+It supports both synchronous and asynchronous callables; therefore in async contexts you can always use {func}`svcs.aautowire`.
 :::
 
 Pros:
@@ -93,17 +112,10 @@ with Container(registry) as container:
     print(handler.svc.name, handler.prefix)  # Output: "api svc:"
 ```
 
-::: {warning}
-Do **not** decorate the class itself!
-Decorating the class replaces the class with the autowire factory, so its name suddenly refers to a function, not a type.
-
-Wrap the class only at register time.
-:::
-
 
 ## Autowiring a function
 
-Best used as a decorator on top of your factories.
+Best used as a decorator on top of your factories:
 
 ```python
 from svcs import Container, Registry, autowire
