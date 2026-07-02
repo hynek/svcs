@@ -5,13 +5,13 @@
 from __future__ import annotations
 
 from . import exceptions
+from ._autowire import aautowire, autowire
 from ._core import (
     Container,
     RegisteredService,
     Registry,
     ServicePing,
 )
-from .helpers import aautowire, autowire
 
 
 __all__ = [

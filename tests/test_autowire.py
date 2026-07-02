@@ -3,15 +3,15 @@
 # SPDX-License-Identifier: MIT
 
 """
-Tests for svcs.helpers.autowire.
+Tests for svcs.autowire() and svcs.aautowire().
 """
 
 from typing import Annotated, NewType
 
 import pytest
 
+from svcs import aautowire, autowire
 from svcs.exceptions import ServiceNotFoundError
-from svcs.helpers import aautowire, autowire
 from tests.fake_factories import (
     async_list_ignores_variadic_args_factory,
     async_list_keyword_arg_with_default_factory,
