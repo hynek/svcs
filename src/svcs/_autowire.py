@@ -99,8 +99,12 @@ def autowire(fn_or_cls: Callable[..., _T]) -> Callable[[Container], _T]:
 
             try:
                 resolved = svcs_container.get(annotation)
-            except ServiceNotFoundError:
-                if param.default is param.empty:
+            except ServiceNotFoundError as e:
+                # Only fall back to the default for this parameter's own
+                # missing service. A miss for a different type means a
+                # registered factory failed to resolve its own dependency
+                # -- don't mask that.
+                if param.default is param.empty or e.args[0] is not annotation:
                     raise
                 resolved = param.default
 
@@ -149,8 +153,12 @@ def aautowire(
 
             try:
                 resolved = await svcs_container.aget(annotation)
-            except ServiceNotFoundError:
-                if param.default is param.empty:
+            except ServiceNotFoundError as e:
+                # Only fall back to the default for this parameter's own
+                # missing service. A miss for a different type means a
+                # registered factory failed to resolve its own dependency
+                # -- don't mask that.
+                if param.default is param.empty or e.args[0] is not annotation:
                     raise
                 resolved = param.default
 

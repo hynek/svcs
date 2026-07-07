@@ -138,6 +138,32 @@ class TestAutowireFunction:
         with pytest.raises(ServiceNotFoundError):
             container.get(tuple)
 
+    def test_autowire_does_not_mask_nested_error(self, registry, container):
+        """
+        A ServiceNotFoundError raised while building a *registered*
+        dependency is propagated, not masked by the parameter's own
+        default.
+        """
+
+        class Missing: ...
+
+        class Database:
+            def __init__(self, missing: Missing) -> None:
+                self.missing = missing
+
+        fallback = object()
+
+        def build(db: Database = fallback) -> tuple:
+            return ("built", db)
+
+        registry.register_factory(Database, autowire(Database))
+        registry.register_factory(tuple, autowire(build))
+
+        with pytest.raises(ServiceNotFoundError) as ei:
+            container.get(tuple)
+
+        assert Missing is ei.value.args[0]
+
     @pytest.mark.parametrize("special_type", SPECIAL_TYPE_CASES)
     def test_autowire_special_types(self, registry, container, special_type):
         """
@@ -402,6 +428,34 @@ class TestAAutowireFunction:
 
         with pytest.raises(ServiceNotFoundError):
             await container.aget(tuple)
+
+    async def test_aautowire_does_not_mask_nested_error(
+        self, registry, container
+    ):
+        """
+        A ServiceNotFoundError raised while building a *registered*
+        dependency is propagated, not masked by the parameter's own
+        default.
+        """
+
+        class Missing: ...
+
+        class Database:
+            def __init__(self, missing: Missing) -> None:
+                self.missing = missing
+
+        fallback = object()
+
+        def build(db: Database = fallback) -> tuple:
+            return ("built", db)
+
+        registry.register_factory(Database, aautowire(Database))
+        registry.register_factory(tuple, aautowire(build))
+
+        with pytest.raises(ServiceNotFoundError) as ei:
+            await container.aget(tuple)
+
+        assert Missing is ei.value.args[0]
 
     @pytest.mark.parametrize("special_type", SPECIAL_TYPE_CASES)
     async def test_aautowire_special_types(
