@@ -7,7 +7,7 @@ from __future__ import annotations
 import dataclasses
 import inspect
 
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Iterator
 from typing import Any, TypeVar
 
 from ._core import Container, _robust_signature
@@ -43,6 +43,40 @@ def _lazy_signature(
         return cache
 
     return get_signature
+
+
+def _wireable_params(
+    sig: inspect.Signature,
+) -> Iterator[tuple[str, inspect.Parameter, Any]]:
+    """
+    Yield the ``(name, parameter, annotation)`` triples of *sig* that
+    autowire should resolve from a container.
+    """
+    for name, param in sig.parameters.items():
+        # skip variadic parameters (``*args`` and ``**kwargs``)
+        if param.kind in (param.VAR_POSITIONAL, param.VAR_KEYWORD):
+            continue
+
+        annotation = param.annotation
+        if isinstance(annotation, dataclasses.InitVar):
+            annotation = annotation.type
+
+        yield name, param, annotation
+
+
+def _default_or_raise(
+    param: inspect.Parameter, annotation: Any, exc: ServiceNotFoundError
+) -> Any:
+    """
+    Return *param*'s default when its own service is missing, else re-raise.
+    """
+    # Only fall back for a miss of *annotation* itself. A miss for a different
+    # type means a registered factory failed to resolve its own dependency,
+    # which must not be masked by the default.
+    if param.default is param.empty or exc.args[0] is not annotation:
+        raise exc
+
+    return param.default
 
 
 def autowire(fn_or_cls: Callable[..., _T]) -> Callable[[Container], _T]:
@@ -82,37 +116,19 @@ def autowire(fn_or_cls: Callable[..., _T]) -> Callable[[Container], _T]:
     get_signature = _lazy_signature(fn_or_cls)
 
     def wrapper(svcs_container: Container) -> _T:
-        sig = get_signature()
-
         posargs: list[Any] = []
         kwargs: dict[str, Any] = {}
 
-        for name, param in sig.parameters.items():
-            # Skip variadic parameters (*args, **kwargs)
-            if param.kind in (param.VAR_POSITIONAL, param.VAR_KEYWORD):
-                continue
-
-            annotation = param.annotation
-            # Unwrap InitVar[T] to get T
-            if isinstance(annotation, dataclasses.InitVar):
-                annotation = annotation.type
-
+        for name, param, annotation in _wireable_params(get_signature()):
             try:
                 resolved = svcs_container.get(annotation)
             except ServiceNotFoundError as e:
-                # Only fall back to the default for this parameter's own
-                # missing service. A miss for a different type means a
-                # registered factory failed to resolve its own dependency
-                # -- don't mask that.
-                if param.default is param.empty or e.args[0] is not annotation:
-                    raise
-                resolved = param.default
+                resolved = _default_or_raise(param, annotation, e)
 
             if param.kind == param.POSITIONAL_ONLY:
                 posargs.append(resolved)
-                continue
-
-            kwargs[name] = resolved
+            else:
+                kwargs[name] = resolved
 
         return fn_or_cls(*posargs, **kwargs)
 
@@ -136,37 +152,19 @@ def aautowire(
     is_async_fn = inspect.iscoroutinefunction(fn_or_cls)
 
     async def wrapper(svcs_container: Container) -> _T:
-        sig = get_signature()
-
         posargs: list[Any] = []
         kwargs: dict[str, Any] = {}
 
-        for name, param in sig.parameters.items():
-            # Skip variadic parameters (*args, **kwargs)
-            if param.kind in (param.VAR_POSITIONAL, param.VAR_KEYWORD):
-                continue
-
-            annotation = param.annotation
-            # Unwrap InitVar[T] to get T
-            if isinstance(annotation, dataclasses.InitVar):
-                annotation = annotation.type
-
+        for name, param, annotation in _wireable_params(get_signature()):
             try:
                 resolved = await svcs_container.aget(annotation)
             except ServiceNotFoundError as e:
-                # Only fall back to the default for this parameter's own
-                # missing service. A miss for a different type means a
-                # registered factory failed to resolve its own dependency
-                # -- don't mask that.
-                if param.default is param.empty or e.args[0] is not annotation:
-                    raise
-                resolved = param.default
+                resolved = _default_or_raise(param, annotation, e)
 
             if param.kind == param.POSITIONAL_ONLY:
                 posargs.append(resolved)
-                continue
-
-            kwargs[name] = resolved
+            else:
+                kwargs[name] = resolved
 
         if is_async_fn:
             return await fn_or_cls(*posargs, **kwargs)  # type: ignore[no-any-return,misc]  # ty: ignore[invalid-await]
