@@ -148,13 +148,11 @@ class TestAutowireFunction:
         class Missing: ...
 
         class Database:
-            def __init__(self, missing: Missing) -> None:
-                self.missing = missing
+            def __init__(self, missing: Missing) -> None: ...
 
         fallback = object()
 
-        def build(db: Database = fallback) -> tuple:
-            return ("built", db)
+        def build(db: Database = fallback) -> tuple: ...
 
         registry.register_factory(Database, autowire(Database))
         registry.register_factory(tuple, autowire(build))
@@ -441,13 +439,11 @@ class TestAAutowireFunction:
         class Missing: ...
 
         class Database:
-            def __init__(self, missing: Missing) -> None:
-                self.missing = missing
+            def __init__(self, missing: Missing) -> None: ...
 
         fallback = object()
 
-        def build(db: Database = fallback) -> tuple:
-            return ("built", db)
+        def build(db: Database = fallback) -> tuple: ...
 
         registry.register_factory(Database, aautowire(Database))
         registry.register_factory(tuple, aautowire(build))
