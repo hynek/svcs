@@ -61,6 +61,13 @@ def _wireable_params(
         if isinstance(annotation, dataclasses.InitVar):
             annotation = annotation.type
 
+        if annotation is param.empty and param.default is param.empty:
+            msg = (
+                f"Cannot autowire parameter {name!r}: it has no type "
+                f"annotation and no default."
+            )
+            raise TypeError(msg)
+
         yield name, param, annotation
 
 
@@ -102,6 +109,11 @@ def autowire(fn_or_cls: Callable[..., _T]) -> Callable[[Container], _T]:
     Returns:
         A factory that takes a container and returns the result of calling
         *fn_or_cls* with the resolved dependencies.
+
+    Raises:
+        TypeError:
+            If a required parameter has neither a type annotation nor a
+            default value.
 
     .. warning::
         Do **not** decorate classes at definition time!

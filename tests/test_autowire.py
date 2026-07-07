@@ -162,6 +162,35 @@ class TestAutowireFunction:
 
         assert Missing is ei.value.args[0]
 
+    def test_autowire_unannotated_required_raises(self, registry, container):
+        """
+        autowire raises a TypeError for a required parameter without a type
+        annotation, since there is nothing to resolve it by.
+        """
+
+        @autowire
+        def build(svc: Service, mystery) -> tuple: ...
+
+        registry.register_factory(tuple, build)
+
+        with pytest.raises(TypeError, match="mystery"):
+            container.get(tuple)
+
+    def test_autowire_unannotated_with_default_uses_default(
+        self, registry, container
+    ):
+        """
+        An unannotated parameter with a default keeps that default.
+        """
+
+        @autowire
+        def build(svc: Service, mystery=42) -> tuple:
+            return (svc, mystery)
+
+        registry.register_factory(tuple, build)
+
+        assert (_service, 42) == container.get(tuple)
+
     @pytest.mark.parametrize("special_type", SPECIAL_TYPE_CASES)
     def test_autowire_special_types(self, registry, container, special_type):
         """
@@ -452,6 +481,37 @@ class TestAAutowireFunction:
             await container.aget(tuple)
 
         assert Missing is ei.value.args[0]
+
+    async def test_aautowire_unannotated_required_raises(
+        self, registry, container
+    ):
+        """
+        aautowire raises a TypeError for a required parameter without a type
+        annotation, since there is nothing to resolve it by.
+        """
+
+        @aautowire
+        async def build(svc: Service, mystery) -> tuple: ...
+
+        registry.register_factory(tuple, build)
+
+        with pytest.raises(TypeError, match="mystery"):
+            await container.aget(tuple)
+
+    async def test_aautowire_unannotated_with_default_uses_default(
+        self, registry, container
+    ):
+        """
+        An unannotated parameter with a default keeps that default.
+        """
+
+        @aautowire
+        async def build(svc: Service, mystery=42) -> tuple:
+            return (svc, mystery)
+
+        registry.register_factory(tuple, build)
+
+        assert (_service, 42) == await container.aget(tuple)
 
     @pytest.mark.parametrize("special_type", SPECIAL_TYPE_CASES)
     async def test_aautowire_special_types(
