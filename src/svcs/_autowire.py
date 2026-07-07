@@ -10,11 +10,39 @@ import inspect
 from collections.abc import Awaitable, Callable
 from typing import Any, TypeVar
 
-from ._core import Container
+from ._core import Container, _robust_signature
 from .exceptions import ServiceNotFoundError
 
 
 _T = TypeVar("_T")
+
+
+def _lazy_signature(
+    fn_or_cls: Callable[..., Any],
+) -> Callable[[], inspect.Signature]:
+    """
+    Return a callable that resolves and caches the signature of *fn_or_cls* on
+    first use.
+
+    This allows autowire to work with (eventually resolvable) forward
+    references.
+    """
+    cache: inspect.Signature | None = None
+
+    def get_signature() -> inspect.Signature:
+        nonlocal cache
+
+        if not cache:
+            sig = _robust_signature(fn_or_cls)
+            if sig is None:
+                msg = f"Cannot determine the signature of {fn_or_cls!r}."
+                raise TypeError(msg)
+
+            cache = sig
+
+        return cache
+
+    return get_signature
 
 
 def autowire(fn_or_cls: Callable[..., _T]) -> Callable[[Container], _T]:
@@ -51,9 +79,11 @@ def autowire(fn_or_cls: Callable[..., _T]) -> Callable[[Container], _T]:
 
     .. versionadded:: 26.1.0
     """
-    sig = inspect.signature(fn_or_cls, follow_wrapped=False, eval_str=True)
+    get_signature = _lazy_signature(fn_or_cls)
 
     def wrapper(svcs_container: Container) -> _T:
+        sig = get_signature()
+
         posargs: list[Any] = []
         kwargs: dict[str, Any] = {}
 
@@ -98,10 +128,12 @@ def aautowire(
 
     .. versionadded:: 26.1.0
     """
-    sig = inspect.signature(fn_or_cls, follow_wrapped=False, eval_str=True)
+    get_signature = _lazy_signature(fn_or_cls)
     is_async_fn = inspect.iscoroutinefunction(fn_or_cls)
 
     async def wrapper(svcs_container: Container) -> _T:
+        sig = get_signature()
+
         posargs: list[Any] = []
         kwargs: dict[str, Any] = {}
 

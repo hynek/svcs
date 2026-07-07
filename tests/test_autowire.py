@@ -6,11 +6,14 @@
 Tests for svcs.autowire() and svcs.aautowire().
 """
 
+import functools
+import textwrap
+
 from typing import Annotated, NewType
 
 import pytest
 
-from svcs import aautowire, autowire
+from svcs import Container, aautowire, autowire
 from svcs.exceptions import ServiceNotFoundError
 from tests.fake_factories import (
     async_list_ignores_variadic_args_factory,
@@ -151,6 +154,85 @@ class TestAutowireFunction:
         result = container.get(object)
 
         assert expected == result
+
+    def test_autowire_sees_through_wraps_decorator(self, registry, container):
+        """
+        autowire follows __wrapped__, so a factory behind a pass-through
+        functools.wraps decorator is autowired from the wrapped signature.
+        """
+
+        def logging_decorator(f):
+            @functools.wraps(f)
+            def inner(*args, **kwargs):
+                return f(*args, **kwargs)
+
+            return inner
+
+        @logging_decorator
+        def build(svc: Service, another: AnotherService) -> tuple:
+            return (svc, another)
+
+        registry.register_factory(tuple, autowire(build))
+
+        assert (_service, _another_service) == container.get(tuple)
+
+    def test_autowire_resolves_forward_reference_at_call_time(
+        self, registry, container
+    ):
+        """
+        autowire resolves annotations lazily, when the factory is first
+        called.
+
+        A string annotation and other forward references don't fail at import
+        time and resolve once everything is defined.
+        """
+        ns: dict[str, object] = {}
+        exec(  # noqa: S102
+            textwrap.dedent(
+                """
+                import svcs
+
+                @svcs.autowire
+                def make_holder(dep: "Later") -> tuple:
+                    return ("holder", dep)
+
+                class Later:
+                    pass
+                """
+            ),
+            ns,
+        )
+
+        later = ns["Later"]()
+        registry.register_value(ns["Later"], later)
+        registry.register_factory(tuple, ns["make_holder"])
+
+        assert ("holder", later) == container.get(tuple)
+
+    def test_autowire_without_signature_raises(self, registry, container):
+        """
+        autowire raises a TypeError when the callable has no introspectable
+        signature.
+        """
+        registry.register_factory(int, autowire(int))
+
+        with pytest.raises(TypeError, match="signature"):
+            container.get(int)
+
+    def test_autowire_signature_reused_across_containers(self, registry):
+        """
+        The resolved signature is cached, so the same autowired factory
+        can be reused across multiple containers.
+        """
+        registry.register_factory(SingleService, autowire(SingleService))
+
+        with Container(registry) as c1:
+            first = c1.get(SingleService)
+        with Container(registry) as c2:
+            second = c2.get(SingleService)
+
+        assert SingleService(_service) == first
+        assert SingleService(_service) == second
 
 
 class TestAutowireClass:
