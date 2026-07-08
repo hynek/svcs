@@ -140,7 +140,7 @@ def create_app(config_filename):
         app,
         Connection,
         connection_factory,
-        ping=lambda conn: conn.execute(ping),
+        ping=lambda conn: conn.execute(ping).close(),
         on_registry_close=engine.dispose,
     )
 
