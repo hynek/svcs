@@ -127,6 +127,9 @@ def autowire(fn_or_cls: Callable[..., _T]) -> Callable[[Container], _T]:
     Variadic parameters (``*args`` and ``**kwargs``) are ignored and
     :class:`dataclasses.InitVar` annotations are unwrapped.
 
+    A parameter annotated as :class:`svcs.Container` receives the current
+    container itself.
+
     Factories that return context managers are entered and cleaned up as usual.
     Bare generator factories are rejected, because their cleanup would be lost.
     Decorate them with :func:`~contextlib.contextmanager` instead.
@@ -165,10 +168,13 @@ def autowire(fn_or_cls: Callable[..., _T]) -> Callable[[Container], _T]:
         kwargs: dict[str, Any] = {}
 
         for name, param, annotation in _wireable_params(get_signature()):
-            try:
-                resolved = svcs_container.get(annotation)
-            except ServiceNotFoundError as e:
-                resolved = _default_or_raise(param, annotation, e)
+            if annotation is Container:
+                resolved: Any = svcs_container
+            else:
+                try:
+                    resolved = svcs_container.get(annotation)
+                except ServiceNotFoundError as e:
+                    resolved = _default_or_raise(param, annotation, e)
 
             if param.kind == param.POSITIONAL_ONLY:
                 posargs.append(resolved)
@@ -216,10 +222,13 @@ def aautowire(
         kwargs: dict[str, Any] = {}
 
         for name, param, annotation in _wireable_params(get_signature()):
-            try:
-                resolved = await svcs_container.aget(annotation)
-            except ServiceNotFoundError as e:
-                resolved = _default_or_raise(param, annotation, e)
+            if annotation is Container:
+                resolved: Any = svcs_container
+            else:
+                try:
+                    resolved = await svcs_container.aget(annotation)
+                except ServiceNotFoundError as e:
+                    resolved = _default_or_raise(param, annotation, e)
 
             if param.kind == param.POSITIONAL_ONLY:
                 posargs.append(resolved)

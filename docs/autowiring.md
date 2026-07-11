@@ -69,6 +69,9 @@ Autowiring handles regular, positional-only, and keyword-only parameters, and ig
 If a parameter cannot be resolved because the service has not been registered,
 the default value is injected instead.
 
+A parameter annotated as {class}`svcs.Container` receives the current container itself, so a factory can look up further services dynamically.
+Autowiring only looks at type annotations, therefore injecting the container by naming an argument `svcs_container` does **not** work.
+
 Factories that return context managers are entered and cleaned up as usual.
 Bare generator factories, however, are rejected with a `TypeError`, because their cleanup would be lost.
 Decorate them with {func}`~contextlib.contextmanager` or {func}`~contextlib.asynccontextmanager` instead.

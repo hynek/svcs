@@ -198,6 +198,20 @@ class TestAutowireFunction:
 
         assert (_service, 42) == container.get(tuple)
 
+    def test_autowire_injects_container(self, registry, container):
+        """
+        A parameter annotated as Container receives the current container
+        itself, regardless of its name.
+        """
+
+        @autowire
+        def build(svc: Service, cont: Container) -> tuple:
+            return (svc, cont)
+
+        registry.register_factory(tuple, build)
+
+        assert (_service, container) == container.get(tuple)
+
     def test_autowire_rejects_generator_factories(self):
         """
         autowire rejects bare generator and async generator factories at
@@ -569,6 +583,20 @@ class TestAAutowireFunction:
         registry.register_factory(tuple, build)
 
         assert (_service, 42) == await container.aget(tuple)
+
+    async def test_aautowire_injects_container(self, registry, container):
+        """
+        A parameter annotated as Container receives the current container
+        itself, regardless of its name.
+        """
+
+        @aautowire
+        async def build(svc: Service, cont: Container) -> tuple:
+            return (svc, cont)
+
+        registry.register_factory(tuple, build)
+
+        assert (_service, container) == await container.aget(tuple)
 
     async def test_aautowire_rejects_generator_factories(self):
         """
