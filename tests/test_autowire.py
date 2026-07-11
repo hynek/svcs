@@ -9,6 +9,7 @@ Tests for svcs.autowire() and svcs.aautowire().
 import functools
 import textwrap
 
+from contextlib import asynccontextmanager, contextmanager
 from typing import Annotated, NewType
 
 import pytest
@@ -55,7 +56,9 @@ SPECIAL_TYPE_CASES = [
     pytest.param(Annotated[Service, "primary"], id="Annotated"),
     pytest.param(Interface, id="Protocol"),
 ]
-"""Special Python types that autowire should support when resolving dependencies."""
+"""
+Special Python types that autowire should support when resolving dependencies.
+"""
 
 
 _service = Service()
@@ -190,6 +193,48 @@ class TestAutowireFunction:
         registry.register_factory(tuple, build)
 
         assert (_service, 42) == container.get(tuple)
+
+    def test_autowire_rejects_generator_factories(self):
+        """
+        autowire rejects bare generator and async generator factories at
+        decoration time, because their cleanup would be lost.
+        """
+
+        def gen_factory(svc: Service):
+            yield svc
+
+        async def agen_factory(svc: Service):
+            yield svc
+
+        with pytest.raises(TypeError, match=r"contextlib\.contextmanager"):
+            autowire(gen_factory)
+
+        with pytest.raises(
+            TypeError, match=r"contextlib\.asynccontextmanager"
+        ):
+            autowire(agen_factory)
+
+    def test_autowire_context_manager_cleanup(self, registry):
+        """
+        A factory decorated with @contextlib.contextmanager is autowired and
+        its cleanup runs when the container is closed.
+        """
+        has_cleaned_up = False
+
+        @contextmanager
+        def factory(svc: Service):
+            nonlocal has_cleaned_up
+
+            yield ("conn", svc)
+
+            has_cleaned_up = True
+
+        registry.register_factory(tuple, autowire(factory))
+
+        with Container(registry) as container:
+            assert ("conn", _service) == container.get(tuple)
+
+        assert has_cleaned_up
 
     @pytest.mark.parametrize("special_type", SPECIAL_TYPE_CASES)
     def test_autowire_special_types(self, registry, container, special_type):
@@ -512,6 +557,45 @@ class TestAAutowireFunction:
         registry.register_factory(tuple, build)
 
         assert (_service, 42) == await container.aget(tuple)
+
+    async def test_aautowire_rejects_generator_factories(self):
+        """
+        aautowire rejects bare generator and async generator factories at
+        decoration time, because their cleanup would be lost.
+        """
+
+        def gen_factory(svc: Service):
+            yield svc
+
+        async def agen_factory(svc: Service):
+            yield svc
+
+        with pytest.raises(TypeError, match=r"contextlib\.contextmanager"):
+            aautowire(gen_factory)
+
+        with pytest.raises(
+            TypeError, match=r"contextlib\.asynccontextmanager"
+        ):
+            aautowire(agen_factory)
+
+    async def test_aautowire_context_manager_cleanup(self, registry):
+        """
+        A factory decorated with @contextlib.asynccontextmanager is
+        autowired and its cleanup runs when the container is closed.
+        """
+        cleanups = []
+
+        @asynccontextmanager
+        async def factory(svc: Service):
+            yield ("conn", svc)
+            cleanups.append("closed")
+
+        registry.register_factory(tuple, aautowire(factory))
+
+        async with Container(registry) as container:
+            assert ("conn", _service) == await container.aget(tuple)
+
+        assert ["closed"] == cleanups
 
     @pytest.mark.parametrize("special_type", SPECIAL_TYPE_CASES)
     async def test_aautowire_special_types(

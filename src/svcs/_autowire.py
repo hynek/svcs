@@ -45,6 +45,31 @@ def _lazy_signature(
     return get_signature
 
 
+def _reject_bare_generator(fn_or_cls: Callable[..., Any]) -> None:
+    """
+    Raise TypeError if *fn_or_cls* is a bare (async) generator function.
+
+    The autowire wrapper is a plain function, so the registry's automatic
+    context-manager conversion of generator factories never kicks in and
+    their cleanup would be silently lost.
+    """
+    if inspect.isgeneratorfunction(fn_or_cls):
+        msg = (
+            f"Cannot autowire the generator function {fn_or_cls!r}: its "
+            f"cleanup would be lost. Decorate it with "
+            f"contextlib.contextmanager instead."
+        )
+        raise TypeError(msg)
+
+    if inspect.isasyncgenfunction(fn_or_cls):
+        msg = (
+            f"Cannot autowire the async generator function {fn_or_cls!r}: "
+            f"its cleanup would be lost. Decorate it with "
+            f"contextlib.asynccontextmanager instead."
+        )
+        raise TypeError(msg)
+
+
 def _wireable_params(
     sig: inspect.Signature,
 ) -> Iterator[tuple[str, inspect.Parameter, Any]]:
@@ -88,18 +113,22 @@ def _default_or_raise(
 
 def autowire(fn_or_cls: Callable[..., _T]) -> Callable[[Container], _T]:
     """
-    Return a factory that resolves the dependencies of *fn_or_cls* from a
-    container, based on its type annotations.
+    Return a factory that resolves the dependencies of *fn_or_cls* from
+    a container, based on its type annotations.
 
     The returned factory takes a :class:`svcs.Container`, resolves every
-    annotated parameter of *fn_or_cls* from it, and calls *fn_or_cls* with
-    the resolved services.
+    annotated parameter of *fn_or_cls* from it, and calls *fn_or_cls* with the
+    resolved services.
 
-    If a service is not found in the container and the parameter has a
-    default value, the default is used instead of raising an error.
+    If a service is not found in the container and the parameter has a default
+    value, the default is used instead of raising an error.
 
     Variadic parameters (``*args`` and ``**kwargs``) are ignored and
     :class:`dataclasses.InitVar` annotations are unwrapped.
+
+    Factories that return context managers are entered and cleaned up as usual.
+    Bare generator factories are rejected, because their cleanup would be lost.
+    Decorate them with :func:`~contextlib.contextmanager` instead.
 
     Args:
         fn_or_cls:
@@ -115,16 +144,19 @@ def autowire(fn_or_cls: Callable[..., _T]) -> Callable[[Container], _T]:
             If a required parameter has neither a type annotation nor a
             default value.
 
+        TypeError:
+            If *fn_or_cls* is a bare generator function.
+
     .. warning::
-        Do **not** decorate classes at definition time!
-        Decorating a class using ``@autowire`` notation replaces the class
-        with the autowire factory, so its name suddenly refers to a function,
-        not a type.
+        Do **not** decorate classes at definition time! Decorating a class
+        using ``@autowire`` notation replaces the class with the autowire
+        factory, so its name suddenly refers to a function, not a type.
 
         Wrap the class only at register time.
 
     .. versionadded:: 26.1.0
     """
+    _reject_bare_generator(fn_or_cls)
     get_signature = _lazy_signature(fn_or_cls)
 
     def wrapper(svcs_container: Container) -> _T:
@@ -152,14 +184,15 @@ def aautowire(
 ) -> Callable[[Container], Awaitable[_T]]:
     """
     Like :func:`autowire`, but dependencies are resolved with
-    :meth:`svcs.Container.aget`, the returned factory is async, and
-    *fn_or_cls* is awaited if it's a coroutine function.
+    :meth:`svcs.Container.aget`, the returned factory is async, and *fn_or_cls*
+    is awaited if it's a coroutine function.
 
     It also works with synchronous callables and services, so in an async
     application, just use this.
 
     .. versionadded:: 26.1.0
     """
+    _reject_bare_generator(fn_or_cls)
     get_signature = _lazy_signature(fn_or_cls)
     is_async_fn = inspect.iscoroutinefunction(fn_or_cls)
 
