@@ -8,7 +8,7 @@ import dataclasses
 import inspect
 
 from collections.abc import Awaitable, Callable, Iterator
-from typing import Any, TypeVar
+from typing import Any, TypeVar, overload
 
 from ._core import Container, _robust_signature
 from .exceptions import ServiceNotFoundError
@@ -179,9 +179,24 @@ def autowire(fn_or_cls: Callable[..., _T]) -> Callable[[Container], _T]:
     return wrapper
 
 
+# The overloads unwrap the result of coroutine functions. Without them,
+# decorating an async callable would be typed as returning a doubly-wrapped
+# Awaitable[Coroutine[...]] while the wrapper actually awaits it.
+@overload
+def aautowire(
+    fn_or_cls: Callable[..., Awaitable[_T]],
+) -> Callable[[Container], Awaitable[_T]]: ...
+
+
+@overload
 def aautowire(
     fn_or_cls: Callable[..., _T],
-) -> Callable[[Container], Awaitable[_T]]:
+) -> Callable[[Container], Awaitable[_T]]: ...
+
+
+def aautowire(
+    fn_or_cls: Callable[..., object],
+) -> Callable[[Container], Awaitable[object]]:
     """
     Like :func:`autowire`, but dependencies are resolved with
     :meth:`svcs.Container.aget`, the returned factory is async, and the
@@ -195,7 +210,7 @@ def aautowire(
     _reject_bare_generator(fn_or_cls)
     get_signature = _lazy_signature(fn_or_cls)
 
-    async def wrapper(svcs_container: Container) -> _T:
+    async def wrapper(svcs_container: Container) -> object:
         posargs: list[Any] = []
         kwargs: dict[str, Any] = {}
 
@@ -217,6 +232,6 @@ def aautowire(
         if inspect.isawaitable(result):
             result = await result
 
-        return result  # pyright: ignore[reportReturnType]  # ty:ignore[invalid-return-type]
+        return result
 
     return wrapper
