@@ -91,6 +91,15 @@ Cons:
 - **Extra Indirection:** Wrapping and introspection add small runtime and debugging overhead.
 
 
+## Caveats
+
+- Annotations are looked up verbatim:
+  a parameter annotated with, for example, `Annotated[Database, "primary"]` or a `NewType` is resolved only if the service is registered under exactly that type – not under the plain `Database`.
+
+- Annotations are resolved when the returned factory is called for the first time.
+  Forward references that are resolvable by then work fine, but types that only exist under {data}`typing.TYPE_CHECKING` can never be resolved and fail with a {class}`svcs.exceptions.ServiceNotFoundError`.
+
+
 ## Autowiring a class
 
 Best used as a wrapper during registration:
