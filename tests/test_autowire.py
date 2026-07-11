@@ -597,6 +597,38 @@ class TestAAutowireFunction:
 
         assert ["closed"] == cleanups
 
+    async def test_aautowire_awaits_async_callable_instance(
+        self, registry, container
+    ):
+        """
+        aautowire awaits the result of an instance with an async __call__.
+        """
+
+        class AsyncFactory:
+            async def __call__(self, svc: Service) -> tuple:
+                return ("called", svc)
+
+        registry.register_factory(tuple, aautowire(AsyncFactory()))
+
+        assert ("called", _service) == await container.aget(tuple)
+
+    async def test_aautowire_awaits_returned_awaitable(
+        self, registry, container
+    ):
+        """
+        aautowire awaits an awaitable that a synchronous callable returns.
+        """
+
+        async def make(svc: Service) -> tuple:
+            return ("made", svc)
+
+        def sync_factory(svc: Service):
+            return make(svc)
+
+        registry.register_factory(tuple, aautowire(sync_factory))
+
+        assert ("made", _service) == await container.aget(tuple)
+
     @pytest.mark.parametrize("special_type", SPECIAL_TYPE_CASES)
     async def test_aautowire_special_types(
         self, registry, container, special_type

@@ -184,8 +184,8 @@ def aautowire(
 ) -> Callable[[Container], Awaitable[_T]]:
     """
     Like :func:`autowire`, but dependencies are resolved with
-    :meth:`svcs.Container.aget`, the returned factory is async, and *fn_or_cls*
-    is awaited if it's a coroutine function.
+    :meth:`svcs.Container.aget`, the returned factory is async, and the
+    result of *fn_or_cls* is awaited if it's awaitable.
 
     It also works with synchronous callables and services, so in an async
     application, just use this.
@@ -194,7 +194,6 @@ def aautowire(
     """
     _reject_bare_generator(fn_or_cls)
     get_signature = _lazy_signature(fn_or_cls)
-    is_async_fn = inspect.iscoroutinefunction(fn_or_cls)
 
     async def wrapper(svcs_container: Container) -> _T:
         posargs: list[Any] = []
@@ -211,9 +210,13 @@ def aautowire(
             else:
                 kwargs[name] = resolved
 
-        if is_async_fn:
-            return await fn_or_cls(*posargs, **kwargs)  # type: ignore[no-any-return,misc]  # ty: ignore[invalid-await]
+        result = fn_or_cls(*posargs, **kwargs)
+        # Mirror Container.aget's semantics: await anything awaitable, so
+        # coroutine functions, partials, and instances with an async
+        # __call__ all work.
+        if inspect.isawaitable(result):
+            result = await result
 
-        return fn_or_cls(*posargs, **kwargs)
+        return result  # pyright: ignore[reportReturnType]  # ty:ignore[invalid-return-type]
 
     return wrapper
