@@ -9,7 +9,11 @@ Tests for svcs.autowire() and svcs.aautowire().
 import functools
 import textwrap
 
-from contextlib import asynccontextmanager, contextmanager
+from contextlib import (
+    AbstractAsyncContextManager,
+    asynccontextmanager,
+    contextmanager,
+)
 from typing import Annotated, NewType
 
 import pytest
@@ -604,6 +608,46 @@ class TestAAutowireFunction:
             assert ("conn", _service) == await container.aget(tuple)
 
         assert ["closed"] == cleanups
+
+    async def test_aautowire_does_not_await_async_context_manager(
+        self, registry
+    ):
+        """
+        An awaitable async context manager is entered without being awaited
+        first.
+        """
+        events = []
+
+        class AwaitableContextManager(AbstractAsyncContextManager):
+            def __init__(self, svc: Service) -> None:
+                self.svc = svc
+
+            def __await__(self):
+                async def start():
+                    events.append("await")
+                    return self
+
+                return start().__await__()
+
+            async def __aenter__(self):
+                events.append("enter")
+                return self
+
+            async def __aexit__(self, *exc_info):
+                events.append("exit")
+
+        def factory(svc: Service) -> AwaitableContextManager:
+            return AwaitableContextManager(svc)
+
+        registry.register_factory(AwaitableContextManager, aautowire(factory))
+
+        async with Container(registry) as container:
+            cm = await container.aget(AwaitableContextManager)
+
+            assert _service is cm.svc
+            assert ["enter"] == events
+
+        assert ["enter", "exit"] == events
 
     async def test_aautowire_awaits_async_callable_instance(
         self, registry, container

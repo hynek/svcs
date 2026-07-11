@@ -99,6 +99,11 @@ Cons:
 - Annotations are resolved when the returned factory is called for the first time.
   Forward references that are resolvable by then work fine, but types that only exist under {data}`typing.TYPE_CHECKING` can never be resolved and fail with a {class}`svcs.exceptions.ServiceNotFoundError`.
 
+- Some objects (for example, HTTP client responses) are both awaitable *and* a context manager.
+  {func}`svcs.aautowire` does not await such objects:
+  they are treated as context managers and left to the container, which by default enters them and takes care of their cleanup.
+  If you've registered the factory with *enter* set to `False`, you get the object as-is and have to enter – or await – it yourself.
+
 
 ## Autowiring a class
 

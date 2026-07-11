@@ -8,6 +8,7 @@ import dataclasses
 import inspect
 
 from collections.abc import Awaitable, Callable, Iterator
+from contextlib import AbstractAsyncContextManager, AbstractContextManager
 from typing import Any, TypeVar, overload
 
 from ._core import Container, _robust_signature
@@ -226,10 +227,14 @@ def aautowire(
                 kwargs[name] = resolved
 
         result = fn_or_cls(*posargs, **kwargs)
-        # Mirror Container.aget's semantics: await anything awaitable, so
-        # coroutine functions, partials, and instances with an async
-        # __call__ all work.
-        if inspect.isawaitable(result):
+        # Mirror Container.aget's semantics: context managers take
+        # precedence over awaitables and are left for the container to
+        # enter. Everything else awaitable is awaited, so coroutine
+        # functions, partials, and instances with an async __call__ all
+        # work.
+        if not isinstance(
+            result, (AbstractContextManager, AbstractAsyncContextManager)
+        ) and inspect.isawaitable(result):
             result = await result
 
         return result
