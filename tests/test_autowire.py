@@ -201,10 +201,10 @@ class TestAutowireFunction:
         """
 
         def gen_factory(svc: Service):
-            yield svc
+            yield svc  # pragma: no cover
 
         async def agen_factory(svc: Service):
-            yield svc
+            yield svc  # pragma: no cover
 
         with pytest.raises(TypeError, match=r"contextlib\.contextmanager"):
             autowire(gen_factory)
@@ -565,10 +565,10 @@ class TestAAutowireFunction:
         """
 
         def gen_factory(svc: Service):
-            yield svc
+            yield svc  # pragma: no cover
 
         async def agen_factory(svc: Service):
-            yield svc
+            yield svc  # pragma: no cover
 
         with pytest.raises(TypeError, match=r"contextlib\.contextmanager"):
             aautowire(gen_factory)
