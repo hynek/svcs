@@ -416,7 +416,7 @@ class TestAutowireClass:
         registry.register_value(special_type, expected)
         registry.register_factory(MyClass, autowire(MyClass))
 
-        assert container.get(MyClass).value == expected
+        assert expected == container.get(MyClass).value
 
     def test_autowire_class_arg_required(self, registry, container):
         """
@@ -701,7 +701,7 @@ class TestAAutowireClass:
         registry.register_value(special_type, expected)
         registry.register_factory(MyClass, aautowire(MyClass))
 
-        assert (await container.aget(MyClass)).value == expected
+        assert expected == (await container.aget(MyClass)).value
 
     async def test_aautowire_class_arg_required(self, registry, container):
         """
