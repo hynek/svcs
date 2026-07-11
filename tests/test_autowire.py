@@ -376,11 +376,6 @@ class TestAutowireClass:
                 id="variadic_args",
             ),
             pytest.param(
-                InitVarService,
-                InitVarService(_service, _another_service),
-                id="initvar",
-            ),
-            pytest.param(
                 StringAnnotationService,
                 StringAnnotationService(_service),
                 id="string_type_annotation",
@@ -399,6 +394,19 @@ class TestAutowireClass:
         resolved = container.get(service_cls)
 
         assert expected == resolved
+
+    def test_autowire_class_initvar(self, registry, container):
+        """
+        autowire unwraps InitVar annotations and the resolved service
+        reaches __post_init__.
+        """
+
+        registry.register_factory(InitVarService, autowire(InitVarService))
+
+        resolved = container.get(InitVarService)
+
+        assert _service is resolved.service
+        assert _another_service is resolved.another
 
     @pytest.mark.parametrize("special_type", SPECIAL_TYPE_CASES)
     def test_autowire_class_special_types(
@@ -693,11 +701,6 @@ class TestAAutowireClass:
                 id="variadic_args",
             ),
             pytest.param(
-                InitVarService,
-                InitVarService(_service, _another_service),
-                id="initvar",
-            ),
-            pytest.param(
                 StringAnnotationService,
                 StringAnnotationService(_service),
                 id="string_type_annotation",
@@ -716,6 +719,19 @@ class TestAAutowireClass:
         resolved = await container.aget(service_cls)
 
         assert expected == resolved
+
+    async def test_aautowire_class_initvar(self, registry, container):
+        """
+        aautowire unwraps InitVar annotations and the resolved service
+        reaches __post_init__.
+        """
+
+        registry.register_factory(InitVarService, aautowire(InitVarService))
+
+        resolved = await container.aget(InitVarService)
+
+        assert _service is resolved.service
+        assert _another_service is resolved.another
 
     @pytest.mark.parametrize("special_type", SPECIAL_TYPE_CASES)
     async def test_aautowire_class_special_types(

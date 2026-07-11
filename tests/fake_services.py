@@ -84,16 +84,13 @@ class VariadicArgs:
         self.kwargs = kwargs
 
 
-@dataclass(eq=False)
-class InitVarService:  # noqa: PLW1641
+@dataclass
+class InitVarService:
     service: Service
     another: InitVar[AnotherService]
 
-    def __post_init__(self, another: InitVar[AnotherService]) -> None:
+    def __post_init__(self, another: AnotherService) -> None:
         self.another = another
-
-    def __eq__(self, other: object) -> bool:
-        return self.service == other.service and self.another == other.another
 
 
 @dataclass
