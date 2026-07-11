@@ -622,7 +622,7 @@ class TestAAutowireFunction:
             def __init__(self, svc: Service) -> None:
                 self.svc = svc
 
-            def __await__(self):
+            def __await__(self):  # pragma: no cover
                 async def start():
                     events.append("await")
                     return self
