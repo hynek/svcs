@@ -351,7 +351,7 @@ class Registry:
             *factory* now may take any amount of arguments and they are ignored.
 
         .. versionadded:: 26.1.0
-           *suppress_context*.
+           *suppress_context_exit*.
         """
         rs = self._register_factory(
             svc_type,
