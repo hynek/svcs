@@ -71,6 +71,7 @@ exclude_patterns = ["_build"]
 nitpick_ignore = [
     ("py:class", "SomeLifespan"),  # just a type alias
     *[("py:class", f"svcs._core.T{i}") for i in range(1, 11)],
+    ("py:class", "svcs._autowire._T"),
     ("py:class", "typing_extensions.TypeForm"),
     # This only fails in CI!?
     *[("py:class", f"T{i}") for i in range(1, 11)],

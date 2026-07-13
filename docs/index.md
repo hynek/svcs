@@ -86,6 +86,7 @@ Read on in *{doc}`why`* if you're intrigued!
 
 why
 core-concepts
+autowiring
 integrations/index
 typing-caveats
 glossary
