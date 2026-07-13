@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 from . import exceptions
+from ._autowire import aautowire, autowire
 from ._core import (
     Container,
     RegisteredService,
@@ -18,6 +19,8 @@ __all__ = [
     "RegisteredService",
     "Registry",
     "ServicePing",
+    "aautowire",
+    "autowire",
     "exceptions",
 ]
 

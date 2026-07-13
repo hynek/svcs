@@ -5,7 +5,7 @@
 import contextlib
 import sys
 
-from collections.abc import AsyncGenerator, Generator
+from collections.abc import AsyncGenerator, Awaitable, Callable, Generator
 from typing import Protocol
 
 import svcs
@@ -168,3 +168,25 @@ class Foo:
 foo = Foo()
 
 reg.register_value(Foo, foo)
+
+
+# Autowire
+@svcs.autowire
+def fn(a: str, /, b: int, *, c: bool) -> str:
+    return "fn"
+
+
+@svcs.aautowire
+async def afn(a: str, /, b: int, *, c: bool) -> str:
+    return "afn"
+
+
+assert_type(fn, Callable[[svcs.Container], str])
+assert_type(afn, Callable[[svcs.Container], Awaitable[str]])
+assert_type(svcs.autowire(P), Callable[[svcs.Container], P])
+assert_type(svcs.aautowire(P), Callable[[svcs.Container], Awaitable[P]])
+
+reg.register_factory(str, fn)
+reg.register_factory(str, afn)
+reg.register_factory(P, svcs.autowire(P))
+reg.register_factory(P, svcs.aautowire(P))

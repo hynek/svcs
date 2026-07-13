@@ -74,7 +74,8 @@ registry = svcs.Registry()
 registry.register_factory(
     Connection,
     connection_factory,
-    ping=lambda conn: conn.execute(text("SELECT 1")), # ← health check
+    # Health check; make sure you don't leaks results.
+    ping=lambda conn: conn.execute(text("SELECT 1")).close(),
     on_registry_close=engine.dispose
 )
 
@@ -96,7 +97,7 @@ registry = svcs.Registry()
 registry.register_factory(
     Connection,
     engine.connect,  # ← sqlalchemy.Connection is a context manager
-    ping=lambda conn: conn.execute(text("SELECT 1")),
+    ping=lambda conn: conn.execute(text("SELECT 1").close()),
     on_registry_close=engine.dispose
 )
 
