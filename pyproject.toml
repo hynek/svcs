@@ -82,7 +82,7 @@ typing = [
   "pyramid",
   "setuptools<82",
 ]
-mypy = [{ include-group = "typing" }, "mypy>=1.4"]
+mypy = [{ include-group = "typing" }, "mypy>=2.2"]  # TypeForms
 pyright = [{ include-group = "typing" }, "pyright"]
 ty = [{ include-group = "typing" }, "ty"]
 pyrefly = [{ include-group = "typing" }, "pyrefly"]
@@ -101,6 +101,8 @@ dev = [
 [tool.uv]
 # Dependency cooldown
 exclude-newer = "1 week"
+# 2.2 shipped TypeForms;  remove after 2026-07-15
+exclude-newer-package = { mypy = false }
 
 
 [project.urls]

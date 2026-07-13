@@ -8,13 +8,13 @@
 You add support for *svcs* to your AIOHTTP app by calling {meth}`svcs.aiohttp.init_app` wherever you create your {class}`aiohttp.web.Application` object.
 
 
-## Service Acquisition
+## Service acquisition
 
 You can get either the {class}`~svcs.Container` using {func}`svcs.aiohttp.svcs_from` and use it as usual, or pluck them directly from the request object using {func}`svcs.aiohttp.aget` that takes a {class}`aiohttp.web.Request` object as its first argument.
 
 (aiohttp-health)=
 
-## Health Checks
+## Health checks
 
 As with services, you have the option to either {func}`svcs.aiohttp.svcs_from` on the request or go straight for {func}`svcs.aiohttp.get_pings`.
 
@@ -34,9 +34,9 @@ If you register *on_registry_close* callbacks, you can use {func}`svcs.aiohttp.a
 Therefore, if you shut down your AIOHTTP applications cleanly, you don't have to think about registry cleanup either.
 
 
-## API Reference
+## API reference
 
-### Application Life Cycle
+### Application life cycle
 
 ```{eval-rst}
 .. module:: svcs.aiohttp
@@ -48,14 +48,14 @@ Therefore, if you shut down your AIOHTTP applications cleanly, you don't have to
 ```
 
 
-### Registering Services
+### Registering services
 
 ```{eval-rst}
 .. autofunction:: register_factory
 .. autofunction:: register_value
 ```
 
-### Service Acquisition
+### Service acquisition
 
 ```{eval-rst}
 .. autofunction:: svcs_from

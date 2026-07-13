@@ -55,7 +55,7 @@ def view(request):
 ... or less!
 
 <!-- begin addendum -->
-To a type checker like [Mypy](https://mypy-lang.org), `db` has the type `Database`, `api` has the type `WebAPIClient`, and `cache` has the type `Cache`.
+To a type checker, `db` has the type `Database`, `api` has the type `WebAPIClient`, and `cache` has the type `Cache`.
 `db`, `api`, and `cache` will be automatically cleaned up when the request ends -- it's context managers all the way down.
 <!-- end addendum -->
 
@@ -73,7 +73,7 @@ Read on in [*Why?*](https://svcs.hynek.me/en/latest/why.html) or watch this shor
 [![Watch the video](https://img.youtube.com/vi/d1elMD9WgpA/maxresdefault.jpg)](https://youtu.be/d1elMD9WgpA)
 
 
-## Project Links
+## Project links
 
 - [**PyPI**](https://pypi.org/project/svcs/)
 - [**GitHub**](https://github.com/hynek/svcs)

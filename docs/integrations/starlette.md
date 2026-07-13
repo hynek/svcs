@@ -35,7 +35,7 @@ app = Starlette(
 
 (starlette-get)=
 
-## Service Acquisition
+## Service acquisition
 
 You can either use {func}`svcs.starlette.svcs_from`:
 
@@ -57,7 +57,7 @@ async def view(request):
 
 (starlette-health)=
 
-## Health Checks
+## Health checks
 
 As with services, you have the option to either {func}`svcs.starlette.svcs_from` on the request or go straight for {func}`svcs.starlette.get_pings`.
 
@@ -93,9 +93,9 @@ Otherwise the lifespan function overwrites your settings.
 If you initialize the application with a lifespan and middleware as shown above, and use {func}`~svcs.starlette.svcs_from` or {func}`~svcs.starlette.aget` to get your services, everything is cleaned up behind you automatically.
 
 
-## API Reference
+## API reference
 
-### Application Life Cycle
+### Application life cycle
 
 ```{eval-rst}
 .. module:: svcs.starlette
@@ -107,7 +107,7 @@ If you initialize the application with a lifespan and middleware as shown above,
 ```
 
 
-### Service Acquisition
+### Service acquisition
 
 ```{eval-rst}
 .. function:: aget(request: starlette.requests.Request, svc_type1: type, ...)

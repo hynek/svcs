@@ -6,7 +6,7 @@ import contextlib
 import sys
 
 from collections.abc import AsyncGenerator, Awaitable, Callable, Generator
-from typing import Protocol
+from typing import Annotated, NewType, Protocol
 
 import svcs
 
@@ -100,21 +100,11 @@ con.register_local_factory(int, factory_with_cleanup)
 con.register_local_value(int, 42)
 
 # The type checker believes whatever we tell it.
-o1: object = con.get(object)
-o2: int = con.get(int)
-
-a: int
-b: str
-c: bool
-d: tuple
-e: object
-f: float
-g: list
-h: dict
-i: set
-j: bytes
-a, b, c, d, e, f, g, h, i, j = con.get(
-    int, str, bool, tuple, object, float, list, dict, set, bytes
+assert_type(con.get(object), object)
+assert_type(con.get(int), int)
+assert_type(
+    con.get(int, str, bool, tuple, object, float, list, dict, set, bytes),
+    tuple[int, str, bool, tuple, object, float, list, dict, set, bytes],
 )
 
 
@@ -122,9 +112,9 @@ class P(Protocol):
     def m(self) -> None: ...
 
 
-p_from_get: P = con.get(P)
+assert_type(con.get(P), P)
 
-assert_type(p_from_get, P)
+# Just make sure it passes even tho it's Any.
 p: P = con.get_abstract(P)
 
 con.close()
@@ -133,7 +123,7 @@ with contextlib.closing(svcs.Container(reg)) as con:
     ...
 
 with svcs.Container(reg) as con:
-    i2: int = con.get(int)
+    assert_type(con.get(int), int)
 
 
 async def ctx() -> None:
@@ -149,15 +139,21 @@ class S1(str):
     pass
 
 
-class S2(str):
-    pass
+S2 = NewType("S2", str)
+S3 = Annotated[str, "S3"]
 
 
 reg.register_value(S1, "foo")
-reg.register_value(S2, "bar")
+reg.register_value(S2, "bar")  # pyright:ignore[reportArgumentType]
+reg.register_value(S3, "qux")  # pyright:ignore[reportArgumentType]
 
-s1: str = con.get(S1)
-s2: str = con.get(S2)
+assert_type(con.get(S1), S1)
+assert_type(con.get(S2), S2)  # pyright:ignore[reportAssertTypeFailure,reportArgumentType]
+assert_type(con.get(S3), S3)  # pyright:ignore[reportAssertTypeFailure,reportArgumentType]
+
+s: str = con.get(S1)
+s = con.get(S2)  # pyright:ignore[reportArgumentType]
+s = con.get(S3)  # pyright:ignore[reportArgumentType]
 
 
 # Register instances of custom classes as values

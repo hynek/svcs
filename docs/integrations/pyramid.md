@@ -25,7 +25,7 @@ def make_app():
 ```
 
 
-## Service Acquisition
+## Service acquisition
 
 You can use {func}`svcs.pyramid.svcs_from()` to access a request-scoped {class}`svcs.Container` from a request object:
 
@@ -46,7 +46,7 @@ def view(request):
 ```
 
 
-### Thread Locals
+### Thread locals
 
 Despite being [discouraged](<inv:#narr/threadlocals>), you can use Pyramid's thread locals to access the active container.
 
@@ -73,7 +73,7 @@ These functions only work from within **active** Pyramid requests.
 
 (pyramid-health)=
 
-## Health Checks
+## Health checks
 
 As with services, you have the option to either {func}`svcs.pyramid.svcs_from` on the request or go straight for {func}`svcs.pyramid.get_pings`.
 
@@ -135,9 +135,9 @@ Since {func}`~svcs.pyramid.init()` takes a *registry* keyword argument, you can 
 You can use {func}`svcs.pyramid.close_registry()` to close the registry that is attached to the {class}`pyramid.registry.Registry` of the config or app object that you pass as the only parameter.
 
 
-## API Reference
+## API reference
 
-### Application Life Cycle
+### Application life cycle
 
 ```{eval-rst}
 .. module:: svcs.pyramid
@@ -152,7 +152,7 @@ You can use {func}`svcs.pyramid.close_registry()` to close the registry that is 
 ```
 
 
-### Registering Services
+### Registering services
 
 ```{eval-rst}
 .. autofunction:: register_factory
@@ -160,7 +160,7 @@ You can use {func}`svcs.pyramid.close_registry()` to close the registry that is 
 ```
 
 
-### Service Acquisition
+### Service acquisition
 
 ```{eval-rst}
 .. function:: get(request, *svc_types)
