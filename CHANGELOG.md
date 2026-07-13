@@ -32,8 +32,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   This means that it's now possible use abstract types like `Protocol`s or abstract base classes for registered services, removing an important typing caveat.
   This change introduces a dependency on `typing-extensions` for Python 3.14 and earlier.
 
-  Note: Mypy users that want to take advantage of this must pass the `--enable-incomplete-feature=TypeForm` argument for the time being.
-  Since the [PR to activate it has been merged](https://github.com/python/mypy/pull/21262), we expect it to land in Mypy 2.2.
+  Note: On Mypy versions older than 2.2, users that want to take advantage of this must pass the `--enable-incomplete-feature=TypeForm` argument.
 
 - New `svcs.autowire()` and `svcs.aautowire()` that can be used to automatically resolve dependencies based on type annotations.
   [#167](https://github.com/hynek/svcs/pull/167)
