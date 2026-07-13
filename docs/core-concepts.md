@@ -39,18 +39,18 @@ But the types must be *hashable* because they're used as keys in a lookup dictio
 Sometimes, it makes sense to have multiple instances of the same type.
 For example, you might have multiple HTTP client pools or more than one database connection.
 
-You can achieve this by creating new types by subclassing the common type.
+You can achieve this by creating new types by subclassing the common type or by using {any}`typing.NewType` or {any}`typing.Annotated`.
 
-On Mypy, you can also use {any}`typing.Annotated` to add metadata to the type to the same effect.
-However, it doesn't work with Pyright and [it's unclear if it's even _supposed_ to work](https://github.com/hynek/svcs/discussions/74), so we recommend the first approach.
+However, the latter two don't work with Pyright and for `Annotated` [it's unclear if it's even _supposed_ to work](https://github.com/hynek/svcs/discussions/74).
 
 You can mix and match those two approaches, as long your type checker supports both.
-For instance, if you need a primary and a secondary database connection:
+For instance, if you need three different database connections:
 
 % invisible-code-block: python
 %
 % primary_url = "sqlite:///:memory:"
 % secondary_url = "sqlite:///:memory:"
+% tertiary_url = "sqlite:///:memory:"
 
 ```python
 from typing import Annotated, NewType
@@ -60,25 +60,27 @@ from sqlalchemy import Connection, create_engine
 # Create the two connection engines
 primary_engine = create_engine(primary_url)
 secondary_engine = create_engine(secondary_url)
+tertiary_engine = create_engine(tertiary_url)
 
-# Clunky, but works universally.
+# Clunky, but works universally:
 class PrimaryConnection(Connection):
     pass
 
-# This works with Mypy, but NOT with Pyright:
-SecondaryConnection = Annotated[Connection, "secondary"]
+# Works with Mypy, ty, and Pyrefly, but NOT with Pyright:
+SecondaryConnection = NewType("SecondaryConnection", Connection)
+
+# Works with Mypy, ty, and Pyrefly, but NOT with Pyright:
+TertiaryConnection = Annotated[Connection, "tertiary"]
 
 # Register the factories to the aliases
 registry.register_factory(PrimaryConnection, primary_engine.connect)
 registry.register_factory(SecondaryConnection, secondary_engine.connect)
+registry.register_factory(TertiaryConnection, tertiary_engine.connect)
 ```
 
 The type and content of the annotated metadata ("secondary") are not important to *svcs*, as long as the whole type is hashable.
 
 ::: {note}
-- As of Pyright 1.1.402, the NewType approach that we used to recommend [doesn't pass the type checker anymore](https://github.com/microsoft/pyright/discussions/10596).
-  Unless a better solution is found earlier, it looks like such kind of functionality won't work until {pep}`747` has passed and is widely implemented.
-  We're tracking this in [#128](https://github.com/hynek/svcs/issues/128).
 - The {pep}`695` {keyword}`type` keyword is currently not supported and we weren't able to figure out how to support it.
   It looks like this also will require at least {pep}`747` to be workable.
 :::
@@ -154,7 +156,7 @@ If a factory takes a first argument called `svcs_container` or the first argumen
 '639c0a5c8d934a678341fe43367308a5'
 ```
 
-::: {note}
+::: {tip}
 It is possible to overwrite registered service factories later -- for example, for testing -- **without monkey-patching**.
 This is especially interesting if you want to replace a low-level service with a mock without re-jiggering all services that depend on it.
 
@@ -319,7 +321,7 @@ Here's how a health check endpoint could look like:
 ::::
 <!-- end health checks -->
 
-Now, you can point your monitoring tool of choice -- like Prometheus's [Blackbox Exporter](https://github.com/prometheus/blackbox_exporter) or [Nagios](https://www.nagios.org) -- at it and you'll get alerted whenever the application is broken.
+Now, you can point your monitoring tool of choice -- like Prometheus's [Blackbox Exporter](https://github.com/prometheus/blackbox_exporter) or [Icinga](https://icinga.com) -- at it and you'll get alerted whenever the application is broken.
 
 
 ## Life Cycle Summary
