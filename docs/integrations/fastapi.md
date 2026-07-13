@@ -50,7 +50,7 @@ Therefore, you **can't** have per-router scoped registries.
 
 (fastapi-get)=
 
-## Service Acquisition
+## Service acquisition
 
 *svcs* comes with the {func}`svcs.fastapi.container` dependency that will inject a request-scoped {class}`svcs.Container` into your views if the application is correctly initialized:
 
@@ -75,7 +75,7 @@ async def index(services: svcs.fastapi.DepContainer):
 
 (fastapi-health)=
 
-## Health Checks
+## Health checks
 
 With the help of the {func}`svcs.fastapi.container` dependency you can easily add a health check endpoint to your application without any special API:
 
@@ -110,9 +110,9 @@ Otherwise the lifespan function overwrites your settings.
 If you initialize the application with a lifespan as shown above, and use the {func}`svcs.fastapi.container` dependency to get your services, everything is cleaned up behind you automatically.
 
 
-## API Reference
+## API reference
 
-### Application Life Cycle
+### Application life cycle
 
 ```{eval-rst}
 .. autoclass:: svcs.fastapi.lifespan(lifespan)
@@ -121,7 +121,7 @@ If you initialize the application with a lifespan as shown above, and use the {f
 ```
 
 
-### Service Acquisition
+### Service acquisition
 
 ```{eval-rst}
 .. autofunction:: svcs.fastapi.container

@@ -11,7 +11,7 @@ You can [skip this section](#flask-init) if you'd rather see solutions than prob
 
 (flask-get-x)=
 
-## The Problems with the `get_X` Pattern
+## The problems with the `get_X` pattern
 
 % skip: next
 
@@ -167,7 +167,7 @@ def create_app(config_filename):
     return app
 ```
 
-## Service Acquisition
+## Service acquisition
 
 Now you can request the `Connection` object in your views:
 
@@ -190,7 +190,7 @@ def index() -> flask.ResponseValue:
 
 (flask-health)=
 
-## Health Checks
+## Health checks
 
 The {func}`svcs.flask.get_pings` helper will transparently pick the container from `g`.
 So, if you would like a health endpoint, it could look like this:
@@ -232,7 +232,7 @@ def test_handles_db_failure():
 
 {meth}`svcs.flask.overwrite_value` makes sure that the instantiation cache of the active container is cleared, such that possibly existing connections that you've used in setup are closed and removed.
 
-## Quality of Life
+## Quality of life
 
 In practice, you can simplify/beautify the code within your views by creating a module that re-exports those Flask helpers.
 
@@ -289,9 +289,9 @@ def index():
 
 🧑‍🍳💋
 
-## API Reference
+## API reference
 
-### Application Life Cycle
+### Application life cycle
 
 ```{eval-rst}
 .. module:: svcs.flask
@@ -306,14 +306,14 @@ def index():
    .. versionadded:: 23.21.0
 ```
 
-### Registering Services
+### Registering services
 
 ```{eval-rst}
 .. autofunction:: register_factory
 .. autofunction:: register_value
 ```
 
-### Service Acquisition
+### Service acquisition
 
 ```{eval-rst}
 .. autofunction:: svcs_from

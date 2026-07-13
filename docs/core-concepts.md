@@ -34,7 +34,7 @@ The values and return values of the factories don't have to be actual instances 
 But the types must be *hashable* because they're used as keys in a lookup dictionary.
 
 
-### Multiple Factories for the Same Type
+### Multiple factories for the same type
 
 Sometimes, it makes sense to have multiple instances of the same type.
 For example, you might have multiple HTTP client pools or more than one database connection.
@@ -203,7 +203,7 @@ That makes testing even easier because the business code makes fewer assumptions
 
 (local-registries)=
 
-### Container-Local Registries
+### Container-local registries
 
 ::: {versionadded} 23.21.0
 :::
@@ -282,7 +282,7 @@ Now the type name expresses the purpose of the object and it doesn't matter if t
 
 (health)=
 
-### Health Checks
+### Health checks
 
 Each registered service may have a `ping` callable that you can use for health checks.
 You can request all pingable registered services with {meth}`svcs.Container.get_pings()`.
@@ -324,7 +324,7 @@ Here's how a health check endpoint could look like:
 Now, you can point your monitoring tool of choice -- like Prometheus's [Blackbox Exporter](https://github.com/prometheus/blackbox_exporter) or [Icinga](https://icinga.com) -- at it and you'll get alerted whenever the application is broken.
 
 
-## Life Cycle Summary
+## Life cycle summary
 
 While *svcs*'s core is entirely agnostic on how you use the registry and the container, all our {doc}`integrations/index` follow the same life cycle:
 
@@ -334,7 +334,7 @@ While *svcs*'s core is entirely agnostic on how you use the registry and the con
 You're free to structure your own integrations as you want, though.
 
 
-## Debugging Registrations
+## Debugging registrations
 
 If you are confused about where a particular factory for a type has been defined, *svcs* logs every registration at debug level along with a stack trace.
 
@@ -363,7 +363,7 @@ Stack (most recent call last):
 You can see that the datetime factory and the str value have both been registered in `debugging_with_logging.py`, down to the line number.
 
 
-## API Reference
+## API reference
 
 ```{eval-rst}
 .. module:: svcs

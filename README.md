@@ -73,7 +73,7 @@ Read on in [*Why?*](https://svcs.hynek.me/en/latest/why.html) or watch this shor
 [![Watch the video](https://img.youtube.com/vi/d1elMD9WgpA/maxresdefault.jpg)](https://youtu.be/d1elMD9WgpA)
 
 
-## Project Links
+## Project links
 
 - [**PyPI**](https://pypi.org/project/svcs/)
 - [**GitHub**](https://github.com/hynek/svcs)

@@ -159,7 +159,7 @@ with Container(registry) as container:
 ```
 
 
-## API Reference
+## API reference
 
 ```{eval-rst}
 .. autofunction:: svcs.autowire

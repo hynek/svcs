@@ -126,11 +126,13 @@ All of this may look over-engineered if you have only one or two services.
 However, it starts paying dividends _very fast_ once you go past that.
 :::
 
+
 ## asyncio
 
 _svcs_ comes with **full async** support via a-prefixed methods (like `aget()` instead of `get()`, and so on).
 
 In fact, most of our {doc}`integrations/index` are for async frameworks!
+
 
 ## Static typing
 
@@ -138,6 +140,7 @@ In fact, most of our {doc}`integrations/index` are for async frameworks!
 :start-after: "<!-- begin typing -->"
 :end-before: "<!-- end typing -->"
 ```
+
 
 ## Is this *Dependency Injection* or *Service Location*!?
 
@@ -158,6 +161,7 @@ On the other hand, if you use _svcs_ in your service layer -- or even business l
 We strongly recommend the former over the latter because it's much easier to test and reason about.
 
 If you're curious, check the [glossary](glossary) entries for {term}`Service Locator` and {term}`Dependency Injection` for more details, or watch Hynek's video [_Loose Coupling & Dependency Injection the EASY Way!_](https://youtu.be/uWTvMCra-_Y).
+
 
 ## Benefits
 
@@ -190,6 +194,7 @@ Having that exposed as a web endpoint is great for monitoring and debugging.
 Providing a health endpoint without a centralized registry of services is highly boilerplate-heavy.
 With _svcs_ you get that for free.
 
+
 ## Why not?
 
 The main downside of service locators is that it's only possible to verify whether all required dependencies have been configured by running the code.
@@ -201,7 +206,8 @@ For instance, by configuring the same service in the same place for all environm
 
 If you still prefer a dependency injection framework, check out [_incant_](https://github.com/Tinche/incant) -- a lovely package by a friend of the project.
 
-## What Next?
+
+## What next?
 
 If you're still interested, learn about our [core concepts](core-concepts) first -- it's just two of them!
 
