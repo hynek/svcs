@@ -101,8 +101,6 @@ dev = [
 [tool.uv]
 # Dependency cooldown
 exclude-newer = "1 week"
-# 2.2 shipped TypeForms;  remove after 2026-07-15
-exclude-newer-package = { mypy = false }
 
 
 [project.urls]
@@ -224,20 +222,12 @@ module = "pyramid.*"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = "pytest.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
 module = "tests.*"
 ignore_errors = true
 
 [[tool.mypy.overrides]]
 module = "conftest"
 ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "tests.typing.*"
-ignore_errors = false
 
 [[tool.mypy.overrides]]
 module = "health_check_pyramid"
@@ -250,36 +240,36 @@ ignore = [
   "conftest.py",
   "docs",
   "src/svcs/pyramid.py",
-  # Excluding tests and allowing tests/typing (like in Mypy) doesn't work.
-  "tests/*.py",
-  "tests/integrations",
-  "tests/typing/mypy.py",
-  "tests/typing/pyramid.py",
+  "tests",
+  "typing_tests/mypy.py",
+  "typing_tests/pyramid.py",
 ]
 
+
+[tool.ty.src]
+include = ["src", "typing_tests"]
 
 [tool.ty.rules]
 possibly-missing-attribute = "ignore"
 
-[tool.ty.src]
-exclude = [
+[[tool.ty.overrides]]
+rules.all = "ignore"
+include = [
+  "conftest.py",
   "docs",
   "src/svcs/pyramid.py",
-  "tests/typing/mypy.py",
-  "tests/typing/pyramid.py",
+  "tests",
+  "typing_tests/mypy.py",
+  "typing_tests/pyramid.py"
 ]
-
-[[tool.ty.overrides]]
-include = ["conftest.py", "tests"]
-rules.all = "ignore"
 
 
 [tool.pyrefly]
-project-includes = ["src", "tests/typing"]
+project-includes = ["src", "typing_tests"]
 project-excludes = [
   "src/svcs/pyramid.py",
-  "tests/typing/mypy.py",
-  "tests/typing/pyramid.py",
+  "typing_tests/mypy.py",
+  "typing_tests/pyramid.py",
 ]
 
 
@@ -317,8 +307,9 @@ ignore = [
   "TRY002",  # stock exceptions are fine in tests
 ]
 
-"tests/typing/*" = [
+"typing_tests/*" = [
   "F841",   # unused variables are fine in type checks
+  "F842",   # unused variables are fine in type checks
   "RUF059", # unused variables are fine in type checks
   "SLOT",   # we don't care about slots in type checks
 ]

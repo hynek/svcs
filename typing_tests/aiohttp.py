@@ -45,12 +45,12 @@ class P(Protocol):
 
 
 async def func(request: Request) -> None:
-    a, b, c, d, e, f, g, h, i, j = await svcs.aiohttp.aget(
+    _a, _b, _c, _d, _e, _f, _g, _h, _i, _j = await svcs.aiohttp.aget(
         request, int, str, bool, tuple, object, float, list, dict, set, bytes
     )
 
-    p: P = await svcs.aiohttp.aget_abstract(request, P)
+    await svcs.aiohttp.aget_abstract(request, P)
 
     await svcs.aiohttp.aclose_registry(app)
 
-    con: svcs.Container = svcs.aiohttp.svcs_from(request)
+    svcs.aiohttp.svcs_from(request)

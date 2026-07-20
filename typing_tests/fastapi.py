@@ -54,13 +54,13 @@ app = FastAPI(lifespan=lifespan)
 async def view(
     services: Annotated[svcs.Container, Depends(svcs.fastapi.container)],
 ) -> JSONResponse:
-    x: int = services.get(int)
+    services.get(int)
 
     return JSONResponse({}, 200)
 
 
 @app.get("/")
 async def view2(services: svcs.fastapi.DepContainer) -> JSONResponse:
-    x: int = services.get(int)
+    services.get(int)
 
     return JSONResponse({}, 200)
