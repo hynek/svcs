@@ -78,11 +78,11 @@ class P(Protocol):
 
 
 async def func() -> None:
-    a, b, c, d, e, f, g, h, i, j = await svcs.starlette.aget(
+    _a, _b, _c, _d, _e, _f, _g, _h, _i, _j = await svcs.starlette.aget(
         request, int, str, bool, tuple, object, float, list, dict, set, bytes
     )
 
-    p: P = await svcs.starlette.aget_abstract(request, P)
+    await svcs.starlette.aget_abstract(request, P)
 
 
 con: svcs.Container = svcs.starlette.svcs_from(request)
