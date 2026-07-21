@@ -35,18 +35,23 @@ async def func() -> None:
         reg2.register_factory(int, int)
 
         async with svcs.Container(reg2) as con2:
-            a: int
-            b: str
-            c: bool
-            d: tuple
-            e: object
-            f: float
-            g: list
-            h: dict
-            i: set
-            j: bytes
-            _a, _b, _c, _d, _e, _f, _g, _h, _i, _j = await con2.aget(
+            services = await con2.aget(
                 int, str, bool, tuple, object, float, list, dict, set, bytes
+            )
+            assert_type(
+                services,
+                tuple[
+                    int,
+                    str,
+                    bool,
+                    tuple,
+                    object,
+                    float,
+                    list,
+                    dict,
+                    set,
+                    bytes,
+                ],
             )
 
 

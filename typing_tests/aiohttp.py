@@ -2,12 +2,20 @@
 #
 # SPDX-License-Identifier: MIT
 
+import sys
+
 from collections.abc import Generator
 from typing import Protocol
 
 from aiohttp.web import Application, Request
 
 import svcs
+
+
+if sys.version_info < (3, 11):
+    from typing_extensions import assert_type
+else:
+    from typing import assert_type
 
 
 def factory_with_cleanup() -> Generator[int, None, None]:
@@ -28,29 +36,22 @@ svcs.aiohttp.register_factory(app, str, str)
 svcs.aiohttp.register_factory(app, int, factory_with_cleanup)
 svcs.aiohttp.register_value(app, str, str, ping=lambda: None)
 
-a: int
-b: str
-c: bool
-d: tuple
-e: object
-f: float
-g: list
-h: dict
-i: set
-j: bytes
-
 
 class P(Protocol):
     def m(self) -> None: ...
 
 
 async def func(request: Request) -> None:
-    _a, _b, _c, _d, _e, _f, _g, _h, _i, _j = await svcs.aiohttp.aget(
+    services = await svcs.aiohttp.aget(
         request, int, str, bool, tuple, object, float, list, dict, set, bytes
     )
+    assert_type(
+        services,
+        tuple[int, str, bool, tuple, object, float, list, dict, set, bytes],
+    )
 
-    await svcs.aiohttp.aget_abstract(request, P)
+    p: P = await svcs.aiohttp.aget_abstract(request, P)
 
     await svcs.aiohttp.aclose_registry(app)
 
-    svcs.aiohttp.svcs_from(request)
+    assert_type(svcs.aiohttp.svcs_from(request), svcs.Container)

@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+import sys
+
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from typing import Annotated
@@ -12,6 +14,12 @@ from fastapi import Depends, FastAPI
 from fastapi.responses import JSONResponse
 
 import svcs
+
+
+if sys.version_info < (3, 11):
+    from typing_extensions import assert_type
+else:
+    from typing import assert_type
 
 
 @svcs.fastapi.lifespan
@@ -54,13 +62,13 @@ app = FastAPI(lifespan=lifespan)
 async def view(
     services: Annotated[svcs.Container, Depends(svcs.fastapi.container)],
 ) -> JSONResponse:
-    services.get(int)
+    assert_type(services.get(int), int)
 
     return JSONResponse({}, 200)
 
 
 @app.get("/")
 async def view2(services: svcs.fastapi.DepContainer) -> JSONResponse:
-    services.get(int)
+    assert_type(services.get(int), int)
 
     return JSONResponse({}, 200)

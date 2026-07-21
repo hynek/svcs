@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+import sys
+
 from collections.abc import AsyncGenerator, Generator
 from contextlib import asynccontextmanager
 from typing import Protocol
@@ -13,6 +15,12 @@ from starlette.middleware import Middleware
 from starlette.requests import Request
 
 import svcs
+
+
+if sys.version_info < (3, 11):
+    from typing_extensions import assert_type
+else:
+    from typing import assert_type
 
 
 def factory_with_cleanup() -> Generator[int, None, None]:
@@ -59,17 +67,6 @@ app = Starlette(
     middleware=[Middleware(svcs.starlette.SVCSMiddleware)],
 )
 
-a: int
-b: str
-c: bool
-d: tuple
-e: object
-f: float
-g: list
-h: dict
-i: set
-j: bytes
-
 request = Request({})
 
 
@@ -78,11 +75,15 @@ class P(Protocol):
 
 
 async def func() -> None:
-    _a, _b, _c, _d, _e, _f, _g, _h, _i, _j = await svcs.starlette.aget(
+    services = await svcs.starlette.aget(
         request, int, str, bool, tuple, object, float, list, dict, set, bytes
     )
+    assert_type(
+        services,
+        tuple[int, str, bool, tuple, object, float, list, dict, set, bytes],
+    )
 
-    await svcs.starlette.aget_abstract(request, P)
+    p: P = await svcs.starlette.aget_abstract(request, P)
 
 
-con: svcs.Container = svcs.starlette.svcs_from(request)
+assert_type(svcs.starlette.svcs_from(request), svcs.Container)
