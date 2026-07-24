@@ -202,7 +202,10 @@ Dependency Injection
 Composition Root
     The place that acquires all the services your application needs and calls into the {term}`service layer`.
 
-    Common types are web framework views, CLI command entry points, or test fixtures.
+    Common types are web framework views, CLI command entry points, background task queues, or test fixtures.
+
+    Production software tends to have multiple composition roots, one for each entry point.
+    With *svcs*, you can reuse the same service management machinery across all your composition roots.
 
     We recommend using *svcs* in your composition roots to get all the services you need and then pass them into your {term}`service layer`.
 

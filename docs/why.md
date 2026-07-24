@@ -16,7 +16,7 @@ It's bound neither to request objects nor to web applications.
 
 More formally: _svcs_ is a {term}`service locator`.
 Service locators like _svcs_ allow you to configure and manage all your {term}`service`s in _one central place_, acquire them in a _consistent_ way without worrying about _cleaning them up_, and thus achieve _loose coupling_.
-That gives you a well-defined place and method for storing -- _and replacing!_ -- your application's configurable dependencies.
+That gives you a well-defined place and method for storing – _and replacing!_ – your application's configurable dependencies.
 
 :::{admonition} Terminology
 :class: tip
@@ -109,7 +109,7 @@ def cleanup():
 
 The automatic entering of context managers can be disabled on registration if you need control over when they're entered (for example, for database transaction managers).
 
-The callbacks defined as `on_registry_close` are called when you call {meth}`svcs.Registry.close()` -- for example, when your application is shutting down or after a test.
+The callbacks defined as `on_registry_close` are called when you call {meth}`svcs.Registry.close()` – for example, when your application is shutting down or after a test.
 
 Next, you can write a simple health check endpoint if you've registered health checks (called _pings_) for your services.
 This is how it could look with the shipped integrations:
@@ -145,7 +145,7 @@ In fact, most of our {doc}`integrations/index` are for async frameworks!
 ## Is this *Dependency Injection* or *Service Location*!?
 
 It can be both, depending on your perspective!
-At its core, _svcs_ is a {term}`service locator` because it locates services for you when you call `get()` -- based on your configuration.
+At its core, _svcs_ is a {term}`service locator` because it locates services for you when you call `get()` – based on your configuration.
 
 But it depends _where_ you choose to call `get()` whether you're doing _dependency injection_ or _service location_ in the classical sense.
 
@@ -156,7 +156,7 @@ It means that a piece of code doesn't instantiate its dependencies itself and is
 Therefore, if you use _svcs_ in your web view to look up a database connection and pass the database connection into your {term}`service layer`, you're doing _dependency injection_ for the arguably most important part of your application.
 You have moved your {term}`composition root` into the web view, which allows you to be more flexible with the acquisition of your services while maintaining loose coupling between your service layer and its dependencies.
 
-On the other hand, if you use _svcs_ in your service layer -- or even business logic -- to look up a database connection and use it there, you're doing _service location_.
+On the other hand, if you use _svcs_ in your service layer – or even business logic – to look up a database connection and use it there, you're doing _service location_.
 
 We strongly recommend the former over the latter because it's much easier to test and reason about.
 
@@ -178,10 +178,14 @@ Knowing where to find your services, how to acquire them, and not caring about t
 It also makes it easier to write reusable middleware because you don't have to remember where a dependency it needs is stored on the request object (or was it on the application object!?).
 With _svcs_ you just have to remember its _type_ and gain a portable API for pluggable dependencies.
 
+Importantly, the entry point to your app is usually the {term}`composition root`.
+Using *svcs* to manage your services means you can **reuse** the same service machinery across multiple entry points, which production software tends to have.
+For example: CLI, web views, and a background task queue.
+
 **Type safety.**
 Since you're asking for objects of certain types, _svcs_ can ensure that your type checker knows that the returned object is of that type.
-You can cheat, of course, by returning something else -- _svcs_ doesn't care.
-And, of course, type hints are optional -- _svcs_ is just as valuable without them.
+You can cheat, of course, by returning something else – _svcs_ doesn't care.
+And, of course, type hints are optional – _svcs_ is just as valuable without them.
 
 **Unintrusive testing through loose coupling.**
 As per Brandon's quote at the beginning of this section, monkey-patching is software bankruptcy.
@@ -189,7 +193,7 @@ Adding {term}`late binding` to your application allows you to replace your depen
 Just create your application and overwrite the service configurations before you perform your tests as necessary.
 
 **Health checks.**
-A production-grade application should be able to tell you whether it -- and all its external dependencies -- is healthy.
+A production-grade application should be able to tell you whether it – and all its external dependencies – is healthy.
 Having that exposed as a web endpoint is great for monitoring and debugging.
 Providing a health endpoint without a centralized registry of services is highly boilerplate-heavy.
 With _svcs_ you get that for free.
@@ -204,12 +208,12 @@ That's a consequence of {term}`late binding` happening _imperatively_ and the ma
 We believe the upsides of service locators outweigh the downsides and that avoiding late binding problems is easy.
 For instance, by configuring the same service in the same place for all environments.
 
-If you still prefer a dependency injection framework, check out [_incant_](https://github.com/Tinche/incant) -- a lovely package by a friend of the project.
+If you still prefer a dependency injection framework, check out [_incant_](https://github.com/Tinche/incant) – a lovely package by a friend of the project.
 
 
 ## What next?
 
-If you're still interested, learn about our [core concepts](core-concepts) first -- it's just two of them!
+If you're still interested, learn about our [core concepts](core-concepts) first – it's just two of them!
 
 Once you've understood the life cycles of registries and containers, you can look our [framework integrations](integrations/index.md) which should get you started right away.
 
