@@ -132,7 +132,7 @@ True
 'Hello World'
 ```
 
-A container lives as long as you want the instances within to live -- for example, as long as a request lives.
+A container lives as long as you want the instances within to live – for example, as long as a request lives.
 
 Our {doc}`integrations/index` offer a `svcs_from()` function to extract the container from the current environment, and a `get()` (and/or `aget()`) function that transparently gets the service from the current container for you.
 Depending on your web framework, you may have to pass the current request object as the first argument to `svcs_from()` / `get()` / `aget()`.
@@ -157,7 +157,7 @@ If a factory takes a first argument called `svcs_container` or the first argumen
 ```
 
 ::: {tip}
-It is possible to overwrite registered service factories later -- for example, for testing -- **without monkey-patching**.
+It is possible to overwrite registered service factories later – for example, for testing – **without monkey-patching**.
 This is especially interesting if you want to replace a low-level service with a mock without re-jiggering all services that depend on it.
 
 If there's a chance that the container has been used by your fixtures to acquire a service, it's possible that the service is already cached by the container.
@@ -227,7 +227,7 @@ When looking up factories in a container, the local registry takes precedence ov
 ```
 
 ::: {warning}
-Nothing is going to stop you from letting your global factories depend on local ones -- similarly to template subclassing.
+Nothing is going to stop you from letting your global factories depend on local ones – similarly to template subclassing.
 
 For example, you could define your database connection like this:
 
@@ -272,7 +272,7 @@ def middleware(request):
         return conn
 
     # Use a factory to keep the service lazy. If the view never asks for a
-    # connection, we never connect -- or set a user.
+    # connection, we never connect – or set a user.
     container.register_local_factory(ConnectionWithUserID, set_user_id)
 ```
 
@@ -321,7 +321,7 @@ Here's how a health check endpoint could look like:
 ::::
 <!-- end health checks -->
 
-Now, you can point your monitoring tool of choice -- like Prometheus's [Blackbox Exporter](https://github.com/prometheus/blackbox_exporter) or [Icinga](https://icinga.com) -- at it and you'll get alerted whenever the application is broken.
+Now, you can point your monitoring tool of choice – like Prometheus's [Blackbox Exporter](https://github.com/prometheus/blackbox_exporter) or [Icinga](https://icinga.com) – at it and you'll get alerted whenever the application is broken.
 
 
 ## Life cycle summary

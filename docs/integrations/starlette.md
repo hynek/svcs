@@ -8,7 +8,7 @@ It's a great way to get type-safety and rich life cycle management on top of Sta
 
 ## Initialization
 
-To use *svcs* with Starlette, you have to pass a [*lifespan*](https://www.starlette.io/lifespan/) -- that has been wrapped by {class}`svcs.starlette.lifespan` -- and a {class}`~svcs.starlette.SVCSMiddleware` to your application:
+To use *svcs* with Starlette, you have to pass a [*lifespan*](https://www.starlette.io/lifespan/) – that has been wrapped by {class}`svcs.starlette.lifespan` – and a {class}`~svcs.starlette.SVCSMiddleware` to your application:
 
 ```python
 from starlette.applications import Starlette

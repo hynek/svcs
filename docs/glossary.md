@@ -36,7 +36,7 @@ Dependency
 
 
 Service Layer
-    The service layer -- sometimes called the *orchestration layer* or the *use-case layer* -- is where your business logic (also known as the *domain model*) meets your {term}`service`s.
+    The service layer – sometimes called the *orchestration layer* or the *use-case layer* –  is where your business logic (also known as the *domain model*) meets your {term}`service`s.
 
     Since services can use other services, it's not a flat layer but more of a tree.
     The entry point is called from your {term}`composition root` (for example, your web framework's views) and coordinates database transactions, other services and, the domain model.
@@ -63,7 +63,7 @@ Service Layer
             unit_of_work.commit()
     ```
 
-    In this case, the `unit_of_work` and `mail_q` parameters are services that are used by the service `add_user_to_org()` and are passed -- or: *injected* -- by the {term}`composition root`.
+    In this case, the `unit_of_work` and `mail_q` parameters are services that are used by the service `add_user_to_org()` and are passed – or: *injected* – by the {term}`composition root`.
 
     The business rules are enforced by `domain_model.check_if_can_add_user_to_org()` which is a pure function working on plain domain objects and doesn't use any services.
 
@@ -91,7 +91,7 @@ Service Locator
     You ask for services explicitly at runtime instead of having them injected into your business code.
     The injection also usually requires opaque magic and meddling with your function/method definitions when using dependency injection frameworks.
 
-    The active acquisition of services by calling `get()` when you *know* for sure you're going to need them avoids the conundrum of either having to pass a factory (like a connection pool -- which also puts the onus of cleanup on you) or eagerly creating services that you never use:
+    The active acquisition of services by calling `get()` when you *know* for sure you're going to need them avoids the conundrum of either having to pass a factory (like a connection pool – which also puts the onus of cleanup on you) or eagerly creating services that you never use:
 
     % skip: next
 
@@ -109,9 +109,9 @@ Service Locator
     ```
 
     ::: {important}
-    If you use *svcs* like in the example above, you're doing {term}`dependency injection` -- and that's a Good Thing™.
+    If you use *svcs* like in the example above, you're doing {term}`dependency injection` – and that's a Good Thing™.
 
-    Obtaining the database using {meth}`svcs.Container.get()` *is* service location, but passing it into your {term}`service layer` -- without using it yourself -- makes the view a {term}`composition root` and `handle_form_data()` the entry point into your service layer.
+    Obtaining the database using {meth}`svcs.Container.get()` *is* service location, but passing it into your {term}`service layer` – without using it yourself – makes the view a {term}`composition root` and `handle_form_data()` the entry point into your service layer.
 
     You could say that you're moving your composition root into the view where it acquires services on demand as it needs them.
 
@@ -140,7 +140,7 @@ Service Locator
 
 Dependency Injection
     Dependency Injection means that the {term}`service layer` is called with all services it needs to do its job.
-    It is a fundamental technique to achieve loose coupling between your business code and the services it depends on -- and to achieve {term}`Inversion of Control`.
+    It is a fundamental technique to achieve loose coupling between your business code and the services it depends on – and to achieve {term}`Inversion of Control`.
 
     For example, in the following code, we have a function that adds a user to a database then sends them an email.
     To do that, it needs an `SmtpSender` and a `DbConnection` which it constructs.
@@ -158,7 +158,7 @@ Dependency Injection
             log.warning("Duplicate user", email=email)
     ```
 
-    To fix that, we need to take _control_ of the dependencies out of the function, and pass them in as parameters -- we _inject_ them:
+    To fix that, we need to take _control_ of the dependencies out of the function, and pass them in as parameters – we _inject_ them:
 
     ```python
     def add_user(email, smtp, db):
@@ -214,7 +214,7 @@ IoC
     See {term}`Inversion of Control`.
 
 Inversion of Control
-    Inversion of Control (IoC) describes the concept of *your* code being invoked by someone else -- usually based on some kind of configuration.
+    Inversion of Control (IoC) describes the concept of *your* code being invoked by someone else – usually based on some kind of configuration.
 
     That's why it's sometimes called the *Hollywood Principle*:
     "Don't call us, we'll call you."
@@ -238,7 +238,7 @@ Inversion of Control
 
     - [*Three Techniques for Inverting Control, in Python*](https://seddonym.me/2019/08/03/ioc-techniques/)
 
-    - [*Hoist Your I/O*](https://www.youtube.com/watch?v=PBQN62oUnN8) -- a 2015 talk by Brandon Rhodes.
+    - [*Hoist Your I/O*](https://www.youtube.com/watch?v=PBQN62oUnN8) – a 2015 talk by Brandon Rhodes.
     :::
 
 
@@ -289,9 +289,9 @@ Hexagonal Architecture
 
     - <https://web.archive.org/web/20140329201018/http://alistair.cockburn.us/Hexagonal+architecture>
 
-    - [*Functional Core, Imperative Shell*](https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell) -- a screencast by Gary Bernhardt.
+    - [*Functional Core, Imperative Shell*](https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell) – a screencast by Gary Bernhardt.
 
-    - [*The Clean Architecture in Python*](https://www.youtube.com/watch?v=DJtef410XaM) -- a 2014 talk by Brandon Rhodes.
+    - [*The Clean Architecture in Python*](https://www.youtube.com/watch?v=DJtef410XaM) – a 2014 talk by Brandon Rhodes.
 
     :::
 
