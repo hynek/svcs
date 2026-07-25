@@ -57,7 +57,7 @@ docs = [
   "fastapi",
   "flask",
   "pyramid",
-  "setuptools<82",
+  "setuptools<84",
   "starlette",
   "sqlalchemy",
 ]
@@ -71,7 +71,7 @@ optional = [
   "flask",
   "httpx2",
   "pyramid",
-  "setuptools<82",
+  "setuptools<84",
   "starlette",
 ]
 typing = [
@@ -80,7 +80,7 @@ typing = [
   "starlette",
   "aiohttp",
   "pyramid",
-  "setuptools<82",
+  "setuptools<84",
 ]
 mypy = [{ include-group = "typing" }, "mypy>=2.2"]  # TypeForms
 pyright = [{ include-group = "typing" }, "pyright"]
