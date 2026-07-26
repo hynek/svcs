@@ -11,7 +11,6 @@ Thanks to its flexibility, it's possible to integrate with any framework in thei
 aiohttp
 fastapi
 flask
-pyramid
 starlette
 ```
 

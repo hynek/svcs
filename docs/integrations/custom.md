@@ -24,4 +24,6 @@ All you need to do is:
 
 That's it!
 
-If you need inspiration, look at our integrations, like the [one for Flask](https://github.com/hynek/svcs/blob/main/src/svcs/flask.py) that is based on thread locals, the [one for Pyramid](https://github.com/hynek/svcs/blob/main/src/svcs/pyramid.py) that extracts the container from a request object, or the [one for AIOHTTP](https://github.com/hynek/svcs/blob/main/src/svcs/aiohttp.py) that is async.
+If you need inspiration, look at our integrations, like the [one for Flask](https://github.com/hynek/svcs/blob/main/src/svcs/flask.py) that is based on thread locals, the [one for Starlette](https://github.com/hynek/svcs/blob/main/src/svcs/starlette.py) that extracts the container from a request object, or the [one for AIOHTTP](https://github.com/hynek/svcs/blob/main/src/svcs/aiohttp.py) that is async.
+
+The out-of-tree [*svcs-pyramid*](https://github.com/hynek/svcs-pyramid) package is a good example for an integration that lives in its own package.

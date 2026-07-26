@@ -59,7 +59,8 @@ To a type checker, `db` has the type `Database`, `api` has the type `WebAPIClien
 `db`, `api`, and `cache` will be automatically cleaned up when the request ends – it's context managers all the way down.
 <!-- end addendum -->
 
-*svcs* comes with seamless integration for **AIOHTTP**, **FastAPI**, **Flask**, **Pyramid**, and **Starlette**.
+*svcs* comes with seamless integration for **AIOHTTP**, **FastAPI**, **Flask**, and **Starlette**.
+Even more community-supported integrations can be found in our [project wiki](https://github.com/hynek/svcs/wiki/Third%E2%80%90party-Extensions).
 
 <!-- begin typing -->
 While *svcs* also has first-class support for static typing, it is **strictly optional** and will always remain so.
@@ -68,7 +69,7 @@ It only forwards the type you have asked for to the type checker.
 If you don't use a type checker, that information is ignored without any runtime overhead.
 <!-- end typing -->
 
-Read on in [*Why?*](https://svcs.hynek.me/en/latest/why.html) or watch this short video if you're intrigued:
+Read on in [*Why?*](https://svcs.hynek.me/en/stable/why.html) or watch this short video if you're intrigued:
 
 [![Watch the video](https://img.youtube.com/vi/d1elMD9WgpA/maxresdefault.jpg)](https://youtu.be/d1elMD9WgpA)
 

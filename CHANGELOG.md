@@ -15,6 +15,17 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/26.1.0...HEAD)
 
+### Removed
+
+- The Pyramid integration.
+  Maintenance within the main package has become too much of a burden, so it is now lives in its own package called [*svcs-pyramid*](https://github.com/hynek/svcs-pyramid).
+
+  Migrating is a pure rename: install `svcs-pyramid`, then replace `import svcs` with `import svcs_pyramid` and `svcs.pyramid.foo()` with `svcs_pyramid.foo()`.
+  The registry and the container are still stored under the same keys, so nothing else changes.
+  We will try to continue its maintenance for as long as its feasible.
+
+  This is in line with our [backwards-compatibility policy](https://github.com/hynek/svcs/blob/main/.github/SECURITY.md) that has a provision for this exact case.
+
 
 ## [26.1.0](https://github.com/hynek/svcs/compare/25.1.0...26.1.0) - 2026-07-13
 

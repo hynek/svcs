@@ -187,8 +187,10 @@ jobs:
           source .venv/bin/activate
 
           python -Ic 'import svcs'
+          python -Ic 'import svcs.aiohttp'
+          python -Ic 'import svcs.fastapi'
           python -Ic 'import svcs.flask'
-          python -Ic 'import svcs.pyramid'
+          python -Ic 'import svcs.starlette'
 
   required-checks-pass:
     if: always()
