@@ -8,7 +8,7 @@ All you need to do is:
 
 - Ensure that the registry is closed when the application shuts down.
   Either by using the registry as a context manager, or by calling {meth}`~svcs.Registry.close()` or {meth}`~svcs.Registry.aclose()` on your registry instance.
-  Or by telling the user to do it themselves -- some web frameworks don't have a way to hook into the application shutdown process.
+  Or by telling the user to do it themselves – some web frameworks don't have a way to hook into the application shutdown process.
 
 - Give the user an API to access the registry instance such they can register factories on startup.
 
@@ -24,4 +24,6 @@ All you need to do is:
 
 That's it!
 
-If you need inspiration, look at our integrations, like the [one for Flask](https://github.com/hynek/svcs/blob/main/src/svcs/flask.py) that is based on thread locals, the [one for Pyramid](https://github.com/hynek/svcs/blob/main/src/svcs/pyramid.py) that extracts the container from a request object, or the [one for AIOHTTP](https://github.com/hynek/svcs/blob/main/src/svcs/aiohttp.py) that is async.
+If you need inspiration, look at our integrations, like the [one for Flask](https://github.com/hynek/svcs/blob/main/src/svcs/flask.py) that is based on thread locals, the [one for Starlette](https://github.com/hynek/svcs/blob/main/src/svcs/starlette.py) that extracts the container from a request object, or the [one for AIOHTTP](https://github.com/hynek/svcs/blob/main/src/svcs/aiohttp.py) that is async.
+
+The out-of-tree [*svcs-pyramid*](https://github.com/hynek/svcs-pyramid) package is a good example for an integration that lives in its own package.

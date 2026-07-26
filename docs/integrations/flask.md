@@ -5,7 +5,7 @@ It also installs a {meth}`flask.Flask.teardown_appcontext` handler to close the 
 
 ---
 
-_svcs_'s origin story is the frustration over the repetitiveness of the "write a `get_X` that creates an `X` and then stores it on `g` and register clean up -- for every single `X`"-[pattern](https://flask.palletsprojects.com/en/latest/patterns/sqlite3/), so let's have a quick look at its problems for motivation.
+_svcs_'s origin story is the frustration over the repetitiveness of the "write a `get_X` that creates an `X` and then stores it on `g` and register clean up – for every single `X`"-[pattern](https://flask.palletsprojects.com/en/latest/patterns/sqlite3/), so let's have a quick look at its problems for motivation.
 
 You can [skip this section](#flask-init) if you'd rather see solutions than problems.
 
@@ -35,7 +35,7 @@ def teardown_db(exception):
 Here, we have a `get_db` function that creates a database connection and stores it on {obj}`~flask.g` so that it can be reused later.
 If you ask again, it returns the same connection from `g`.
 
-At the same time, it registers a {meth}`~flask.Flask.teardown_appcontext` handler that, at the end of a request, looks at `g` for the connection and closes it -- if it finds one.
+At the same time, it registers a {meth}`~flask.Flask.teardown_appcontext` handler that, at the end of a request, looks at `g` for the connection and closes it – if it finds one.
 
 If you need to replace the database connection with a mock in tests, the canonical way is using {obj}`flask.appcontext_pushed`.
 In _pytest_ it could look like this:

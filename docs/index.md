@@ -49,17 +49,6 @@ def view():
     ...
 ```
 :::
-::: {tab-item} Pyramid
-```python
-import svcs
-
-@view_config(route_name="index")
-def view(request):
-    db, api, cache = svcs.pyramid.get(request, Database, WebAPIClient, Cache)
-
-    ...
-```
-:::
 ::: {tab-item} Starlette
 ```python
 import svcs

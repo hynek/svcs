@@ -35,18 +35,23 @@ async def func() -> None:
         reg2.register_factory(int, int)
 
         async with svcs.Container(reg2) as con2:
-            a: int
-            b: str
-            c: bool
-            d: tuple
-            e: object
-            f: float
-            g: list
-            h: dict
-            i: set
-            j: bytes
-            a, b, c, d, e, f, g, h, i, j = await con2.aget(
+            services = await con2.aget(
                 int, str, bool, tuple, object, float, list, dict, set, bytes
+            )
+            assert_type(
+                services,
+                tuple[
+                    int,
+                    str,
+                    bool,
+                    tuple,
+                    object,
+                    float,
+                    list,
+                    dict,
+                    set,
+                    bytes,
+                ],
             )
 
 
@@ -177,8 +182,22 @@ async def afn(a: str, /, b: int, *, c: bool) -> str:
     return "afn"
 
 
-assert_type(fn, Callable[[svcs.Container], str])
-assert_type(afn, Callable[[svcs.Container], Awaitable[str]])
+assert_type(fn, Callable[[svcs.Container], str])  # ty: ignore[type-assertion-failure]  -- https://github.com/astral-sh/ty/issues/3697
+assert_type(afn, Callable[[svcs.Container], Awaitable[str]])  # ty: ignore[type-assertion-failure]
+
+
+def f(
+    fn: Callable[[svcs.Container], str],
+    afn: Callable[[svcs.Container], Awaitable[str]],
+) -> None:
+    """
+    A slightly convoluted check for ty until we have a way to assert.
+    """
+
+
+f(fn, afn)
+
+
 assert_type(svcs.autowire(P), Callable[[svcs.Container], P])
 assert_type(svcs.aautowire(P), Callable[[svcs.Container], Awaitable[P]])
 
