@@ -40,11 +40,6 @@ except ImportError:
     __all__ += ["flask"]
 
 try:
-    from . import pyramid
-except ImportError:
-    __all__ += ["pyramid"]
-
-try:
     from . import starlette
 except ImportError:
     __all__ += ["starlette"]

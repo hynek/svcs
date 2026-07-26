@@ -31,7 +31,6 @@ keywords = [
   "inversion of control",
   "flask",
   "starlette",
-  "pyramid",
   "fastapi",
   "aiohttp",
 ]
@@ -56,8 +55,6 @@ docs = [
   "aiohttp",
   "fastapi",
   "flask",
-  "pyramid",
-  "setuptools<82",
   "starlette",
   "sqlalchemy",
 ]
@@ -70,8 +67,6 @@ optional = [
   "fastapi",
   "flask",
   "httpx2",
-  "pyramid",
-  "setuptools<82",
   "starlette",
 ]
 typing = [
@@ -79,8 +74,6 @@ typing = [
   "flask",
   "starlette",
   "aiohttp",
-  "pyramid",
-  "setuptools<82",
 ]
 mypy = [{ include-group = "typing" }, "mypy>=2.2"]  # TypeForms
 pyright = [{ include-group = "typing" }, "pyright"]
@@ -171,13 +164,7 @@ replacement = 'https://raw.githubusercontent.com/hynek/svcs/main/\1"'
 strict = true
 testpaths = ["tests"]
 addopts = ["-ra"]
-filterwarnings = [
-  "once::Warning",
-  # pkg_resources.declare_namespace('zope')
-  "ignore::DeprecationWarning:pkg_resources",
-  # Nothing we can do about this except hoping Pyramid releases a fix.
-  "ignore:pkg_resources is deprecated:UserWarning:pyramid.asset",
-]
+filterwarnings = ["once::Warning"]
 asyncio_default_fixture_loop_scope = "function"
 
 
@@ -187,7 +174,7 @@ parallel = true
 source = ["svcs", "tests"]
 
 [tool.coverage.paths]
-source = ["src", ".tox/3.*/**/site-packages"]
+source = ["src", ".tox/3.*-tests*/**/site-packages"]
 
 [tool.coverage.report]
 show_missing = true
@@ -218,10 +205,6 @@ enable_error_code = ["ignore-without-code"]
 disallow_any_generics = false
 
 [[tool.mypy.overrides]]
-module = "pyramid.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
 module = "tests.*"
 ignore_errors = true
 
@@ -229,20 +212,13 @@ ignore_errors = true
 module = "conftest"
 ignore_errors = true
 
-[[tool.mypy.overrides]]
-module = "health_check_pyramid"
-
-disallow_untyped_decorators = false
-
 
 [tool.pyright]
 ignore = [
   "conftest.py",
   "docs",
-  "src/svcs/pyramid.py",
   "tests",
   "typing_tests/mypy.py",
-  "typing_tests/pyramid.py",
 ]
 
 
@@ -257,19 +233,15 @@ rules.all = "ignore"
 include = [
   "conftest.py",
   "docs",
-  "src/svcs/pyramid.py",
   "tests",
-  "typing_tests/mypy.py",
-  "typing_tests/pyramid.py"
+  "typing_tests/mypy.py"
 ]
 
 
 [tool.pyrefly]
 project-includes = ["src", "typing_tests"]
 project-excludes = [
-  "src/svcs/pyramid.py",
   "typing_tests/mypy.py",
-  "typing_tests/pyramid.py",
 ]
 
 
@@ -284,6 +256,7 @@ ignore = [
   "ANN",     # Mypy is better at this
   "ARG",     # unused arguments are normal when implementing interfaces
   "COM",     # Formatter takes care of our commas
+  "CPY",     # they expect a very specific shape of a copyright notice
   "D",       # We prefer our own docstring style.
   "E501",    # leave line-length enforcement to formatter
   "FBT",     # we have one function that takes one bool; c'mon!
@@ -291,6 +264,7 @@ ignore = [
   "INP001",  # sometimes we want Python files outside of packages
   "ISC001",  # conflicts with formatter
   "PLR0913", # yes, many arguments, but most have defaults
+  "PLR0917", # some people have to write hard software
   "PYI034",  # We're not adding typing_extensions just for Self.
   "SLF001",  # private members are accessed by friendly functions
   "TC",      # TYPE_CHECKING blocks break autodocs

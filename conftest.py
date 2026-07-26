@@ -42,7 +42,7 @@ try:
 except ImportError:
     collect_ignore.extend(["docs"])
 
-for name in ["fastapi", "pyramid", "flask", "aiohttp", "starlette"]:
+for name in ["fastapi", "flask", "aiohttp", "starlette"]:
     try:
         importlib.import_module(name)
     except ImportError:  # noqa: PERF203
