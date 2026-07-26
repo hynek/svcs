@@ -25,6 +25,7 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   We will try to continue its maintenance for as long as its feasible.
 
   This is in line with our [backwards-compatibility policy](https://github.com/hynek/svcs/blob/main/.github/SECURITY.md) that has a provision for this exact case.
+  [#180](https://github.com/hynek/svcs/pull/180)
 
 
 ## [26.1.0](https://github.com/hynek/svcs/compare/25.1.0...26.1.0) - 2026-07-13
