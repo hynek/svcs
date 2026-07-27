@@ -58,8 +58,8 @@ def get_registry(app: Flask | None = None) -> Registry:
     return app.extensions[_KEY_REGISTRY]  # type: ignore[no-any-return]
 
 
-registry = cast(Registry, LocalProxy(get_registry))
-container = cast(Container, LocalProxy(svcs_from))
+registry: Registry = cast(Registry, LocalProxy(get_registry))
+container: Container = cast(Container, LocalProxy(svcs_from))
 
 FlaskAppT = TypeVar("FlaskAppT", bound=Flask)
 
