@@ -3,12 +3,19 @@ ci:
   autoupdate_schedule: monthly
 
 repos:
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.22
+  - repo: local
     hooks:
       - id: ruff-check
-        args: [--fix, --exit-non-zero-on-fix]
+        name: ruff check
+        language: python
+        entry: uv run -m ruff check --fix --exit-non-zero-on-fix
+        files: ^.*\.(py|md)$
+
       - id: ruff-format
+        name: ruff format
+        language: python
+        entry: uv run -m ruff format
+        files: ^.*\.py$
 
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.11.29
