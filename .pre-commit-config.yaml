@@ -8,13 +8,15 @@ repos:
       - id: ruff-check
         name: ruff check
         language: python
+        additional_dependencies: [uv]
         entry: uv run -m ruff check --fix --exit-non-zero-on-fix
         files: ^.*\.(py|md)$
 
       - id: ruff-format
         name: ruff format
         language: python
-        entry: uv run -m ruff format
+        additional_dependencies: [uv]
+        entry: uv run -m ruff format --exit-non-zero-on-format
         files: ^.*\.py$
 
   - repo: https://github.com/astral-sh/uv-pre-commit
