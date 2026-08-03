@@ -214,12 +214,8 @@ ignore_errors = true
 
 
 [tool.pyright]
-ignore = [
-  "conftest.py",
-  "docs",
-  "tests",
-  "typing_tests/mypy.py",
-]
+include = ["typing_tests"]
+ignore = ["typing_tests/mypy.py"]
 
 
 [tool.ty.src]
