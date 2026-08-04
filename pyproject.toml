@@ -216,15 +216,9 @@ ignore_errors = true
 
 
 [tool.pyright]
-include = ["typing_tests"]
+include = ["src", "typing_tests"]
 ignore = ["typing_tests/mypy.py"]
 
-
-[tool.ty.src]
-include = ["src", "typing_tests"]
-
-[tool.ty.rules]
-possibly-missing-attribute = "ignore"
 
 [[tool.ty.overrides]]
 rules.all = "ignore"
