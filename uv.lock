@@ -2305,6 +2305,7 @@ dev = [
     { name = "starlette" },
     { name = "sybil", version = "9.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "sybil", version = "10.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "tox" },
     { name = "tox-uv-bare" },
     { name = "ty" },
 ]
@@ -2393,6 +2394,10 @@ tests = [
     { name = "sybil", version = "9.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "sybil", version = "10.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
+tox = [
+    { name = "tox" },
+    { name = "tox-uv-bare" },
+]
 ty = [
     { name = "aiohttp" },
     { name = "fastapi" },
@@ -2433,6 +2438,7 @@ dev = [
     { name = "ruff", specifier = ">=0.16" },
     { name = "starlette" },
     { name = "sybil", specifier = ">=6" },
+    { name = "tox", specifier = ">4" },
     { name = "tox-uv-bare" },
     { name = "ty" },
 ]
@@ -2509,6 +2515,10 @@ tests = [
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "sybil", specifier = ">=6" },
+]
+tox = [
+    { name = "tox", specifier = ">4" },
+    { name = "tox-uv-bare" },
 ]
 ty = [
     { name = "aiohttp" },
