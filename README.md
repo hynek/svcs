@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <em>A Flexible Service Locator for Python.</em>
+  <em>A flexible service locator for Python</em>
 </p>
 
 <!-- end logo -->
