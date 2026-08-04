@@ -48,6 +48,7 @@ The goal is to minimize the code for acquiring pluggable services to:
 ```python
 from svcs.your_framework import svcs_from
 
+
 def view(request):
     db, api, cache = svcs_from(request).get(Database, WebAPIClient, Cache)
 ```

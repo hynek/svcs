@@ -42,6 +42,7 @@ You can either use {func}`svcs.starlette.svcs_from`:
 ```python
 from svcs.starlette import svcs_from
 
+
 async def view(request):
     db = await svcs_from(request).aget(Database)
 ```
@@ -50,6 +51,7 @@ Or you can use {func}`svcs.starlette.aget` to extract your services directly:
 
 ```python
 import svcs
+
 
 async def view(request):
     db = await svcs.starlette.aget(request, Database)
