@@ -62,9 +62,11 @@ primary_engine = create_engine(primary_url)
 secondary_engine = create_engine(secondary_url)
 tertiary_engine = create_engine(tertiary_url)
 
+
 # Clunky, but works universally:
 class PrimaryConnection(Connection):
     pass
+
 
 # Works with Mypy, ty, and Pyrefly, but NOT with Pyright:
 SecondaryConnection = NewType("SecondaryConnection", Connection)
@@ -234,12 +236,14 @@ For example, you could define your database connection like this:
 ```python
 from sqlalchemy import text
 
+
 def connect_and_set_user(svcs_container):
     user_id = svcs_container.get(User).user_id
     with engine.connect() as conn:
         conn.execute(text("SET user = :id", {"id": user_id}))
 
         yield conn
+
 
 registry.register_factory(Connection, connect_and_set_user)
 ```
@@ -263,6 +267,7 @@ registry.register_factory(Connection, engine.connect)
 
 # Create a type alias with an idiomatic name.
 type ConnectionWithUserID = Connection
+
 
 def middleware(request):
     def set_user_id(svcs_container):

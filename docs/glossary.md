@@ -123,9 +123,11 @@ Service Locator
     ```python
     from flask import request
 
+
     def view():
         if request.form.valid():
             return handle_form_data(form.data)
+
 
     def handle_form_data(data):
         svcs.flask.get(Database).do_database_stuff(data)
@@ -181,6 +183,7 @@ Dependency Injection
         View and composition root.
         """
         return do_something(svcs_from(request).get(Database))
+
 
     def do_something(db):
         """

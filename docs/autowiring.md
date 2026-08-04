@@ -115,14 +115,17 @@ Best used as a wrapper during registration:
 ```python
 from svcs import Container, Registry, autowire
 
+
 class Service:
     def __init__(self, name: str) -> None:
         self.name = name
+
 
 class Handler:
     def __init__(self, svc: Service, prefix: str = "svc:") -> None:
         self.svc = svc
         self.prefix = prefix
+
 
 registry = Registry()
 registry.register_value(Service, Service("api"))
@@ -141,13 +144,16 @@ Best used as a decorator on top of your factories:
 ```python
 from svcs import Container, Registry, autowire
 
+
 class Service:
     def __init__(self, name: str) -> None:
         self.name = name
 
+
 @autowire
 def build_label(svc: Service, suffix: int = 42) -> str:
     return f"{svc.name}{suffix}"
+
 
 registry = Registry()
 registry.register_value(Service, Service("api"))

@@ -60,6 +60,10 @@ docs = [
 ]
 docs-watch = [{ include-group = "docs" }, "watchfiles"]
 tests = ["pytest", "pytest-asyncio", "sybil>=6"]
+lint = [
+  "ruff>=0.16",
+  "prek>=0.4",
+]
 cov = [{ include-group = "tests" }, "coverage[toml]"]
 # Optional integration dependencies for tests.
 optional = [
@@ -84,10 +88,8 @@ dev = [
   { include-group = "mypy" },
   { include-group = "ty" },
   { include-group = "optional" },
-  "ruff",
-  # Lock the tox version for even better reproducibility; can't use `uv run tox`
-  # in CI though, because we delete the source code for wheel-first testing.
-  "tox-uv",
+  { include-group = "lint" },
+  "tox-uv-bare",
 ]
 
 
