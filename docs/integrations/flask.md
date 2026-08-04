@@ -18,15 +18,17 @@ You can [skip this section](#flask-init) if you'd rather see solutions than prob
 ```python
 from flask import g
 
+
 def get_db():
-    if 'db' not in g:
+    if "db" not in g:
         g.db = connect_to_database()
 
     return g.db
 
+
 @app.teardown_appcontext
 def teardown_db(exception):
-    db = g.pop('db', None)
+    db = g.pop("db", None)
 
     if db is not None:
         db.close()
@@ -44,22 +46,26 @@ In _pytest_ it could look like this:
 from contextlib import contextmanager
 from flask import appcontext_pushed
 
+
 @contextmanager
 def db_set(app, db):
     def handler(sender, **kwargs):
         g.db = db  # ← setting g.db here prevents get_db setting it itself
+
     with appcontext_pushed.connected_to(handler, app):
         yield
+
 
 class Boom:
     def __getattr__(self, name):
         """Just raise an exception when you try to use it."""
         raise RuntimeError("Boom!")
 
+
 def test_broken_db(app):
     with db_set(app, Boom()):
         c = app.test_client()
-        resp = c.get('/some-url')
+        resp = c.get("/some-url")
 
         assert 500 == resp.status_code
 ```
@@ -128,6 +134,7 @@ def create_app(config_filename):
     # If you ask for a ping, it will run `SELECT 1` on a new connection and
     # clean up the connection behind itself.
     engine = create_engine("postgresql://localhost")
+
     def connection_factory():
         with engine.connect() as conn:
             yield conn
@@ -144,12 +151,10 @@ def create_app(config_filename):
 
     # You also use svcs WITHIN factories:
     svcs.flask.register_factory(
-        app, # <---
+        app,  # <---
         AbstractRepository,
         # No cleanup, so we just return an object using a lambda
-        lambda: Repository.from_connection(
-            svcs.flask.get(Connection)
-        ),
+        lambda: Repository.from_connection(svcs.flask.get(Connection)),
     )
 
     @atexit.register
@@ -160,6 +165,7 @@ def create_app(config_filename):
         log.info("app.cleanup.start")
         svcs.flask.close_registry(app)  # calls engine.dispose()
         log.info("app.cleanup.done")
+
     ##########################################################################
 
     ...
@@ -180,8 +186,8 @@ def index() -> flask.ResponseValue:
 You can also use the {obj}`svcs.flask.container` local proxy:
 
 ```python
-
 from svcs.flask import container
+
 
 @app.get("/")
 def index() -> flask.ResponseValue:
@@ -208,6 +214,7 @@ So, if you want the connection service to return a mock `Connection`, you can do
 
 ```python
 from unittest.mock import Mock
+
 
 def test_handles_db_failure():
     """
@@ -270,6 +277,7 @@ Now you can register services in your application factory like this:
 ```python
 from your_app import services
 
+
 def init_app(app):
     app = services.init_app(app)
     services.register_factory(app, Connection, ...)
@@ -281,6 +289,7 @@ And you get them in your views like this:
 
 ```python
 from your_app import services
+
 
 @app.route("/")
 def index():

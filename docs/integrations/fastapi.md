@@ -61,7 +61,9 @@ from fastapi import Depends
 
 
 @app.get("/")
-async def index(services: Annotated[svcs.Container, Depends(svcs.fastapi.container)]):
+async def index(
+    services: Annotated[svcs.Container, Depends(svcs.fastapi.container)],
+):
     db = services.get(Database)
 ```
 

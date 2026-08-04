@@ -21,8 +21,11 @@ Release **{sub-ref}`release`**  ([What's new?](https://github.com/hynek/svcs/blo
 ```python
 import svcs
 
+
 async def view(request):
-    db, api, cache = await svcs.aiohttp.aget(request, Database, WebAPIClient, Cache)
+    db, api, cache = await svcs.aiohttp.aget(
+        request, Database, WebAPIClient, Cache
+    )
 
     ...
 ```
@@ -30,6 +33,7 @@ async def view(request):
 ::: {tab-item} FastAPI
 ```python
 import svcs
+
 
 @app.get("/")
 async def view(services: svcs.fastapi.DepContainer):
@@ -42,6 +46,7 @@ async def view(services: svcs.fastapi.DepContainer):
 ```python
 import svcs
 
+
 @app.route("/")
 def view():
     db, api, cache = svcs.flask.get(Database, WebAPIClient, Cache)
@@ -53,8 +58,11 @@ def view():
 ```python
 import svcs
 
+
 async def view(request):
-    db, api, cache = await svcs.starlette.aget(request, Database, WebAPIClient, Cache)
+    db, api, cache = await svcs.starlette.aget(
+        request, Database, WebAPIClient, Cache
+    )
 
     ...
 ```

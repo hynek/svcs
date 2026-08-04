@@ -151,8 +151,10 @@ class TestRegistry:
         registry.register_factory(Interface, Service)
 
         assert [
-            "registered factory <class 'tests.ifaces.Service'> for "
-            "service type tests.ifaces.Interface"
+            (
+                "registered factory <class 'tests.ifaces.Service'> for "
+                "service type tests.ifaces.Interface"
+            )
         ] == caplog.messages
         assert "tests.ifaces.Interface" == caplog.records[0].svcs_service_name
         assert "tests.ifaces.Service" == caplog.records[0].svcs_factory_name
