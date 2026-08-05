@@ -327,7 +327,8 @@ class TestRegisteredService:
             "takes_container=False, "
             "enter=True, "
             "has_ping=False, "
-            "suppress_context_exit=True"
+            "suppress_context_exit=True, "
+            "inheritable=True"
             ")>"
         ) == repr(rs)
 
