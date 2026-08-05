@@ -83,6 +83,7 @@ Now if you want to make a request against the `get_user` view, but want the data
 ```
 
 As you can see, we can inspect the decorated lifespan function to get the registry that got injected and you can overwrite it later.
+Alternatively, {func}`svcs.starlette.get_registry` returns the running application's registry directly, and it also accepts a {class}`starlette.testclient.TestClient`, so your tests don't need access to the application object itself.
 
 ::: {important}
 You must overwrite *after* the application has been initialized.
@@ -104,6 +105,7 @@ If you initialize the application with a lifespan and middleware as shown above,
 
 .. autoclass:: lifespan(lifespan)
 .. autoclass:: SVCSMiddleware
+.. autofunction:: get_registry
 
 .. seealso:: :ref:`fastapi-init`
 ```

@@ -8,7 +8,7 @@ import contextlib
 import inspect
 
 from collections.abc import AsyncGenerator, Callable
-from typing import Any, overload
+from typing import TYPE_CHECKING, Any, cast, overload
 
 import attrs
 
@@ -34,6 +34,15 @@ from svcs._core import (
     TypeForm,
     _ServiceType,
 )
+
+
+if TYPE_CHECKING:
+    from starlette.testclient import TestClient
+else:
+    try:
+        from starlette.testclient import TestClient
+    except (ImportError, RuntimeError):  # pragma: no cover
+        TestClient = Any
 
 
 def svcs_from(request: Request) -> svcs.Container:
@@ -87,10 +96,45 @@ class lifespan:  # noqa: N801
         else:
             cm = self._lifespan  # type: ignore[assignment]  # ty: ignore[invalid-assignment]
 
-        async with self.registry, cm(app, self.registry) as state:
-            self._state = state or {}
-            self._state[_KEY_REGISTRY] = self.registry
-            yield self._state
+        # When lifespans are composed (e.g. FastAPI's router lifespans),
+        # the first svcs lifespan wins and detaches the registry on exit.
+        owns_app_state = not hasattr(app.state, _KEY_REGISTRY)
+        if owns_app_state:
+            setattr(app.state, _KEY_REGISTRY, self.registry)
+        try:
+            async with self.registry, cm(app, self.registry) as state:
+                self._state = state or {}
+                self._state[_KEY_REGISTRY] = self.registry
+                yield self._state
+        finally:
+            if owns_app_state:
+                delattr(app.state, _KEY_REGISTRY)
+
+
+def get_registry(app: Starlette | TestClient) -> svcs.Registry:
+    """
+    Get the registry that :class:`lifespan` has attached to *app*.
+
+    The registry is attached when the application starts, so this only works
+    on a running application.
+
+    Args:
+        app:
+            A Starlette application with a *svcs*-aware lifespan, or a
+            :class:`starlette.testclient.TestClient` wrapping one.
+
+    Raises:
+        LookupError: If no registry is attached to *app*.
+
+    .. versionadded:: 26.2.0
+    """
+    try:
+        if not isinstance(app, Starlette):
+            app = cast("Starlette", app.app)
+        return getattr(app.state, _KEY_REGISTRY)  # type: ignore[no-any-return]
+    except AttributeError:
+        msg = "No svcs registry on app."
+        raise LookupError(msg) from None
 
 
 @attrs.define

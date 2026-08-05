@@ -15,6 +15,14 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/26.1.0...HEAD)
 
+### Added
+
+- FastAPI: `svcs.fastapi.get_registry()` returns the registry of a running application, either from the application object itself or from a test client wrapping it.
+  The new `svcs.fastapi.DepRegistry` dependency (based on `svcs.fastapi.registry()`) injects it into views.
+
+- Starlette: `svcs.starlette.get_registry()` returns the registry of a running application, either from the application object itself or from a test client wrapping it.
+
+
 ### Removed
 
 - The Pyramid integration.

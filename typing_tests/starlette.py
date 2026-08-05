@@ -13,6 +13,7 @@ from typing import Protocol
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.requests import Request
+from starlette.testclient import TestClient
 
 import svcs
 
@@ -87,3 +88,9 @@ async def func() -> None:
 
 
 assert_type(svcs.starlette.svcs_from(request), svcs.Container)
+
+assert_type(svcs.starlette.get_registry(app), svcs.Registry)
+
+client = TestClient(app)
+
+assert_type(svcs.starlette.get_registry(client), svcs.Registry)

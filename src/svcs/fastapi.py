@@ -8,7 +8,7 @@ import contextlib
 import inspect
 
 from collections.abc import AsyncGenerator, Callable
-from typing import Annotated, TypeAlias, cast
+from typing import TYPE_CHECKING, Annotated, Any, TypeAlias, cast
 
 import attrs
 
@@ -17,6 +17,15 @@ from fastapi import Depends, FastAPI, Request
 import svcs
 
 from svcs._core import _KEY_REGISTRY
+
+
+if TYPE_CHECKING:
+    from fastapi.testclient import TestClient
+else:
+    try:
+        from fastapi.testclient import TestClient
+    except (ImportError, RuntimeError):  # pragma: no cover
+        TestClient = Any
 
 
 AsyncGenLifespan: TypeAlias = Callable[
@@ -61,10 +70,46 @@ class lifespan:  # noqa: N801
         else:
             cm = cast(AsyncCMLifespan, self._lifespan)
 
-        async with self.registry, cm(app, self.registry) as state:
-            self._state = state or {}
-            self._state[_KEY_REGISTRY] = self.registry
-            yield self._state
+        # FastAPI enters merged lifespans app-first, but merges their
+        # states first-wins.  Mirror that precedence: only the first
+        # svcs lifespan attaches its registry and detaches it on exit.
+        owns_app_state = not hasattr(app.state, _KEY_REGISTRY)
+        if owns_app_state:
+            setattr(app.state, _KEY_REGISTRY, self.registry)
+        try:
+            async with self.registry, cm(app, self.registry) as state:
+                self._state = state or {}
+                self._state[_KEY_REGISTRY] = self.registry
+                yield self._state
+        finally:
+            if owns_app_state:
+                delattr(app.state, _KEY_REGISTRY)
+
+
+def get_registry(app: FastAPI | TestClient) -> svcs.Registry:
+    """
+    Get the registry that :class:`lifespan` has attached to *app*.
+
+    The registry is attached when the application starts, so this only works
+    on a running application.
+
+    Args:
+        app:
+            A FastAPI application with a *svcs*-aware lifespan, or a
+            :class:`fastapi.testclient.TestClient` wrapping one.
+
+    Raises:
+        LookupError: If no registry is attached to *app*.
+
+    .. versionadded:: 26.2.0
+    """
+    try:
+        if not isinstance(app, FastAPI):
+            app = cast("FastAPI", app.app)
+        return getattr(app.state, _KEY_REGISTRY)  # type: ignore[no-any-return]
+    except AttributeError:
+        msg = "No svcs registry on app."
+        raise LookupError(msg) from None
 
 
 async def container(request: Request) -> AsyncGenerator[svcs.Container, None]:
@@ -91,4 +136,31 @@ This allows you write your view like::
     @app.get("/")
     async def view(services: svcs.fastapi.DepContainer):
         ...
+"""
+
+
+async def registry(request: Request) -> svcs.Registry:
+    """
+    A FastAPI `dependency
+    <https://fastapi.tiangolo.com/tutorial/dependencies/>`_ that provides you
+    with the application's registry.
+
+    .. versionadded:: 26.2.0
+    """
+    return getattr(request.state, _KEY_REGISTRY)  # type: ignore[no-any-return]
+
+
+DepRegistry = Annotated[svcs.Registry, Depends(registry)]
+"""
+An alias for::
+
+    typing.Annotated[svcs.Registry, fastapi.Depends(svcs.fastapi.registry)]
+
+This allows you write your view like::
+
+    @app.get("/")
+    async def view(registry: svcs.fastapi.DepRegistry):
+        ...
+
+.. versionadded:: 26.2.0
 """
