@@ -14,7 +14,7 @@ FastAPI inherited the [`request.state`](https://www.starlette.io/requests/#other
 To get it there you have to instantiate your FastAPI application with a *lifespan*.
 Whatever this lifespan yields, becomes the initial request state via shallow copy.
 
-To keep track of its registry for later overwriting, *svcs* comes with the {class}`svcs.fastapi.lifespan` decorator that remembers the registry on the lifespan object (see below in testing to see it in action):
+To keep track of its registry for later overwriting, *svcs* comes with the {class}`svcs.fastapi.lifespan` decorator that remembers the registry on the lifespan object:
 
 ```python
 from fastapi import FastAPI
@@ -41,6 +41,7 @@ the [`fastapi.FastAPI`](https://fastapi.tiangolo.com/reference/fastapi/) instanc
 
 However, FastAPI merges the application lifespan state with all its routers' lifespan states into one mapping that becomes `request.state`.
 Therefore, you **can't** have per-router scoped registries.
+{func}`svcs.fastapi.get_registry` follows the same precedence and returns the same registry that the requests receive.
 :::
 
 ::: {seealso}
@@ -75,6 +76,13 @@ async def index(services: svcs.fastapi.DepContainer):
     db = services.get(Database)
 ```
 
+For the rarer case that a view needs the registry itself instead of a container, *svcs* also comes with the {func}`svcs.fastapi.registry` dependency and its alias {class}`svcs.fastapi.DepRegistry`:
+
+```python
+@app.get("/")
+async def index(registry: svcs.fastapi.DepRegistry): ...
+```
+
 (fastapi-health)=
 
 ## Health checks
@@ -99,7 +107,9 @@ Now if you want to make a request against the `get_user` view, but want the data
 ```{literalinclude} ../examples/fastapi/test_simple_fastapi_app.py
 ```
 
-As you can see, we can inspect the decorated lifespan function to get the registry that got injected and you can overwrite it later.
+As you can see, {func}`svcs.fastapi.get_registry` returns the running application's registry, so you can overwrite services on it.
+It also accepts a {class}`fastapi.testclient.TestClient`, so your tests don't need access to the application object itself.
+The registry is also accessible as `lifespan.registry` on the decorated lifespan object.
 
 ::: {important}
 You must overwrite *after* the application has been initialized.
@@ -119,6 +129,8 @@ If you initialize the application with a lifespan as shown above, and use the {f
 ```{eval-rst}
 .. autoclass:: svcs.fastapi.lifespan(lifespan)
 
+.. autofunction:: svcs.fastapi.get_registry
+
 .. seealso:: :ref:`fastapi-init`
 ```
 
@@ -129,6 +141,10 @@ If you initialize the application with a lifespan as shown above, and use the {f
 .. autofunction:: svcs.fastapi.container
 
 .. autoclass:: svcs.fastapi.DepContainer
+
+.. autofunction:: svcs.fastapi.registry
+
+.. autoclass:: svcs.fastapi.DepRegistry
 
 .. seealso:: :ref:`fastapi-get`
 ```

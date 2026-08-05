@@ -76,6 +76,7 @@ optional = [
 typing = [
   "fastapi",
   "flask",
+  "httpx2",
   "starlette",
   "aiohttp",
 ]
