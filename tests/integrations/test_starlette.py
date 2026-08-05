@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import asyncio
+import typing
 
 from contextlib import asynccontextmanager
 
@@ -137,3 +138,106 @@ async def test_get_pings(registry, container):
             ],
             "ok": ["builtins.int"],
         } == client.get("/").json()
+
+
+def test_get_registry():
+    """
+    get_registry() returns the registry that the lifespan attached to the
+    running app.
+    """
+
+    @svcs.starlette.lifespan
+    async def lifespan(app: Starlette, registry: svcs.Registry):
+        yield
+
+    app = Starlette(lifespan=lifespan)
+
+    with TestClient(app):
+        assert lifespan.registry is svcs.starlette.get_registry(app)
+
+
+def test_get_registry_type_hints():
+    """
+    get_registry()'s annotations can be resolved at runtime.
+    """
+    hints = typing.get_type_hints(svcs.starlette.get_registry)
+
+    assert Starlette | TestClient == hints["app"]
+    assert svcs.Registry is hints["return"]
+
+
+def test_get_registry_no_svcs():
+    """
+    get_registry() raises LookupError if no registry is attached.
+    """
+    with pytest.raises(LookupError, match="No svcs registry on app"):
+        svcs.starlette.get_registry(Starlette())
+
+
+def test_get_registry_test_client():
+    """
+    get_registry() accepts a test client of the app.
+    """
+
+    @svcs.starlette.lifespan
+    async def lifespan(app: Starlette, registry: svcs.Registry):
+        yield
+
+    app = Starlette(lifespan=lifespan)
+
+    with TestClient(app) as client:
+        assert lifespan.registry is svcs.starlette.get_registry(client)
+
+
+def test_get_registry_test_client_no_svcs():
+    """
+    get_registry() raises LookupError for a client of an app without svcs.
+    """
+    with pytest.raises(LookupError, match="No svcs registry on app"):
+        svcs.starlette.get_registry(TestClient(Starlette()))
+
+
+def test_get_registry_after_shutdown():
+    """
+    get_registry() raises LookupError after the app has shut down.
+    """
+
+    @svcs.starlette.lifespan
+    async def lifespan(app: Starlette, registry: svcs.Registry):
+        yield
+
+    app = Starlette(lifespan=lifespan)
+
+    with TestClient(app):
+        pass
+
+    with pytest.raises(LookupError, match="No svcs registry on app"):
+        svcs.starlette.get_registry(app)
+
+
+def test_get_registry_composed_lifespans():
+    """
+    With composed svcs lifespans, the first one wins and detaches the
+    registry on shutdown.
+    """
+
+    @svcs.starlette.lifespan
+    async def first(app: Starlette, registry: svcs.Registry):
+        yield
+
+    @svcs.starlette.lifespan
+    async def second(app: Starlette, registry: svcs.Registry):
+        yield
+
+    @asynccontextmanager
+    async def combined(app: Starlette):
+        async with first(app) as first_state, second(app) as second_state:
+            yield {**second_state, **first_state}
+
+    app = Starlette(lifespan=combined)
+
+    with TestClient(app):
+        assert first.registry is svcs.starlette.get_registry(app)
+
+    with pytest.raises(LookupError, match="No svcs registry on app"):
+        svcs.starlette.get_registry(app)

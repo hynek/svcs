@@ -2305,6 +2305,7 @@ dev = [
     { name = "starlette" },
     { name = "sybil", version = "9.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "sybil", version = "10.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "tox" },
     { name = "tox-uv-bare" },
     { name = "ty" },
 ]
@@ -2363,6 +2364,7 @@ mypy = [
     { name = "aiohttp" },
     { name = "fastapi" },
     { name = "flask" },
+    { name = "httpx2" },
     { name = "mypy" },
     { name = "starlette" },
 ]
@@ -2377,6 +2379,7 @@ pyrefly = [
     { name = "aiohttp" },
     { name = "fastapi" },
     { name = "flask" },
+    { name = "httpx2" },
     { name = "pyrefly" },
     { name = "starlette" },
 ]
@@ -2384,6 +2387,7 @@ pyright = [
     { name = "aiohttp" },
     { name = "fastapi" },
     { name = "flask" },
+    { name = "httpx2" },
     { name = "pyright" },
     { name = "starlette" },
 ]
@@ -2393,10 +2397,15 @@ tests = [
     { name = "sybil", version = "9.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "sybil", version = "10.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
+tox = [
+    { name = "tox" },
+    { name = "tox-uv-bare" },
+]
 ty = [
     { name = "aiohttp" },
     { name = "fastapi" },
     { name = "flask" },
+    { name = "httpx2" },
     { name = "starlette" },
     { name = "ty" },
 ]
@@ -2404,6 +2413,7 @@ typing = [
     { name = "aiohttp" },
     { name = "fastapi" },
     { name = "flask" },
+    { name = "httpx2" },
     { name = "starlette" },
 ]
 
@@ -2433,6 +2443,7 @@ dev = [
     { name = "ruff", specifier = ">=0.16" },
     { name = "starlette" },
     { name = "sybil", specifier = ">=6" },
+    { name = "tox", specifier = ">4" },
     { name = "tox-uv-bare" },
     { name = "ty" },
 ]
@@ -2481,6 +2492,7 @@ mypy = [
     { name = "aiohttp" },
     { name = "fastapi" },
     { name = "flask" },
+    { name = "httpx2" },
     { name = "mypy", specifier = ">=2.2" },
     { name = "starlette" },
 ]
@@ -2495,6 +2507,7 @@ pyrefly = [
     { name = "aiohttp" },
     { name = "fastapi" },
     { name = "flask" },
+    { name = "httpx2" },
     { name = "pyrefly" },
     { name = "starlette" },
 ]
@@ -2502,6 +2515,7 @@ pyright = [
     { name = "aiohttp" },
     { name = "fastapi" },
     { name = "flask" },
+    { name = "httpx2" },
     { name = "pyright" },
     { name = "starlette" },
 ]
@@ -2510,10 +2524,15 @@ tests = [
     { name = "pytest-asyncio" },
     { name = "sybil", specifier = ">=6" },
 ]
+tox = [
+    { name = "tox", specifier = ">4" },
+    { name = "tox-uv-bare" },
+]
 ty = [
     { name = "aiohttp" },
     { name = "fastapi" },
     { name = "flask" },
+    { name = "httpx2" },
     { name = "starlette" },
     { name = "ty" },
 ]
@@ -2521,6 +2540,7 @@ typing = [
     { name = "aiohttp" },
     { name = "fastapi" },
     { name = "flask" },
+    { name = "httpx2" },
     { name = "starlette" },
 ]
 

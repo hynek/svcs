@@ -76,6 +76,7 @@ optional = [
 typing = [
   "fastapi",
   "flask",
+  "httpx2",
   "starlette",
   "aiohttp",
 ]
@@ -83,13 +84,14 @@ mypy = [{ include-group = "typing" }, "mypy>=2.2"]  # TypeForms
 pyright = [{ include-group = "typing" }, "pyright"]
 ty = [{ include-group = "typing" }, "ty"]
 pyrefly = [{ include-group = "typing" }, "pyrefly"]
+tox = ["tox>4", "tox-uv-bare"]
 dev = [
   { include-group = "cov" },
   { include-group = "mypy" },
   { include-group = "ty" },
   { include-group = "optional" },
   { include-group = "lint" },
-  "tox-uv-bare",
+  { include-group = "tox" },
 ]
 
 

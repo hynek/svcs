@@ -12,6 +12,7 @@ from typing import Annotated
 
 from fastapi import Depends, FastAPI
 from fastapi.responses import JSONResponse
+from fastapi.testclient import TestClient
 
 import svcs
 
@@ -72,3 +73,17 @@ async def view2(services: svcs.fastapi.DepContainer) -> JSONResponse:
     assert_type(services.get(int), int)
 
     return JSONResponse({}, 200)
+
+
+assert_type(svcs.fastapi.get_registry(app), svcs.Registry)
+
+
+@app.get("/")
+async def view3(registry: svcs.fastapi.DepRegistry) -> JSONResponse:
+    assert_type(registry, svcs.Registry)
+
+    return JSONResponse({}, 200)
+
+
+client = TestClient(app)
+assert_type(svcs.fastapi.get_registry(client), svcs.Registry)

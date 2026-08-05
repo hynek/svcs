@@ -77,8 +77,13 @@ nitpick_ignore = [
     *[("py:class", f"T{i}") for i in range(1, 11)],
     # Welcome, MkDocs projects. :(
     ("py:class", "FastAPI"),
+    ("py:class", "fastapi.applications.FastAPI"),
     ("py:class", "Starlette"),
+    ("py:class", "starlette.applications.Starlette"),
     ("py:class", "starlette.requests.Request"),
+    ("py:class", "TestClient"),
+    ("py:class", "fastapi.testclient.TestClient"),
+    ("py:class", "starlette.testclient.TestClient"),
 ]
 
 # If true, '()' will be appended to :func: etc. cross-reference text.

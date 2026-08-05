@@ -69,7 +69,8 @@ jobs:
 
       - name: Run tests
         run: >
-          uvx --with tox-uv tox run
+          uv run --only-group tox
+          tox run
           --installpkg dist/*.whl
           -f ${PYTHON}-tests
 
@@ -84,7 +85,7 @@ jobs:
       - name: Check public API with Mypy
         if: matrix.python-version != '3.15'
         run: >
-          uvx --with tox-uv
+          uv run --only-group tox
           tox run
           --installpkg dist/*.whl
           -e ${PYTHON}-mypy
@@ -146,7 +147,7 @@ jobs:
       - uses: hynek/setup-cached-uv@34e35d30f1ebc7421a5cc733bca38dcc62603960 # v2.6.0
 
       - run: >
-          uvx --with tox-uv
+          uv run --only-group tox
           tox run -f typing
 
   docs:
@@ -162,12 +163,11 @@ jobs:
       - run: tar xf dist/*.tar.gz --strip-components=1
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          # Keep in sync with tox/docs and .readthedocs.yaml.
-          python-version: "3.14"
+          python-version-file: .python-version-default
       - uses: hynek/setup-cached-uv@34e35d30f1ebc7421a5cc733bca38dcc62603960 # v2.6.0
 
       - run: >
-          uvx --with tox-uv
+          uv run --only-group tox
           tox run -e docs-doctests
 
   lint:
@@ -184,7 +184,7 @@ jobs:
       - uses: hynek/setup-cached-uv@34e35d30f1ebc7421a5cc733bca38dcc62603960 # v2.6.0
 
       - run: >
-          uvx --with tox-uv
+          uv run --only-group tox
           tox run -f lint
 
   install-dev:
