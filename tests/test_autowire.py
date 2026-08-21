@@ -292,15 +292,16 @@ class TestAutowireFunction:
 
         assert (_service, _another_service) == container.get(tuple)
 
-    def test_autowire_resolves_forward_reference_at_call_time(
+    def test_autowire_defers_string_forward_reference(
         self, registry, container
     ):
         """
         autowire resolves annotations lazily, when the factory is first
         called.
 
-        A string annotation and other forward references don't fail at import
-        time and resolve once everything is defined.
+        A string annotation and other forward references (e.g. when using
+        future annotations) don't fail at import time and resolve once
+        everything is defined.
         """
         ns: dict[str, object] = {}
         exec(  # noqa: S102
@@ -319,8 +320,9 @@ class TestAutowireFunction:
             ns,
         )
 
-        later = ns["Later"]()
-        registry.register_value(ns["Later"], later)
+        Later = ns["Later"]  # noqa: N806
+        later = Later()
+        registry.register_value(Later, later)
         registry.register_factory(tuple, ns["make_holder"])
 
         assert ("holder", later) == container.get(tuple)
