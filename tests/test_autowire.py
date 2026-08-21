@@ -7,6 +7,7 @@ Tests for svcs.autowire() and svcs.aautowire().
 """
 
 import functools
+import sys
 import textwrap
 
 from contextlib import (
@@ -14,7 +15,7 @@ from contextlib import (
     asynccontextmanager,
     contextmanager,
 )
-from typing import Annotated, NewType
+from typing import Annotated, ForwardRef, NewType
 
 import pytest
 
@@ -325,6 +326,58 @@ class TestAutowireFunction:
         registry.register_value(Later, later)
         registry.register_factory(tuple, ns["make_holder"])
 
+        assert ("holder", later) == container.get(tuple)
+
+    @pytest.mark.skipif(
+        sys.version_info < (3, 14), reason="requires Python 3.14+"
+    )
+    def test_autowire_defers_forward_ref_object(self, registry, container):
+        """
+        autowire evaluates a ForwardRef when the factory is first called.
+
+        On Python 3.14+, annotation consumers such as attrs.define() may
+        request annotations in FORWARDREF format while referenced modules are
+        still being initialized. As a result, the generated attrs constructor
+        ends up with a ForwardRef in its signature. With circular imports,
+        whether this happens depends on import order, which depends on the
+        exact entry point. This can lead to hard to diagnose issues, e.g. tests
+        passing while the actual application fails.
+        """
+        ns: dict[str, object] = {}
+        exec(  # noqa: S102
+            textwrap.dedent(
+                """
+                def make_holder(dep) -> tuple:  # arg annotation injected below
+                    return ("holder", dep)
+                """
+            ),
+            ns,
+        )
+
+        # Inject a ForwardRef pointing to a not-yet defined class.
+        make_holder = ns["make_holder"]
+        make_holder.__annotations__["dep"] = ForwardRef(
+            "Later", owner=make_holder
+        )
+
+        # Set up autowiring; the annotation target does not yet exist.
+        registry.register_factory(tuple, autowire(make_holder))
+
+        # Finally define and register the actual class.
+        exec(  # noqa: S102
+            textwrap.dedent(
+                """
+                class Later:
+                    pass
+                """
+            ),
+            ns,
+        )
+        Later = ns["Later"]  # noqa: N806
+        later = Later()
+        registry.register_value(Later, later)
+
+        # When the factory is first called, the annotation can be resolved.
         assert ("holder", later) == container.get(tuple)
 
     def test_autowire_without_signature_raises(self, registry, container):
