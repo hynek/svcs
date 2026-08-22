@@ -15,16 +15,6 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/26.1.0...HEAD)
 
-### Added
-
-- FastAPI: `svcs.fastapi.get_registry()` returns the registry of a running application, either from the application object itself or from a test client wrapping it.
-  The new `svcs.fastapi.DepRegistry` dependency (based on `svcs.fastapi.registry()`) injects it into views.
-  [#186](https://github.com/hynek/svcs/pull/186)
-
-- Starlette: `svcs.starlette.get_registry()` returns the registry of a running application, either from the application object itself or from a test client wrapping it.
-  [#186](https://github.com/hynek/svcs/pull/186)
-
-
 ### Removed
 
 - The Pyramid integration.
@@ -36,6 +26,22 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
   This is in line with our [backwards-compatibility policy](https://github.com/hynek/svcs/blob/main/.github/SECURITY.md) that has a provision for this exact case.
   [#180](https://github.com/hynek/svcs/pull/180)
+
+
+### Added
+
+- FastAPI: `svcs.fastapi.get_registry()` returns the registry of a running application, either from the application object itself or from a test client wrapping it.
+  The new `svcs.fastapi.DepRegistry` dependency (based on `svcs.fastapi.registry()`) injects it into views.
+  [#186](https://github.com/hynek/svcs/pull/186)
+
+- Starlette: `svcs.starlette.get_registry()` returns the registry of a running application, either from the application object itself or from a test client wrapping it.
+  [#186](https://github.com/hynek/svcs/pull/186)
+
+
+### Fixed
+
+- Autowiring now evaluates Python 3.14+ `typing.ForwardRef` annotations before service lookup.
+  [#187](https://github.com/hynek/svcs/pull/187)
 
 
 ## [26.1.0](https://github.com/hynek/svcs/compare/25.1.0...26.1.0) - 2026-07-13

@@ -6,13 +6,23 @@ from __future__ import annotations
 
 import dataclasses
 import inspect
+import sys
 
 from collections.abc import Awaitable, Callable, Iterator
 from contextlib import AbstractAsyncContextManager, AbstractContextManager
-from typing import Any, TypeVar, overload
+from typing import Any, ForwardRef, TypeVar, overload
 
 from ._core import Container, _robust_signature
 from .exceptions import ServiceNotFoundError
+
+
+if sys.version_info >= (3, 14):
+    from typing import evaluate_forward_ref
+else:
+    _A = TypeVar("_A")
+
+    def evaluate_forward_ref(annotation: _A) -> _A:
+        return annotation
 
 
 _T = TypeVar("_T")
@@ -93,6 +103,9 @@ def _wireable_params(
                 f"annotation and no default."
             )
             raise TypeError(msg)
+
+        if isinstance(annotation, ForwardRef):
+            annotation = evaluate_forward_ref(annotation)
 
         yield name, param, annotation
 
