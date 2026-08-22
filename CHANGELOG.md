@@ -38,6 +38,12 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
   [#180](https://github.com/hynek/svcs/pull/180)
 
 
+## Fixed
+
+- Autowiring now evaluates Python 3.14+ `typing.ForwardRef` annotations before service lookup.
+  [#187](https://github.com/hynek/svcs/pull/187)
+
+
 ## [26.1.0](https://github.com/hynek/svcs/compare/25.1.0...26.1.0) - 2026-07-13
 
 ### Deprecated
