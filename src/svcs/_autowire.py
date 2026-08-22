@@ -19,9 +19,9 @@ from .exceptions import ServiceNotFoundError
 if sys.version_info >= (3, 14):
     from typing import evaluate_forward_ref
 else:
-    T = TypeVar("T")
+    _A = TypeVar("_A")
 
-    def evaluate_forward_ref(annotation: T) -> T:
+    def evaluate_forward_ref(annotation: _A) -> _A:
         return annotation
 
 
