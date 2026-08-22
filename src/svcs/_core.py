@@ -1022,10 +1022,7 @@ class Container:
 
             if not isinstance(svc, MagicMock) and (
                 iscoroutine(svc)
-                or isinstance(
-                    svc,
-                    AbstractAsyncContextManager,  # pyrefly: ignore[unsafe-overlap]
-                )
+                or isinstance(svc, AbstractAsyncContextManager)
             ):
                 msg = "Use `aget()` for async factories."
                 raise TypeError(msg)
