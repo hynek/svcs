@@ -20,6 +20,7 @@ from typing import Annotated, ForwardRef, NewType
 import pytest
 
 from svcs import Container, aautowire, autowire
+from svcs._autowire import evaluate_forward_ref
 from svcs.exceptions import ServiceNotFoundError
 from tests.fake_factories import (
     async_list_ignores_variadic_args_factory,
@@ -891,3 +892,15 @@ class TestAAutowireClass:
 
         with pytest.raises(ServiceNotFoundError):
             await container.aget(MyClass)
+
+
+@pytest.mark.skipif(
+    sys.version_info >= (3, 14), reason="requires pre Python 3.14"
+)
+def test_fake_evaluate_forward_ref_passthru():
+    """
+    The compat shim returns whatever comes in.
+    """
+    obj = object()
+
+    assert obj is evaluate_forward_ref(obj)

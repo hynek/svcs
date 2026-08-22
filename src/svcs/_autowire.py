@@ -18,6 +18,11 @@ from .exceptions import ServiceNotFoundError
 
 if sys.version_info >= (3, 14):
     from typing import evaluate_forward_ref
+else:
+    T = TypeVar("T")
+
+    def evaluate_forward_ref(annotation: T) -> T:
+        return annotation
 
 
 _T = TypeVar("_T")
@@ -99,7 +104,7 @@ def _wireable_params(
             )
             raise TypeError(msg)
 
-        if sys.version_info >= (3, 14) and isinstance(annotation, ForwardRef):
+        if isinstance(annotation, ForwardRef):
             annotation = evaluate_forward_ref(annotation)
 
         yield name, param, annotation
