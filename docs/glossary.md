@@ -3,7 +3,7 @@
 We are trying to make the purpose and best use of *svcs* as clear as possible, even if you're unfamiliar with all the concepts it's based on.
 As such, the glossary got slightly out of hand, but we hope it's to your advantage.
 
-If you want a more narrative introduction into the concepts, we strongly recommend reading the wonderful book [*Architecture Patterns with Python*] (you can read it for free [on the web](https://www.cosmicpython.com/book/preface.html)).
+If you want a more narrative introduction into the concepts, we strongly recommend reading the wonderful book [*Architecture Patterns with Python*] (you can read it for free [on the web](https://www.cosmicpython.com/book/preface)).
 
 :::{glossary}
 
@@ -44,7 +44,7 @@ Service Layer
     If you pass in all the services it needs, it's *{term}`dependency injection`*.
     If you look up the services *within* the service layer, it's *{term}`service location`*.
 
-    An example would be a function for adding users to organizations that takes a database [Unit of Work](https://www.cosmicpython.com/book/chapter_06_uow.html), an email notification queue, an organization ID and a user ID as parameters and queries the domain model if it's OK:
+    An example would be a function for adding users to organizations that takes a database [Unit of Work](https://www.cosmicpython.com/book/chapter_06_uow), an email notification queue, an organization ID and a user ID as parameters and queries the domain model if it's OK:
 
     ```python
     def add_user_to_org(unit_of_work, mail_q, org_id, user_id):
@@ -75,7 +75,7 @@ Service Layer
     Don't let that discourage you.
 
     ::: {seealso}
-    The fourth chapter of the wonderful [*Architecture Patterns with Python*] book called [*Flask API and Service Layer*](https://www.cosmicpython.com/book/chapter_04_service_layer.html) (you can read it for free on the web).
+    The fourth chapter of the wonderful [*Architecture Patterns with Python*] book called [*Flask API and Service Layer*](https://www.cosmicpython.com/book/chapter_04_service_layer) (you can read it for free on the web).
     :::
 
 
@@ -266,7 +266,7 @@ Dependency Inversion Principle
     ::: {seealso}
     - <https://en.wikipedia.org/wiki/Dependency_inversion_principle>
 
-    - The third chapter of the wonderful [*Architecture Patterns with Python*] book called [*On Coupling and Abstractions*](https://www.cosmicpython.com/book/chapter_03_abstractions.html) (you can read it for free on the web).
+    - The third chapter of the wonderful [*Architecture Patterns with Python*] book called [*On Coupling and Abstractions*](https://www.cosmicpython.com/book/chapter_03_abstractions) (you can read it for free on the web).
     :::
 
 
