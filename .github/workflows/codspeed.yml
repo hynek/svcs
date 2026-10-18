@@ -3,10 +3,13 @@ name: CodSpeed
 
 on:
   push:
-    branches: [main]
+    paths: &codspeed_paths
+      - src/**.py
+      - benchmarks/**
+      - .github/workflows/codspeed.yml
   pull_request:
-  # Allows CodSpeed to trigger backtest performance analysis in order to
-  # generate initial data.
+    paths: *codspeed_paths
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
