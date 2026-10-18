@@ -227,6 +227,7 @@ ignore = ["typing_tests/mypy.py"]
 rules.all = "ignore"
 include = [
   "conftest.py",
+  "benchmarks",
   "docs",
   "tests",
   "typing_tests/mypy.py"
@@ -235,9 +236,7 @@ include = [
 
 [tool.pyrefly]
 project-includes = ["src", "typing_tests"]
-project-excludes = [
-  "typing_tests/mypy.py",
-]
+project-excludes = ["typing_tests/mypy.py"]
 
 
 [tool.ruff]
