@@ -65,6 +65,7 @@ lint = [
   "prek>=0.4",
 ]
 cov = [{ include-group = "tests" }, "coverage[toml]"]
+benchmarks = [{ include-group = "tests" }, "pytest-codspeed>=5.0.3"]
 # Optional integration dependencies for tests.
 optional = [
   "aiohttp",
@@ -226,6 +227,7 @@ ignore = ["typing_tests/mypy.py"]
 rules.all = "ignore"
 include = [
   "conftest.py",
+  "benchmarks",
   "docs",
   "tests",
   "typing_tests/mypy.py"
@@ -234,9 +236,7 @@ include = [
 
 [tool.pyrefly]
 project-includes = ["src", "typing_tests"]
-project-excludes = [
-  "typing_tests/mypy.py",
-]
+project-excludes = ["typing_tests/mypy.py"]
 
 
 [tool.ruff]

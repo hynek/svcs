@@ -4,6 +4,10 @@
 
 from __future__ import annotations
 
+
+# unittest.mock is only needed by get_pings().
+__lazy_modules__ = ["unittest.mock"]
+
 import inspect
 import logging
 import sys

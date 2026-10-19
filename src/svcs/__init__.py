@@ -4,6 +4,10 @@
 
 from __future__ import annotations
 
+import sys
+
+from contextlib import suppress
+
 from . import exceptions
 from ._autowire import aautowire, autowire
 from ._core import (
@@ -24,22 +28,23 @@ __all__ = [
     "exceptions",
 ]
 
-try:
-    from . import aiohttp
-except ImportError:
-    __all__ += ["aiohttp"]
+if sys.version_info >= (3, 15):
+    # Relative imports are keyed on the package, not on the submodule.
+    __lazy_modules__ = ["svcs"]
 
-try:
-    from . import fastapi
-except ImportError:
-    __all__ += ["fastapi"]
+    from . import aiohttp as aiohttp
+    from . import fastapi as fastapi
+    from . import flask as flask
+    from . import starlette as starlette
+else:
+    with suppress(ImportError):
+        from . import aiohttp as aiohttp
 
-try:
-    from . import flask
-except ImportError:
-    __all__ += ["flask"]
+    with suppress(ImportError):
+        from . import fastapi as fastapi
 
-try:
-    from . import starlette
-except ImportError:
-    __all__ += ["starlette"]
+    with suppress(ImportError):
+        from . import flask as flask
+
+    with suppress(ImportError):
+        from . import starlette as starlette
