@@ -3,6 +3,8 @@ name: CodSpeed
 
 on:
   push:
+    # Baseline performance to compare against in PRs.
+    branches: [main]
     paths: &codspeed_paths
       - src/**.py
       - benchmarks/**
