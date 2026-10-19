@@ -15,6 +15,11 @@ You can find our backwards-compatibility policy [here](https://github.com/hynek/
 
 ## [Unreleased](https://github.com/hynek/svcs/compare/26.2.0...HEAD)
 
+### Changed
+
+- On Python 3.15 and later, *svcs* now uses [PEP 810](https://peps.python.org/pep-0810/) lazy imports.
+  Importing *svcs* no longer imports the integrations and their frameworks; they are loaded when they are first accessed.
+
 
 ## [26.2.0](https://github.com/hynek/svcs/compare/26.1.0...26.2.0) - 2026-08-24
 

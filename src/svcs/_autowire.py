@@ -4,6 +4,10 @@
 
 from __future__ import annotations
 
+
+# dataclasses is only needed to unwrap InitVars.
+__lazy_modules__ = ["dataclasses"]
+
 import dataclasses
 import inspect
 import sys
