@@ -1183,12 +1183,13 @@ class Container:
                 svc = await svc
 
                 # Factory returned a contextmanager.
-                if rs.enter and isinstance(svc, AbstractAsyncContextManager):
-                    self._on_close.append((rs, svc))
-                    svc = await svc.__aenter__()
-                elif rs.enter and isinstance(svc, AbstractContextManager):
-                    self._on_close.append((rs, svc))
-                    svc = svc.__enter__()
+                match svc:
+                    case AbstractAsyncContextManager() if rs.enter:
+                        self._on_close.append((rs, svc))
+                        svc = await svc.__aenter__()
+                    case AbstractContextManager() if rs.enter:
+                        self._on_close.append((rs, svc))
+                        svc = svc.__enter__()
 
             self._instantiated[svc_type] = (svc, rs)
 
