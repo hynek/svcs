@@ -51,7 +51,7 @@ log = logging.getLogger("svcs")
 
 def _full_name(obj: object) -> str:
     try:
-        return f"{obj.__module__}.{obj.__qualname__}"  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
+        return f"{obj.__module__}.{obj.__qualname__}"  # type: ignore[attr-defined]  # ty: ignore[missing-attribute]
     except AttributeError:
         return repr(obj)
 
