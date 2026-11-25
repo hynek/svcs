@@ -106,9 +106,8 @@ html_theme_options = {
     "top_of_page_buttons": [],
     "sidebar_hide_name": True,
     "light_css_variables": {
-        "font-stack": "Inter,sans-serif",
-        "font-stack--monospace": "BerkeleyMono, MonoLisa, ui-monospace, "
-        "SFMono-Regular, Menlo, Consolas, Liberation Mono, monospace",
+        "font-stack": "MonoLisaText,sans-serif",
+        "font-stack--monospace": "MonoLisaCode,monospace",
     },
 }
 html_logo = "_static/logo_with_name.svg"
